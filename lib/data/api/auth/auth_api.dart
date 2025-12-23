@@ -34,14 +34,22 @@ class AuthApi {
   Future<AuthResponse> signup(
     String email,
     String password,
-    String name,
+    String displayName,
   ) async {
     try {
       final AuthResponse res = await supabase.auth.signUp(
         email: email,
         password: password,
-        data: {'name': name},
+        data: {'display_name': displayName, 'full_name': displayName},
       );
+      
+      if (res.user == null) {
+        throw AppException(
+          message: 'Signup failed',
+          userMessage: 'Failed to create account. Please try again.',
+        );
+      }
+
       return res;
     } on Exception catch (e, st) {
       exceptionHandler.handle(e, st);
@@ -63,6 +71,32 @@ class AuthApi {
   Future<void> logout() async {
     try {
       await supabase.auth.signOut();
+    } on Exception catch (e, st) {
+      exceptionHandler.handle(e, st);
+    }
+  }
+
+  /// Send password reset email
+  Future<void> resetPassword(String email) async {
+    try {
+      await supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo: kIsWeb
+            ? 'http://localhost:7357/reset-password'
+            : 'myapp://reset-password',
+      );
+    } on Exception catch (e, st) {
+      exceptionHandler.handle(e, st);
+    }
+  }
+
+  /// Update password (requires current session)
+  Future<UserResponse> updatePassword(String newPassword) async {
+    try {
+      final response = await supabase.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+      return response;
     } on Exception catch (e, st) {
       exceptionHandler.handle(e, st);
     }
@@ -109,6 +143,10 @@ class AuthApi {
 
     final authState = await supabase.auth.onAuthStateChange.firstWhere(
       (state) => state.session != null,
+      orElse: () => throw AppException(
+        message: 'Auth state not received',
+        userMessage: 'Authentication failed. Please try again.',
+      ),
     );
 
     return AuthResponse(
@@ -126,7 +164,10 @@ class AuthApi {
     final idToken = googleAuth.idToken;
 
     if (idToken == null) {
-      throw AppException(message: 'No ID Token found.');
+      throw AppException(
+        message: 'No ID Token found',
+        userMessage: 'Authentication failed. Please try again.',
+      );
     }
 
     return await supabase.auth.signInWithIdToken(
