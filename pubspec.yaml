@@ -20,15 +20,19 @@ dependencies:
   google_sign_in: ^7.2.0
   google_fonts: ^6.3.3
   flutter_svg: ^2.0.19
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   riverpod_generator: ^3.0.3
-  build_runner: ^2.10.3
+  build_runner: ^2.10.4
   custom_lint: ^0.8.1
   riverpod_lint: ^3.0.3
+  freezed: ^3.2.3
+  json_serializable: ^6.11.2
 
 flutter:
   uses-material-design: true
