@@ -1,41 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:telegram_clone/core/constants/route_names.dart';
+import 'package:telegram_clone/features/splash/notifiers/splash_destination_notifier.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends ConsumerWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
-}
-
-class _SplashPageState extends State<SplashPage> {
-  @override
-  void initState() {
-    super.initState();
-    _checkAuthAndNavigate();
-  }
-
-  Future<void> _checkAuthAndNavigate() async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (!mounted) return;
-
-    // TODO: Integrate actual auth check here using Riverpod provider
-    bool isAuthenticated = false;
-
-    // ignore: dead_code
-    if (isAuthenticated) {
-      context.go(RouteNames.chats);
-    } else {
-      context.go(RouteNames.login);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    
+
+    ref.listen(splashDestinationProvider, (previous, next) {
+      next.whenData((route) {
+        if (context.mounted) {
+          context.go(route);
+        }
+      });
+    });
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(

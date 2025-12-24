@@ -8,13 +8,36 @@ import 'package:telegram_clone/features/auth/ui/pages/signup_page.dart';
 import 'package:telegram_clone/features/chats/ui/pages/chats_screen.dart';
 import 'package:telegram_clone/features/splash/ui/pages/splash_page.dart';
 
+import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
+
 part 'router.g.dart';
 
 @riverpod
 GoRouter router(Ref ref) {
+  final user = ref.watch(currentUserProvider);
+
   return GoRouter(
     initialLocation: RouteNames.splash,
     errorBuilder: (context, state) => const NotFoundScreen(),
+    redirect: (context, state) {
+      final isAuthRoute =
+          state.matchedLocation == RouteNames.login ||
+          state.matchedLocation == RouteNames.signup;
+      final isSplashRoute = state.matchedLocation == RouteNames.splash;
+
+      // Don't redirect while on splash, it has its own logic
+      if (isSplashRoute) return null;
+
+      if (user == null) {
+        // Not logged in: allow only auth routes
+        if (!isAuthRoute) return RouteNames.login;
+      } else {
+        // Logged in: redirect away from auth routes to chats
+        if (isAuthRoute) return RouteNames.chats;
+      }
+
+      return null;
+    },
     routes: [
       GoRoute(
         path: RouteNames.splash,
