@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/app/theme/theme_notifier.dart';
- 
-class ChatsScreen extends ConsumerWidget {
-  const ChatsScreen({super.key}); 
+import 'package:go_router/go_router.dart';
+import 'package:telegram_clone/core/constants/route_names.dart';
+import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
+import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
+
+class ChatsPage extends ConsumerWidget {
+  const ChatsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,12 +29,15 @@ class ChatsScreen extends ConsumerWidget {
         ],
       ),
       drawer: Drawer(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0),
+        ),
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             UserAccountsDrawerHeader(
-              accountName: const Text("User Name"),
-              accountEmail: const Text("+1 234 567 890"),
+              accountName: Text('First Name'),
+              accountEmail: Text(ref.watch(currentUserProvider)?.email ?? ''),
               currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Text(
@@ -41,19 +48,51 @@ class ChatsScreen extends ConsumerWidget {
               decoration: BoxDecoration(color: Theme.of(context).primaryColor),
             ),
             ListTile(
-              leading: const Icon(Icons.group),
+              leading: const Icon(Icons.account_circle_outlined),
+              title: const Text('My Profile'),
+              onTap: () => context.push(RouteNames.profileInfo),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.group_add_outlined),
               title: const Text('New Group'),
               onTap: () {},
             ),
             ListTile(
-              leading: const Icon(Icons.person),
+              leading: const Icon(Icons.contacts_outlined),
               title: const Text('Contacts'),
               onTap: () {},
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
+              leading: const Icon(Icons.bookmark_outline),
+              title: const Text('Saved Messages'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
               title: const Text('Settings'),
               onTap: () {},
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.person_add_outlined),
+              title: const Text('Invite Friends'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.code),
+              title: const Text('Github'),
+              onTap: () {
+                // TODO: Add repo link
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('Logout', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                ref.read(logoutCommandProvider.notifier).run();
+              },
             ),
           ],
         ),

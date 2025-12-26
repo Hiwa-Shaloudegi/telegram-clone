@@ -31,22 +31,27 @@ class AuthApi {
     return supabase.auth.onAuthStateChange;
   }
 
-  Future<AuthResponse> signup(
-    String email,
-    String password,
-    String displayName,
-  ) async {
+  Future<AuthResponse> signup(String email, String password) async {
     try {
       final AuthResponse res = await supabase.auth.signUp(
         email: email,
         password: password,
-        data: {'display_name': displayName, 'full_name': displayName},
       );
-      
+
       if (res.user == null) {
         throw AppException(
           message: 'Signup failed',
           userMessage: 'Failed to create account. Please try again.',
+        );
+      }
+
+      // If session is null, it typically means email confirmation is required
+      // or the user already exists (and confirmation is enabled).
+      if (res.session == null) {
+        throw AppException(
+          message: 'Email confirmation required',
+          userMessage:
+              'Please check your email and confirm your account before logging in.',
         );
       }
 

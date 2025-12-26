@@ -2,7 +2,7 @@ class UserModel {
   final String id;
   final String? email;
   final String? phone;
-  final String username;
+  final String? username;
   final String displayName;
   final String? bio;
   final String? profileImageUrl;
@@ -16,7 +16,7 @@ class UserModel {
     required this.id,
     this.email,
     this.phone,
-    required this.username,
+    this.username,
     required this.displayName,
     this.bio,
     this.profileImageUrl,
@@ -32,7 +32,7 @@ class UserModel {
       id: json['id'] as String,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
-      username: json['username'] as String,
+      username: json['username'] as String?,
       displayName: json['display_name'] as String,
       bio: json['bio'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
@@ -101,14 +101,16 @@ class UserModel {
       }
       return displayName[0].toUpperCase();
     }
-    return username.substring(1, 2).toUpperCase();
+    return email?.substring(0, 1).toUpperCase() ?? 'U';
   }
 
-  String get usernameWithoutAt {
-    return username.startsWith('@') ? username.substring(1) : username;
+  String? get usernameWithoutAt {
+    if (username == null) return null;
+    return username!.startsWith('@') ? username!.substring(1) : username;
   }
 
-  bool get hasProfileImage => profileImageUrl != null && profileImageUrl!.isNotEmpty;
+  bool get hasProfileImage =>
+      profileImageUrl != null && profileImageUrl!.isNotEmpty;
   bool get hasAdditionalImages => additionalImages.isNotEmpty;
   int get imageCount => (hasProfileImage ? 1 : 0) + additionalImages.length;
 }

@@ -22,9 +22,12 @@ class UserApi {
 
   UserApi({required this.supabase, required this.exceptionHandler});
 
+  String? get _currentUserId =>
+      supabase.auth.currentUser?.id ?? supabase.auth.currentSession?.user.id;
+
   Future<UserModel> getCurrentUser() async {
     try {
-      final userId = supabase.auth.currentUser?.id;
+      final userId = _currentUserId;
       if (userId == null) {
         throw AppException(
           message: 'No authenticated user',
@@ -134,7 +137,7 @@ class UserApi {
     String? username,
   }) async {
     try {
-      final userId = supabase.auth.currentUser?.id;
+      final userId = _currentUserId;
       
       if (userId == null) {
         throw AppException(
@@ -202,7 +205,7 @@ class UserApi {
 
   Future<UserModel> updateProfileImage(String imageUrl) async {
     try {
-      final userId = supabase.auth.currentUser?.id;
+      final userId = _currentUserId;
       
       if (userId == null) {
         throw AppException(
@@ -236,7 +239,7 @@ class UserApi {
 
   Future<UserModel> removeProfileImage() async {
     try {
-      final userId = supabase.auth.currentUser?.id;
+      final userId = _currentUserId;
       
       if (userId == null) {
         throw AppException(
@@ -263,7 +266,7 @@ class UserApi {
 
   Future<UserModel> addAdditionalImage(String imageUrl) async {
     try {
-      final userId = supabase.auth.currentUser?.id;
+      final userId = _currentUserId;
       
       if (userId == null) {
         throw AppException(
@@ -312,7 +315,7 @@ class UserApi {
 
   Future<UserModel> removeAdditionalImage(String imageUrl) async {
     try {
-      final userId = supabase.auth.currentUser?.id;
+      final userId = _currentUserId;
       
       if (userId == null) {
         throw AppException(
@@ -351,7 +354,7 @@ class UserApi {
 
   Future<void> deleteAccount() async {
     try {
-      final userId = supabase.auth.currentUser?.id;
+      final userId = _currentUserId;
       
       if (userId == null) {
         throw AppException(

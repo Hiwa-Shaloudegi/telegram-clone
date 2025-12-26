@@ -11,7 +11,7 @@ class SignupCommand extends _$SignupCommand {
   Future<void> run(String email, String password) async {
     state = AsyncValue.loading();
     state = await AsyncValue.guard(
-      () => ref.read(authApiProvider).signup(email, password, ''),
+      () => ref.read(authApiProvider).signup(email, password),
     );
   }
 }

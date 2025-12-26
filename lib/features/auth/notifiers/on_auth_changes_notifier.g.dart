@@ -26,7 +26,7 @@ final class OnAuthChangesProvider
         argument: null,
         retry: null,
         name: r'onAuthChangesProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -45,4 +45,4 @@ final class OnAuthChangesProvider
   }
 }
 
-String _$onAuthChangesHash() => r'89f1ea1896b80f445f6a34902d894f7433639e36';
+String _$onAuthChangesHash() => r'f11d7be18c2660f017c599011c83c21f6e9eb040';

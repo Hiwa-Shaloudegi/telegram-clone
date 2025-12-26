@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'signup_command.dart';
+part of 'complete_profile_command.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,33 +9,34 @@ part of 'signup_command.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(SignupCommand)
-const signupCommandProvider = SignupCommandProvider._();
+@ProviderFor(CompleteProfileCommand)
+const completeProfileCommandProvider = CompleteProfileCommandProvider._();
 
-final class SignupCommandProvider
-    extends $AsyncNotifierProvider<SignupCommand, void> {
-  const SignupCommandProvider._()
+final class CompleteProfileCommandProvider
+    extends $AsyncNotifierProvider<CompleteProfileCommand, void> {
+  const CompleteProfileCommandProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'signupCommandProvider',
+        name: r'completeProfileCommandProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$signupCommandHash();
+  String debugGetCreateSourceHash() => _$completeProfileCommandHash();
 
   @$internal
   @override
-  SignupCommand create() => SignupCommand();
+  CompleteProfileCommand create() => CompleteProfileCommand();
 }
 
-String _$signupCommandHash() => r'1331380ebbf188b37122df8128e7b3d1da864ec4';
+String _$completeProfileCommandHash() =>
+    r'bfa0365e9a26e2da3bed424ae979ab7f371325ec';
 
-abstract class _$SignupCommand extends $AsyncNotifier<void> {
+abstract class _$CompleteProfileCommand extends $AsyncNotifier<void> {
   FutureOr<void> build();
   @$mustCallSuper
   @override

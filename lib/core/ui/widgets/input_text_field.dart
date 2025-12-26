@@ -6,6 +6,7 @@ class InputTextField extends StatelessWidget {
   final String? hint;
   final TextInputType keyboardType;
   final bool obscureText;
+  final bool enabled;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
@@ -18,6 +19,7 @@ class InputTextField extends StatelessWidget {
     this.hint,
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
+    this.enabled = true,
     this.prefixIcon,
     this.suffixIcon,
     this.validator,
@@ -30,6 +32,7 @@ class InputTextField extends StatelessWidget {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
+      enabled: enabled,
       validator: validator,
       onChanged: onChanged,
       decoration: InputDecoration(
@@ -38,7 +41,10 @@ class InputTextField extends StatelessWidget {
         border: const OutlineInputBorder(),
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
     );
   }

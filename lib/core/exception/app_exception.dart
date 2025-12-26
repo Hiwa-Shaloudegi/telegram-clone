@@ -6,5 +6,5 @@ class AppException implements Exception {
   AppException({required this.message, this.userMessage, this.originalError});
 
   @override
-  String toString() => message;
+  String toString() => userMessage ?? message;
 }

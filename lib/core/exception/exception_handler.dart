@@ -105,6 +105,9 @@ class ExceptionHandler {
         if (error.message.contains('Password')) {
           return 'Password must be at least 6 characters long.';
         }
+        if (error.message.contains('User already registered')) {
+          return 'An account with this email already exists.';
+        }
         return 'Unable to process your request. Please check your information.';
 
       case '429':

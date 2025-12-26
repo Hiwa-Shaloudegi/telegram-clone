@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
 import 'package:telegram_clone/core/ui/widgets/input_text_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
 import 'package:telegram_clone/core/ui/widgets/secondary_button.dart';
+import 'package:telegram_clone/features/auth/notifiers/command/login_command.dart';
+import 'package:telegram_clone/features/auth/notifiers/command/login_with_google_command.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/auth_header.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/google_sign_in_button.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/or_divider.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -27,19 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
-
-  void _onLogin() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // TODO: Implement login logic
-      // For now navigate to chats
-      context.go(RouteNames.chats);
-    }
-  }
-
-  void _onGoogleLogin() {
-    // TODO: Implement Google login
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
@@ -92,14 +83,30 @@ class _LoginPageState extends State<LoginPage> {
                     
                     PrimaryButton(
                       text: 'Log In',
-                      onPressed: _onLogin,
+                      isLoading: ref.watch(loginCommandProvider).isLoading,
+                      onPressed: () {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          ref
+                              .read(loginCommandProvider.notifier)
+                              .run(
+                                _emailController.text,
+                                _passwordController.text,
+                              );
+                        }
+                      },
                     ),
                     
                     const SizedBox(height: 16),
                     const OrDivider(),
                     const SizedBox(height: 16),
                     GoogleSignInButton(
-                      onPressed: _onGoogleLogin,
+                      isLoading: ref
+                          .watch(loginWithGoogleCommandProvider)
+                          .isLoading,
+                      onPressed: () {
+                        ref.read(loginWithGoogleCommandProvider.notifier).run();
+                      },
+                      
                     ),
 
                     const Spacer(),

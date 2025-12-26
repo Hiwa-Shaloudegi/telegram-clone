@@ -20,7 +20,7 @@ final class CurrentUserProvider extends $FunctionalProvider<User?, User?, User?>
         argument: null,
         retry: null,
         name: r'currentUserProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -47,4 +47,4 @@ final class CurrentUserProvider extends $FunctionalProvider<User?, User?, User?>
   }
 }
 
-String _$currentUserHash() => r'072117cc6361fdfc6d0fcb3779b147b31041bd71';
+String _$currentUserHash() => r'd8a10cfc67b26c328a1e7fe08dbcc2e943ec87fc';
