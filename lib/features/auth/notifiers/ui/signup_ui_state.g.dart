@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'ui_state.dart';
+part of 'signup_ui_state.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,28 +9,29 @@ part of 'ui_state.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(IsPasswordObscure)
-const isPasswordObscureProvider = IsPasswordObscureProvider._();
+@ProviderFor(SignupUi_isPasswordObscure)
+const signupUi_isPasswordObscureProvider =
+    SignupUi_isPasswordObscureProvider._();
 
-final class IsPasswordObscureProvider
-    extends $NotifierProvider<IsPasswordObscure, bool> {
-  const IsPasswordObscureProvider._()
+final class SignupUi_isPasswordObscureProvider
+    extends $NotifierProvider<SignupUi_isPasswordObscure, bool> {
+  const SignupUi_isPasswordObscureProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'isPasswordObscureProvider',
+        name: r'signupUi_isPasswordObscureProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$isPasswordObscureHash();
+  String debugGetCreateSourceHash() => _$signupUi_isPasswordObscureHash();
 
   @$internal
   @override
-  IsPasswordObscure create() => IsPasswordObscure();
+  SignupUi_isPasswordObscure create() => SignupUi_isPasswordObscure();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
@@ -41,9 +42,10 @@ final class IsPasswordObscureProvider
   }
 }
 
-String _$isPasswordObscureHash() => r'd80b1fb03f8a8af71523b6c32d7c03ed242924ad';
+String _$signupUi_isPasswordObscureHash() =>
+    r'178bdeaa79bb2f1b6f295148a950eb9657dab04a';
 
-abstract class _$IsPasswordObscure extends $Notifier<bool> {
+abstract class _$SignupUi_isPasswordObscure extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override
@@ -62,28 +64,30 @@ abstract class _$IsPasswordObscure extends $Notifier<bool> {
   }
 }
 
-@ProviderFor(IsRepeatPasswordObscure)
-const isRepeatPasswordObscureProvider = IsRepeatPasswordObscureProvider._();
+@ProviderFor(SignupUi_isRepeatPasswordObscure)
+const signupUi_isRepeatPasswordObscureProvider =
+    SignupUi_isRepeatPasswordObscureProvider._();
 
-final class IsRepeatPasswordObscureProvider
-    extends $NotifierProvider<IsRepeatPasswordObscure, bool> {
-  const IsRepeatPasswordObscureProvider._()
+final class SignupUi_isRepeatPasswordObscureProvider
+    extends $NotifierProvider<SignupUi_isRepeatPasswordObscure, bool> {
+  const SignupUi_isRepeatPasswordObscureProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'isRepeatPasswordObscureProvider',
+        name: r'signupUi_isRepeatPasswordObscureProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$isRepeatPasswordObscureHash();
+  String debugGetCreateSourceHash() => _$signupUi_isRepeatPasswordObscureHash();
 
   @$internal
   @override
-  IsRepeatPasswordObscure create() => IsRepeatPasswordObscure();
+  SignupUi_isRepeatPasswordObscure create() =>
+      SignupUi_isRepeatPasswordObscure();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
@@ -94,10 +98,10 @@ final class IsRepeatPasswordObscureProvider
   }
 }
 
-String _$isRepeatPasswordObscureHash() =>
-    r'607d79afc990396d0b12fad930939a5001e7bef1';
+String _$signupUi_isRepeatPasswordObscureHash() =>
+    r'fa9240f4cdcb0e7e49ee66917f9d1f46ad980b19';
 
-abstract class _$IsRepeatPasswordObscure extends $Notifier<bool> {
+abstract class _$SignupUi_isRepeatPasswordObscure extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override

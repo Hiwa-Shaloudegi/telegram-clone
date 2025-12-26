@@ -1,9 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'ui_state.g.dart';
+part 'signup_ui_state.g.dart';
 
 @riverpod
-class IsPasswordObscure extends _$IsPasswordObscure {
+class SignupUi_isPasswordObscure extends _$SignupUi_isPasswordObscure {
   @override
   bool build() => true;
 
@@ -13,7 +13,7 @@ class IsPasswordObscure extends _$IsPasswordObscure {
 }
 
 @riverpod
-class IsRepeatPasswordObscure extends _$IsRepeatPasswordObscure {
+class SignupUi_isRepeatPasswordObscure extends _$SignupUi_isRepeatPasswordObscure {
   @override
   bool build() => true;
 

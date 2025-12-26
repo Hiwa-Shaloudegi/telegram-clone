@@ -7,7 +7,7 @@ import 'package:telegram_clone/core/ui/widgets/input_text_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
 import 'package:telegram_clone/core/ui/widgets/secondary_button.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/signup_command.dart';
-import 'package:telegram_clone/features/auth/notifiers/ui_state.dart';
+import 'package:telegram_clone/features/auth/notifiers/ui/signup_ui_state.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/auth_header.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/google_sign_in_button.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
@@ -102,15 +102,19 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     InputTextField(
                       controller: _passwordController,
                       label: 'Password',
-                      obscureText: ref.watch(isPasswordObscureProvider),
+                      obscureText: ref.watch(
+                        signupUi_isPasswordObscureProvider,
+                      ),
                       suffixIcon: IconButton(
-                        icon: ref.watch(isPasswordObscureProvider)
+                        icon: ref.watch(signupUi_isPasswordObscureProvider)
                             ? Icon(Icons.visibility_off_rounded)
                             : Icon(Icons.visibility_rounded),
                         onPressed: () {
                           ref
-                              .read(isPasswordObscureProvider.notifier)
-                              .set(!ref.read(isPasswordObscureProvider));
+                              .read(signupUi_isPasswordObscureProvider.notifier)
+                              .set(
+                                !ref.read(signupUi_isPasswordObscureProvider),
+                              );
                         },
                       ),
 
@@ -129,15 +133,25 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     InputTextField(
                       controller: _repeatPasswordController,
                       label: 'Repeat Password',
-                      obscureText: ref.watch(isRepeatPasswordObscureProvider),
+                      obscureText: ref.watch(
+                        signupUi_isRepeatPasswordObscureProvider,
+                      ),
                       suffixIcon: IconButton(
-                        icon: ref.watch(isRepeatPasswordObscureProvider)
+                        icon:
+                            ref.watch(signupUi_isRepeatPasswordObscureProvider)
                             ? Icon(Icons.visibility_off_rounded)
                             : Icon(Icons.visibility_rounded),
                         onPressed: () {
                           ref
-                              .read(isRepeatPasswordObscureProvider.notifier)
-                              .set(!ref.read(isRepeatPasswordObscureProvider));
+                              .read(
+                                signupUi_isRepeatPasswordObscureProvider
+                                    .notifier,
+                              )
+                              .set(
+                                !ref.read(
+                                  signupUi_isRepeatPasswordObscureProvider,
+                                ),
+                              );
                         },
                       ),
 

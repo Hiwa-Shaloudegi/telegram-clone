@@ -12,6 +12,7 @@ import 'package:telegram_clone/features/auth/ui/widgets/auth_header.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/google_sign_in_button.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/or_divider.dart';
+import 'package:telegram_clone/features/auth/notifiers/ui/login_ui_state.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -83,8 +84,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     InputTextField(
                       controller: _passwordController,
                       label: 'Password',
-                      obscureText: true,
+                      obscureText: ref.watch(loginUi_isPasswordObscureProvider),
                       prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: ref.watch(loginUi_isPasswordObscureProvider)
+                            ? const Icon(Icons.visibility_off_rounded)
+                            : const Icon(Icons.visibility_rounded),
+                        onPressed: () {
+                          ref
+                              .read(loginUi_isPasswordObscureProvider.notifier)
+                              .set(
+                                !ref.read(loginUi_isPasswordObscureProvider),
+                              );
+                        },
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
