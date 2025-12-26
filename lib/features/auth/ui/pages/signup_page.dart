@@ -10,6 +10,7 @@ import 'package:telegram_clone/features/auth/notifiers/command/signup_command.da
 import 'package:telegram_clone/features/auth/notifiers/ui_state.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/auth_header.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/google_sign_in_button.dart';
+import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/or_divider.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
@@ -35,9 +36,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   void _onSignup() async {
     if (_passwordController.text != _repeatPasswordController.text) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+      AppSnackbar.showError(context, 'Passwords do not match');
       return;
     }
 
@@ -63,9 +62,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
           context.go(RouteNames.profileInfo);
         },
         error: (error, stackTrace) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(error.toString())));
+          AppSnackbar.showError(context, error.toString());
         },
         loading: () {},
       );
@@ -86,6 +83,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     const AuthHeader(
                       title: 'Join Telegram',
                       subtitle: 'Create an account to start chatting',
+                      iconSize: 100,
                     ),
                     const SizedBox(height: 32),
                     InputTextField(

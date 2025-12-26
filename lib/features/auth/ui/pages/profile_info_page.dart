@@ -5,6 +5,7 @@ import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
 import 'package:telegram_clone/core/ui/widgets/input_text_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
+import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/complete_profile_command.dart';
 
 class ProfileInfoPage extends ConsumerStatefulWidget {
@@ -52,9 +53,7 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
           context.go(RouteNames.chats);
         },
         error: (error, stackTrace) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(error.toString())));
+          AppSnackbar.showError(context, error.toString());
         },
         loading: () {},
       );

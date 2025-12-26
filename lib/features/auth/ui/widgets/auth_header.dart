@@ -19,7 +19,7 @@ class AuthHeader extends StatelessWidget {
     return Column(
       children: [
         Icon(
-          Icons.telegram,
+          Icons.telegram_rounded,
           size: iconSize,
           color: theme.primaryColor,
         ),

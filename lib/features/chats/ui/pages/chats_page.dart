@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/app/theme/theme_notifier.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
+import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
 
@@ -12,6 +13,12 @@ class ChatsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
+
+    ref.listen<AsyncValue<void>>(logoutCommandProvider, (_, next) {
+      next.whenOrNull(
+        error: (error, _) => AppSnackbar.showError(context, error.toString()),
+      );
+    });
 
     return Scaffold(
       appBar: AppBar(

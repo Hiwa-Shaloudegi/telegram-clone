@@ -10,6 +10,7 @@ import 'package:telegram_clone/features/auth/notifiers/command/login_command.dar
 import 'package:telegram_clone/features/auth/notifiers/command/login_with_google_command.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/auth_header.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/google_sign_in_button.dart';
+import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/or_divider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -33,6 +34,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
  
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<void>>(loginCommandProvider, (_, next) {
+      next.whenOrNull(
+        error: (error, _) => AppSnackbar.showError(context, error.toString()),
+      );
+    });
+
+    ref.listen<AsyncValue<void>>(loginWithGoogleCommandProvider, (_, next) {
+      next.whenOrNull(
+        error: (error, _) => AppSnackbar.showError(context, error.toString()),
+      );
+    });
+
     return AppScaffold(
       body: CustomScrollView(
         slivers: [
