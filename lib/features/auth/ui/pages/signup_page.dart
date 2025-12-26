@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
 import 'package:telegram_clone/core/ui/widgets/input_text_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
 import 'package:telegram_clone/core/ui/widgets/secondary_button.dart';
+import 'package:telegram_clone/features/auth/notifiers/command/signup_command.dart';
+import 'package:telegram_clone/features/auth/notifiers/ui_state.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/auth_header.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/google_sign_in_button.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/or_divider.dart';
 
-class SignupPage extends StatefulWidget {
+class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  ConsumerState<SignupPage> createState() => _SignupPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _SignupPageState extends ConsumerState<SignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _repeatPasswordController = TextEditingController();
@@ -30,26 +33,43 @@ class _SignupPageState extends State<SignupPage> {
     super.dispose();
   }
 
-  void _onSignup() {
+  void _onSignup() async {
+    if (_passwordController.text != _repeatPasswordController.text) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+      return;
+    }
+
     if (_formKey.currentState?.validate() ?? false) {
-      if (_passwordController.text != _repeatPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passwords do not match')),
-        );
-        return;
-      }
-      // TODO: Implement signup logic
-      // Navigate to Profile Info upon success
-      context.go(RouteNames.profileInfo);
+      await ref
+          .read(signupCommandProvider.notifier)
+          .run(_emailController.text.trim(), _passwordController.text);
     }
   }
 
-  void _onGoogleSignup() {
-    // TODO: Implement Google signup
+  void _onGoogleSignup() async {
+    // TODO: Complete Google signup logic
+    //if already has an account, link instead of create new, then navigate to chats page
+    // if not, create new account and navigate to profile info page
+    //await ref.read(loginWithGoogleCommandProvider.notifier).run();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<void>>(signupCommandProvider, (_, next) {
+      next.when(
+        data: (_) {
+          context.go(RouteNames.profileInfo);
+        },
+        error: (error, stackTrace) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(error.toString())));
+        },
+        loading: () {},
+      );
+    });
     return AppScaffold(
       body: CustomScrollView(
         slivers: [
@@ -84,7 +104,18 @@ class _SignupPageState extends State<SignupPage> {
                     InputTextField(
                       controller: _passwordController,
                       label: 'Password',
-                      obscureText: true,
+                      obscureText: ref.watch(isPasswordObscureProvider),
+                      suffixIcon: IconButton(
+                        icon: ref.watch(isPasswordObscureProvider)
+                            ? Icon(Icons.visibility_off_rounded)
+                            : Icon(Icons.visibility_rounded),
+                        onPressed: () {
+                          ref
+                              .read(isPasswordObscureProvider.notifier)
+                              .set(!ref.read(isPasswordObscureProvider));
+                        },
+                      ),
+
                       prefixIcon: const Icon(Icons.lock_outline),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -100,7 +131,18 @@ class _SignupPageState extends State<SignupPage> {
                     InputTextField(
                       controller: _repeatPasswordController,
                       label: 'Repeat Password',
-                      obscureText: true,
+                      obscureText: ref.watch(isRepeatPasswordObscureProvider),
+                      suffixIcon: IconButton(
+                        icon: ref.watch(isRepeatPasswordObscureProvider)
+                            ? Icon(Icons.visibility_off_rounded)
+                            : Icon(Icons.visibility_rounded),
+                        onPressed: () {
+                          ref
+                              .read(isRepeatPasswordObscureProvider.notifier)
+                              .set(!ref.read(isRepeatPasswordObscureProvider));
+                        },
+                      ),
+
                       prefixIcon: const Icon(Icons.lock_outline),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -112,6 +154,7 @@ class _SignupPageState extends State<SignupPage> {
                     const SizedBox(height: 24),
                     PrimaryButton(
                       text: 'Sign Up',
+                      isLoading: ref.watch(signupCommandProvider).isLoading,
                       onPressed: _onSignup,
                     ),
                     const SizedBox(height: 16),
