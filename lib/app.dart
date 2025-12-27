@@ -1,9 +1,9 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/app/router/router.dart';
 import 'package:telegram_clone/app/theme/app_theme.dart';
 import 'package:telegram_clone/app/theme/theme_notifier.dart';
-
 import 'package:telegram_clone/core/ui/observers/app_lifecycle_observer.dart';
 
 class App extends ConsumerStatefulWidget {
@@ -40,6 +40,8 @@ class _AppState extends ConsumerState<App> {
       themeMode: themeMode,
       routerConfig: ref.watch(routerProvider),
       debugShowCheckedModeBanner: false,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
     );
   }
 }
