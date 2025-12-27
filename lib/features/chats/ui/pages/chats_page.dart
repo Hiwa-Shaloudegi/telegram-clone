@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:telegram_clone/core/logger/logger.dart';
 import 'package:telegram_clone/app/theme/theme_notifier.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
@@ -13,6 +14,7 @@ class ChatsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
+    final logoutState = ref.watch(logoutCommandProvider);
 
     ref.listen<AsyncValue<void>>(logoutCommandProvider, (_, next) {
       next.whenOrNull(
@@ -39,9 +41,11 @@ class ChatsPage extends ConsumerWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(0),
         ),
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Stack(
           children: [
+            ListView(
+              padding: EdgeInsets.zero,
+              children: [
             UserAccountsDrawerHeader(
               accountName: Text('First Name'),
               accountEmail: Text(ref.watch(currentUserProvider)?.email ?? ''),
@@ -97,9 +101,20 @@ class ChatsPage extends ConsumerWidget {
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Logout', style: TextStyle(color: Colors.red)),
-              onTap: () {
-                ref.read(logoutCommandProvider.notifier).run();
-              },
+                  trailing: logoutState.isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : null,
+                  onTap: logoutState.isLoading
+                      ? null
+                      : () {
+                          ref.read(logoutCommandProvider.notifier).run();
+                        },
+            ),
+          ],
             ),
           ],
         ),

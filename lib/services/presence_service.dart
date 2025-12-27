@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:telegram_clone/core/logger/logger.dart';
 import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
 import 'package:telegram_clone/services/supabase_client.dart';
 
@@ -35,20 +36,19 @@ class PresenceService extends _$PresenceService {
     _channel = supabase.channel('presence:online_users');
 
     _channel?.onPresenceSync((payload) {
-      if (kDebugMode) {
-        print('Presence synced: ${_channel?.presenceState()}');
-      }
+          ref
+              .read(loggerProvider)
+              .d('Presence synced: ${_channel?.presenceState()}');
     }).onPresenceJoin((payload) {
-      if (kDebugMode) {
-        print('User joined: ${payload.newPresences}');
-      }
+          ref.read(loggerProvider).d('User joined: ${payload.newPresences}');
     }).onPresenceLeave((payload) {
-      if (kDebugMode) {
-        print('User left: ${payload.leftPresences}');
-      }
+          ref.read(loggerProvider).d('User left: ${payload.leftPresences}');
     });
 
     _channel?.subscribe((status, [error]) async {
+      ref
+          .read(loggerProvider)
+          .d('Presence Channel Status: $status, Error: $error');
       if (status == RealtimeSubscribeStatus.subscribed) {
         await goOnline();
       }
@@ -97,7 +97,15 @@ class PresenceService extends _$PresenceService {
 
   Future<void> _updateLastSeen(String userId, {bool isOnline = true}) async {
     try {
-      await ref.read(supabaseProvider)
+      final supabase = ref.read(supabaseProvider);
+      final currentUid = supabase.auth.currentUser?.id;
+      ref
+          .read(loggerProvider)
+          .d(
+            'Updating presence for $userId (Current Auth UID: $currentUid), isOnline: $isOnline',
+          );
+
+      await supabase
           .from('user_presence')
           .upsert({
             'user_id': userId,
@@ -105,8 +113,10 @@ class PresenceService extends _$PresenceService {
             'updated_at': DateTime.now().toIso8601String(),
             'is_online': isOnline, 
           });
-    } catch (e) {
-      if (kDebugMode) print('Error updating last seen: $e');
+    } catch (e, stack) {
+      ref
+          .read(loggerProvider)
+          .e('Error updating last seen', error: e, stackTrace: stack);
     }
   }
 
