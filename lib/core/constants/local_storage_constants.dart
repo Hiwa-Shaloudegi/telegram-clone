@@ -1,4 +1,4 @@
-abstract class StorageConstants {
+abstract class LocalStorageConstants {
   // Keys
   static const themeMode = 'theme_mode';
   static const isFirstTime = 'is_first_time';
@@ -11,4 +11,3 @@ abstract class StorageConstants {
   static const boolTrue = 'true';
   static const boolFalse = 'false';
 }
-

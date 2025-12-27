@@ -1,12 +1,15 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
+import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/input_text_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
-import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/complete_profile_command.dart';
+import 'package:telegram_clone/features/auth/notifiers/ui/profile_info_ui_state.dart';
 
 class ProfileInfoPage extends ConsumerStatefulWidget {
   const ProfileInfoPage({super.key});
@@ -38,7 +41,7 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
           .read(completeProfileCommandProvider.notifier)
           .run(
             displayName: displayName,
-            // profileImage: _selectedImage,
+            profileImage: ref.read(profileInfoUi_selectedProfileImageProvider),
           );
     }
   }
@@ -69,22 +72,43 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 24),
-                  GestureDetector(
-                    onTap: () {
-                      // TODO: Pick image
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final selectedImage = ref.watch(
+                        profileInfoUi_selectedProfileImageProvider,
+                      );
+                      return GestureDetector(
+                        onTap: () async {
+                          await ref
+                              .read(
+                                profileInfoUi_selectedProfileImageProvider
+                                    .notifier,
+                              )
+                              .pickImage();
+                        },
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: theme.primaryColor.withValues(
+                            alpha: 0.1,
+                          ),
+                          backgroundImage: selectedImage != null
+                              ? (kIsWeb
+                                    ? NetworkImage(selectedImage.path)
+                                    : FileImage(File(selectedImage.path))
+                                          as ImageProvider)
+                              : null,
+                          child: selectedImage == null
+                              ? Icon(
+                                  Icons.add_a_photo,
+                                  size: 40,
+                                  color: theme.primaryColor,
+                                )
+                              : null,
+                        ),
+                      );
                     },
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: theme.primaryColor.withValues(
-                        alpha: 0.1,
-                      ),
-                      child: Icon(
-                        Icons.add_a_photo,
-                        size: 40,
-                        color: theme.primaryColor,
-                      ),
-                    ),
                   ),
+
                   const SizedBox(height: 16),
                   const Text(
                     'Profile Info',

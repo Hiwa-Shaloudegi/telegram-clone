@@ -34,7 +34,7 @@ final class CompleteProfileCommandProvider
 }
 
 String _$completeProfileCommandHash() =>
-    r'bfa0365e9a26e2da3bed424ae979ab7f371325ec';
+    r'58f39a222ba638c6eec76122dda05b3bf1fb8fca';
 
 abstract class _$CompleteProfileCommand extends $AsyncNotifier<void> {
   FutureOr<void> build();

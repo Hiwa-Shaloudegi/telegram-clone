@@ -1,6 +1,6 @@
 import 'package:native_storage/native_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:telegram_clone/core/constants/storage_constants.dart';
+import 'package:telegram_clone/core/constants/local_storage_constants.dart';
 import 'package:telegram_clone/services/native_storage.dart';
 
 part 'local_storage_service.g.dart';
@@ -17,20 +17,23 @@ class LocalStorageService {
 
   // First Time Logic
   bool isFirstTime() {
-    return _storage.read(StorageConstants.isFirstTime) != StorageConstants.boolFalse;
+    return _storage.read(LocalStorageConstants.isFirstTime) !=
+        LocalStorageConstants.boolFalse;
   }
 
   void markAsNotFirstTime() {
-    _storage.write(StorageConstants.isFirstTime, StorageConstants.boolFalse);
+    _storage.write(
+      LocalStorageConstants.isFirstTime,
+      LocalStorageConstants.boolFalse,
+    );
   }
-
 
   // Theme Logic
   void saveTheme(String theme) {
-    _storage.write(StorageConstants.themeMode, theme);
+    _storage.write(LocalStorageConstants.themeMode, theme);
   }
 
   String? getTheme() {
-    return _storage.read(StorageConstants.themeMode);
+    return _storage.read(LocalStorageConstants.themeMode);
   }
 }
