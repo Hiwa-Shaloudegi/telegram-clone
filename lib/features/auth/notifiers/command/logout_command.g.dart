@@ -33,7 +33,7 @@ final class LogoutCommandProvider
   LogoutCommand create() => LogoutCommand();
 }
 
-String _$logoutCommandHash() => r'b962d1cf63d83bdd30dc1a40be91e4df8f9f57a2';
+String _$logoutCommandHash() => r'f71c92f591d84127ae64bc4addf73d22ded8eaa2';
 
 abstract class _$LogoutCommand extends $AsyncNotifier<void> {
   FutureOr<void> build();

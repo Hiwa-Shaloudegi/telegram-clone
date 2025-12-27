@@ -4,11 +4,33 @@ import 'package:telegram_clone/app/router/router.dart';
 import 'package:telegram_clone/app/theme/app_theme.dart';
 import 'package:telegram_clone/app/theme/theme_notifier.dart';
 
-class App extends ConsumerWidget {
+import 'package:telegram_clone/core/ui/observers/app_lifecycle_observer.dart';
+
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+  late final AppLifecycleObserver _lifecycleObserver;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycleObserver = AppLifecycleObserver(ref);
+    WidgetsBinding.instance.addObserver(_lifecycleObserver);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(_lifecycleObserver);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
 
     return MaterialApp.router(

@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/api/auth/auth_api.dart';
+import 'package:telegram_clone/services/presence_service.dart';
 
 part 'logout_command.g.dart';
 
@@ -12,9 +13,10 @@ class LogoutCommand extends _$LogoutCommand {
     final link = ref.keepAlive();
 
     state = AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () => ref.read(authApiProvider).logout(),
-    );
+    state = await AsyncValue.guard(() async {
+      await ref.read(presenceServiceProvider.notifier).goOffline();
+      return ref.read(authApiProvider).logout();
+    });
     link.close();
   }
 }

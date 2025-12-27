@@ -1,3 +1,5 @@
+import 'package:telegram_clone/data/models/privacy_settings_model.dart';
+
 class UserPresenceModel {
   final String userId;
   final bool isOnline;
@@ -43,8 +45,27 @@ class UserPresenceModel {
     );
   }
 
-  String get displayStatus {
-    if (isOnline) return 'online';
+  bool get isActuallyOnline {
+    if (!isOnline) return false;
+    // Timeout Mechanism:
+    // If "last seen" was more than 5 minutes ago, we consider them offline
+    // even if the DB says "is_online: true".
+    // This handles crash/kill scenarios where the user couldn't send an "offline" signal.
+    final cutoff = DateTime.now().subtract(const Duration(minutes: 5));
+    return lastSeenAt.isAfter(cutoff);
+  }
+
+  String getDisplayStatus(PrivacySettingsModel? privacy) {
+    // 1. Privacy Check
+    if (privacy != null) {
+      if (privacy.lastSeenVisibility == 'nobody') {
+        return 'last seen recently';
+      }
+      // 'contacts' logic would go here (requires checking relationship)
+    }
+
+    // 2. Reliability Check (Timeout)
+    if (isActuallyOnline) return 'online';
     
     final now = DateTime.now();
     final difference = now.difference(lastSeenAt);
