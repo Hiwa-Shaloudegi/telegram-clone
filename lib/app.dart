@@ -5,6 +5,7 @@ import 'package:telegram_clone/app/router/router.dart';
 import 'package:telegram_clone/app/theme/app_theme.dart';
 import 'package:telegram_clone/app/theme/theme_notifier.dart';
 import 'package:telegram_clone/core/ui/observers/app_lifecycle_observer.dart';
+import 'package:telegram_clone/services/presence_service.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -32,6 +33,8 @@ class _AppState extends ConsumerState<App> {
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
+    // Initialize presence service on startup
+    ref.watch(presenceServiceProvider);
 
     return MaterialApp.router(
       title: 'Telegram',

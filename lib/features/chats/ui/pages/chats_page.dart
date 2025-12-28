@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:telegram_clone/core/logger/logger.dart';
+
 import 'package:telegram_clone/app/theme/theme_notifier.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
+import 'package:telegram_clone/features/chats/ui/widgets/chats_app_bar_title.dart';
 
 class ChatsPage extends ConsumerWidget {
   const ChatsPage({super.key});
@@ -24,7 +25,7 @@ class ChatsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Telegram'),
+        title: const ChatsAppBarTitle(),
         actions: [
           IconButton(icon: const Icon(Icons.search), onPressed: () {}),
           IconButton(
