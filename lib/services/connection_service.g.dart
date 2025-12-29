@@ -49,7 +49,7 @@ final class ConnectivityStreamProvider
 }
 
 String _$connectivityStreamHash() =>
-    r'dbd2c4ce5970f1f97dad2730821bb5ca0b99c327';
+    r'63b6e0e427b796cdff6b172cd47ea2b1a7aca8cc';
 
 @ProviderFor(channelStatusStream)
 const channelStatusStreamProvider = ChannelStatusStreamProvider._();

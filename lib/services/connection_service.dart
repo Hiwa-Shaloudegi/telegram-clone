@@ -9,8 +9,10 @@ part 'connection_service.g.dart';
 enum TelegramConnectionState { waitingForNetwork, connecting, updating, connected }
 
 @riverpod
-Stream<List<ConnectivityResult>> connectivityStream(Ref ref) {
-  return Connectivity().onConnectivityChanged;
+Stream<List<ConnectivityResult>> connectivityStream(Ref ref) async* {
+  final connectivity = Connectivity();
+  yield await connectivity.checkConnectivity();
+  yield* connectivity.onConnectivityChanged;
 }
 
 @riverpod
@@ -43,14 +45,21 @@ class IsSyncing extends _$IsSyncing {
 
 @riverpod
 TelegramConnectionState appConnectionStatus(Ref ref) {
-  final connectivity = ref.watch(connectivityStreamProvider).value;
-  final channelStatus = ref.watch(channelStatusStreamProvider).value;
+  final connectivityAsync = ref.watch(connectivityStreamProvider);
+  final channelStatusAsync = ref.watch(channelStatusStreamProvider);
   final isSyncing = ref.watch(isSyncingProvider);
 
-  if (connectivity == null || connectivity.contains(ConnectivityResult.none)) {
+  if (connectivityAsync.value == null) {
+    return TelegramConnectionState.connecting;
+  }
+
+  final connectivity = connectivityAsync.value!;
+
+  if (connectivity.contains(ConnectivityResult.none)) {
     return TelegramConnectionState.waitingForNetwork;
   }
 
+  final channelStatus = channelStatusAsync.value;
   if (channelStatus != RealtimeSubscribeStatus.subscribed) {
     return TelegramConnectionState.connecting;
   }

@@ -41,7 +41,7 @@ final class PresenceServiceProvider
   }
 }
 
-String _$presenceServiceHash() => r'b23a582d37c218f11352396487154ea13ad0dcf7';
+String _$presenceServiceHash() => r'ea099e349f34ee863f67c4c25e50a468c68656a4';
 
 abstract class _$PresenceService extends $Notifier<void> {
   void build();
