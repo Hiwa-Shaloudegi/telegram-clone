@@ -29,7 +29,7 @@ import 'package:telegram_clone/core/cache/query_cache_service.dart';
 ///   Future<UserModel> build() => buildCached();
 /// }
 /// ```
-mixin CachedQueryMixin<T> {
+mixin CacheableMixin<T> {
   /// Reference to the provider (provided by AsyncNotifier)
   Ref get ref;
 

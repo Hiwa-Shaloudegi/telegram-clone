@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:telegram_clone/core/cache/cached_query_mixin.dart';
+import 'package:telegram_clone/core/cache/cacheable_mixin.dart';
 import 'package:telegram_clone/core/constants/cache_keys.dart';
 import 'package:telegram_clone/data/api/user/user_api.dart';
 import 'package:telegram_clone/data/models/user_profile.dart';
@@ -9,7 +9,8 @@ import 'package:telegram_clone/features/auth/notifiers/on_auth_changes_notifier.
 part 'user_profile_query.g.dart';
 
 @Riverpod(keepAlive: true)
-class UserProfileQuery extends _$UserProfileQuery with CachedQueryMixin<UserProfile> {
+class UserProfileQuery extends _$UserProfileQuery
+    with CacheableMixin<UserProfile> {
   @override
   String get cacheKey => CacheKeys.currentUser;
 
