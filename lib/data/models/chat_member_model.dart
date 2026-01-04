@@ -1,4 +1,4 @@
-import 'package:telegram_clone/data/models/user_model.dart';
+import 'package:telegram_clone/data/models/user_profile.dart';
 
 class ChatMemberModel {
   final String id;
@@ -12,7 +12,7 @@ class ChatMemberModel {
   final DateTime joinedAt;
   final DateTime? leftAt;
   
-  UserModel? user;
+  UserProfile? user;
 
   ChatMemberModel({
     required this.id,
@@ -40,7 +40,7 @@ class ChatMemberModel {
       lastReadMessageId: json['last_read_message_id'] as String?,
       joinedAt: DateTime.parse(json['joined_at'] as String),
       leftAt: json['left_at'] != null ? DateTime.parse(json['left_at'] as String) : null,
-      user: json['users'] != null ? UserModel.fromJson(json['users'] as Map<String, dynamic>) : null,
+      user: json['users'] != null ? UserProfile.fromJson(json['users'] as Map<String, dynamic>) : null,
     );
   }
 
@@ -70,7 +70,7 @@ class ChatMemberModel {
     String? lastReadMessageId,
     DateTime? joinedAt,
     DateTime? leftAt,
-    UserModel? user,
+    UserProfile? user,
   }) {
     return ChatMemberModel(
       id: id ?? this.id,

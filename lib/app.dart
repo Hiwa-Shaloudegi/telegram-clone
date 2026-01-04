@@ -32,15 +32,13 @@ class _AppState extends ConsumerState<App> {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = ref.watch(themeProvider);
-    // Initialize presence service on startup
     ref.watch(presenceServiceProvider);
 
     return MaterialApp.router(
       title: 'Telegram',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode,
+      themeMode: ref.watch(themeProvider),
       routerConfig: ref.watch(routerProvider),
       debugShowCheckedModeBanner: false,
       locale: DevicePreview.locale(context),

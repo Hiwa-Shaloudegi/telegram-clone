@@ -1,4 +1,4 @@
-class UserModel {
+class UserProfile {
   final String id;
   final String? email;
   final String? phone;
@@ -12,7 +12,7 @@ class UserModel {
   final DateTime updatedAt;
   final bool isActive;
 
-  UserModel({
+  UserProfile({
     required this.id,
     this.email,
     this.phone,
@@ -27,8 +27,8 @@ class UserModel {
     this.isActive = true,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
       id: json['id'] as String,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
@@ -63,7 +63,7 @@ class UserModel {
     };
   }
 
-  UserModel copyWith({
+  UserProfile copyWith({
     String? id,
     String? email,
     String? phone,
@@ -77,7 +77,7 @@ class UserModel {
     DateTime? updatedAt,
     bool? isActive,
   }) {
-    return UserModel(
+    return UserProfile(
       id: id ?? this.id,
       email: email ?? this.email,
       phone: phone ?? this.phone,

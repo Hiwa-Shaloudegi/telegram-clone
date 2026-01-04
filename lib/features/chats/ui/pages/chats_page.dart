@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:telegram_clone/app/theme/theme_notifier.dart';
 import 'package:go_router/go_router.dart';
+import 'package:telegram_clone/app/theme/theme_notifier.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
-import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/chats_app_bar_title.dart';
+import 'package:telegram_clone/features/chats/ui/widgets/drawer_headerd.dart';
 
 class ChatsPage extends ConsumerWidget {
   const ChatsPage({super.key});
@@ -39,69 +38,62 @@ class ChatsPage extends ConsumerWidget {
         ],
       ),
       drawer: Drawer(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
         child: Stack(
           children: [
             ListView(
               padding: EdgeInsets.zero,
               children: [
-            UserAccountsDrawerHeader(
-              accountName: Text('First Name'),
-              accountEmail: Text(ref.watch(currentUserProvider)?.email ?? ''),
-              currentAccountPicture: const CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text(
-                  "U",
-                  style: TextStyle(fontSize: 24.0, color: Colors.blue),
+                AppDrawerHeader(),
+                ListTile(
+                  leading: const Icon(Icons.account_circle_outlined),
+                  title: const Text('My Profile'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(RouteNames.profile);
+                  },
                 ),
-              ),
-              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_circle_outlined),
-              title: const Text('My Profile'),
-              onTap: () => context.push(RouteNames.profileInfo),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.group_add_outlined),
-              title: const Text('New Group'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.contacts_outlined),
-              title: const Text('Contacts'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.bookmark_outline),
-              title: const Text('Saved Messages'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings_outlined),
-              title: const Text('Settings'),
-              onTap: () {},
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.person_add_outlined),
-              title: const Text('Invite Friends'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.code),
-              title: const Text('Github'),
-              onTap: () {
-                // TODO: Add repo link
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout', style: TextStyle(color: Colors.red)),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.group_add_outlined),
+                  title: const Text('New Group'),
+                  onTap: () {},
+                ),
+                ListTile(
+                  leading: const Icon(Icons.contacts_outlined),
+                  title: const Text('Contacts'),
+                  onTap: () {},
+                ),
+                ListTile(
+                  leading: const Icon(Icons.bookmark_outline),
+                  title: const Text('Saved Messages'),
+                  onTap: () {},
+                ),
+                ListTile(
+                  leading: const Icon(Icons.settings_outlined),
+                  title: const Text('Settings'),
+                  onTap: () {},
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.person_add_outlined),
+                  title: const Text('Invite Friends'),
+                  onTap: () {},
+                ),
+                ListTile(
+                  leading: const Icon(Icons.code),
+                  title: const Text('Github'),
+                  onTap: () {
+                    // TODO: Add repo link
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.logout, color: Colors.red),
+                  title: const Text(
+                    'Logout',
+                    style: TextStyle(color: Colors.red),
+                  ),
                   trailing: logoutState.isLoading
                       ? const SizedBox(
                           width: 20,
@@ -114,8 +106,8 @@ class ChatsPage extends ConsumerWidget {
                       : () {
                           ref.read(logoutCommandProvider.notifier).run();
                         },
-            ),
-          ],
+                ),
+              ],
             ),
           ],
         ),

@@ -9,6 +9,8 @@ import 'package:telegram_clone/features/auth/ui/pages/login_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/profile_info_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/signup_page.dart';
 import 'package:telegram_clone/features/chats/ui/pages/chats_page.dart';
+import 'package:telegram_clone/features/profile/ui/pages/edit_profile_page.dart';
+import 'package:telegram_clone/features/profile/ui/pages/profile_page.dart';
 import 'package:telegram_clone/features/splash/ui/pages/splash_page.dart';
 
 part 'router.g.dart';
@@ -42,9 +44,17 @@ GoRouter router(Ref ref) {
         path: RouteNames.chats,
         builder: (context, state) => const ChatsPage(),
       ),
-      GoRoute( 
+      GoRoute(
         path: RouteNames.profileInfo,
         builder: (context, state) => const ProfileInfoPage(),
+      ),
+      GoRoute(
+        path: RouteNames.profile,
+        builder: (context, state) => const ProfilePage(),
+      ),
+      GoRoute(
+        path: RouteNames.editProfile,
+        builder: (context, state) => const EditProfilePage(),
       ),
     ],
     redirect: (context, state) {

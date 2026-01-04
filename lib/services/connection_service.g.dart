@@ -191,4 +191,4 @@ final class AppConnectionStatusProvider
 }
 
 String _$appConnectionStatusHash() =>
-    r'47996902820e291c7838374a41e2873ae6067071';
+    r'e8d691b33cd3e404f21e176f30ee48cd00de51d1';

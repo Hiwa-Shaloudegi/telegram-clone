@@ -1,4 +1,4 @@
-import 'package:telegram_clone/data/models/user_model.dart';
+import 'package:telegram_clone/data/models/user_profile.dart';
 
 class TypingIndicatorModel {
   final String id;
@@ -7,7 +7,7 @@ class TypingIndicatorModel {
   final DateTime startedAt;
   final DateTime expiresAt;
   
-  UserModel? user;
+  UserProfile? user;
 
   TypingIndicatorModel({
     required this.id,
@@ -25,7 +25,7 @@ class TypingIndicatorModel {
       userId: json['user_id'] as String,
       startedAt: DateTime.parse(json['started_at'] as String),
       expiresAt: DateTime.parse(json['expires_at'] as String),
-      user: json['users'] != null ? UserModel.fromJson(json['users'] as Map<String, dynamic>) : null,
+      user: json['users'] != null ? UserProfile.fromJson(json['users'] as Map<String, dynamic>) : null,
     );
   }
 
@@ -45,7 +45,7 @@ class TypingIndicatorModel {
     String? userId,
     DateTime? startedAt,
     DateTime? expiresAt,
-    UserModel? user,
+    UserProfile? user,
   }) {
     return TypingIndicatorModel(
       id: id ?? this.id,

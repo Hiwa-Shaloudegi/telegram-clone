@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/core/exception/app_exception.dart';
 import 'package:telegram_clone/core/exception/exception_handler.dart';
 import 'package:telegram_clone/services/supabase_client.dart';
-import 'package:telegram_clone/data/models/user_model.dart';
+import 'package:telegram_clone/data/models/user_profile.dart';
 
 part 'user_api.g.dart';
 
@@ -25,7 +25,7 @@ class UserApi {
   String? get _currentUserId =>
       supabase.auth.currentUser?.id ?? supabase.auth.currentSession?.user.id;
 
-  Future<UserModel> getCurrentUser() async {
+  Future<UserProfile> getUserProfile() async {
     try {
       final userId = _currentUserId;
       if (userId == null) {
@@ -41,13 +41,13 @@ class UserApi {
           .eq('id', userId)
           .single();
 
-      return UserModel.fromJson(response);
+      return UserProfile.fromJson(response);
     } on Exception catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserModel> getUserById(String userId) async {
+  Future<UserProfile> getUserById(String userId) async {
     try {
       final response = await supabase
           .from('users')
@@ -56,13 +56,13 @@ class UserApi {
           .eq('is_active', true)
           .single();
 
-      return UserModel.fromJson(response);
+      return UserProfile.fromJson(response);
     } on Exception catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserModel?> getUserByUsername(String username) async {
+  Future<UserProfile?> getUserByUsername(String username) async {
     try {
       // Ensure username starts with @
       final formattedUsername = username.startsWith('@') ? username : '@$username';
@@ -76,13 +76,13 @@ class UserApi {
 
       if (response == null) return null;
       
-      return UserModel.fromJson(response);
+      return UserProfile.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<List<UserModel>> searchUsers(String query, {int limit = 20}) async {
+  Future<List<UserProfile>> searchUsers(String query, {int limit = 20}) async {
     try {
       if (query.trim().isEmpty) {
         return [];
@@ -98,7 +98,7 @@ class UserApi {
           .limit(limit);
 
       return (response as List)
-          .map((json) => UserModel.fromJson(json))
+          .map((json) => UserProfile.fromJson(json))
           .toList();
     } catch (e, st) {
       exceptionHandler.handle(e, st);
@@ -131,7 +131,7 @@ class UserApi {
     }
   }
 
-  Future<UserModel> updateProfile({
+  Future<UserProfile> updateProfile({
     String? displayName,
     String? bio,
     String? username,
@@ -197,13 +197,13 @@ class UserApi {
           .select()
           .single();
 
-      return UserModel.fromJson(response);
+      return UserProfile.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserModel> updateProfileImage(String imageUrl) async {
+  Future<UserProfile> updateProfileImage(String imageUrl) async {
     try {
       final userId = _currentUserId;
       
@@ -231,13 +231,13 @@ class UserApi {
           .select()
           .single();
 
-      return UserModel.fromJson(response);
+      return UserProfile.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserModel> removeProfileImage() async {
+  Future<UserProfile> removeProfileImage() async {
     try {
       final userId = _currentUserId;
       
@@ -258,13 +258,13 @@ class UserApi {
           .select()
           .single();
 
-      return UserModel.fromJson(response);
+      return UserProfile.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserModel> addAdditionalImage(String imageUrl) async {
+  Future<UserProfile> addAdditionalImage(String imageUrl) async {
     try {
       final userId = _currentUserId;
       
@@ -283,7 +283,7 @@ class UserApi {
       }
 
       // Get current user to access existing images
-      final current = await getCurrentUser();
+      final current = await getUserProfile();
       final images = List<String>.from(current.additionalImages);
 
       // Limit check (optional - can adjust max count)
@@ -307,13 +307,13 @@ class UserApi {
           .select()
           .single();
 
-      return UserModel.fromJson(response);
+      return UserProfile.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserModel> removeAdditionalImage(String imageUrl) async {
+  Future<UserProfile> removeAdditionalImage(String imageUrl) async {
     try {
       final userId = _currentUserId;
       
@@ -324,7 +324,7 @@ class UserApi {
         );
       }
 
-      final current = await getCurrentUser();
+      final current = await getUserProfile();
       final images = List<String>.from(current.additionalImages);
 
       if (!images.contains(imageUrl)) {
@@ -346,7 +346,7 @@ class UserApi {
           .select()
           .single();
 
-      return UserModel.fromJson(response);
+      return UserProfile.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
@@ -379,7 +379,7 @@ class UserApi {
     }
   }
 
-  Future<List<UserModel>> getUsersByIds(List<String> userIds) async {
+  Future<List<UserProfile>> getUsersByIds(List<String> userIds) async {
     try {
       if (userIds.isEmpty) {
         return [];
@@ -392,7 +392,7 @@ class UserApi {
           .eq('is_active', true);
 
       return (response as List)
-          .map((json) => UserModel.fromJson(json))
+          .map((json) => UserProfile.fromJson(json))
           .toList();
     } catch (e, st) {
       exceptionHandler.handle(e, st);

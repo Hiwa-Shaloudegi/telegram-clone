@@ -4,5 +4,7 @@ abstract class RouteNames {
   static const String signup = '/signup';
   static const String login = '/login';
   static const String profileInfo = '/profile-info';
+  static const String profile = '/profile';
+  static const String editProfile = '/edit-profile';
   static const String error = '/error';
 }
