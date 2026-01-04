@@ -11,6 +11,7 @@ class UserProfile {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isActive;
+  final DateTime? birthday;
 
   UserProfile({
     required this.id,
@@ -25,6 +26,7 @@ class UserProfile {
     required this.createdAt,
     required this.updatedAt,
     this.isActive = true,
+    this.birthday,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -43,6 +45,9 @@ class UserProfile {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       isActive: json['is_active'] as bool? ?? true,
+      birthday: json['birthday'] != null
+          ? DateTime.tryParse(json['birthday'] as String)
+          : null,
     );
   }
 
@@ -60,6 +65,7 @@ class UserProfile {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'is_active': isActive,
+      'birthday': birthday?.toIso8601String(),
     };
   }
 
@@ -76,6 +82,7 @@ class UserProfile {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isActive,
+    DateTime? birthday,
   }) {
     return UserProfile(
       id: id ?? this.id,
@@ -90,6 +97,7 @@ class UserProfile {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isActive: isActive ?? this.isActive,
+      birthday: birthday ?? this.birthday,
     );
   }
 

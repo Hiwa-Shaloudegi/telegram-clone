@@ -1,132 +1,117 @@
-import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/core/cache/query_cache_service.dart';
 
-/// Mixin that provides caching functionality for Riverpod queries
-/// 
-/// Usage:
+/// Mixin for implementing "Stale-While-Revalidate" caching pattern
+///
+/// **Pattern:**
+/// 1. Immediately return cached data if available (instant UI)
+/// 2. Fetch fresh data from network in background
+/// 3. Update UI and persist new data to cache
+///
+/// **Usage:**
 /// ```dart
 /// @Riverpod(keepAlive: true)
-/// class UserProfileQuery extends _$UserProfileQuery with CachedQueryMixin<UserProfile> {
+/// class CurrentUser extends _$CurrentUser with CachedQueryMixin<UserModel> {
 ///   @override
-///   String get cacheKey => 'userProfileQuery';
-///   
+///   String get cacheKey => 'current_user';
+///
 ///   @override
-///   FutureOr<UserProfile> build() async {
-///     return await buildWithCache(
-///       fetcher: () => ref.read(userApiProvider).getUserProfile(),
-///       fromJson: (json) => UserProfile.fromJson(json),
-///       toJson: (data) => data.toJson(),
-///     );
-///   }
+///   UserModel fromJson(Map<String, dynamic> json) => UserModel.fromJson(json);
+///
+///   @override
+///   Map<String, dynamic> toJson(UserModel data) => data.toJson();
+///
+///   @override
+///   Future<UserModel> fetchFromNetwork() => api.getUser();
+///
+///   @override
+///   Future<UserModel> build() => buildCached();
 /// }
 /// ```
 mixin CachedQueryMixin<T> {
-  /// The cache key for this query (should be unique per query)
-  /// Override this in your query class
-  String get cacheKey;
-  
-  /// Reference to the provider (must be provided by the implementing class)
+  /// Reference to the provider (provided by AsyncNotifier)
   Ref get ref;
-  
-  /// State setter (must be provided by the implementing class)
-  set state(AsyncValue<T> value);
 
-  /// Builds the query with caching support
-  /// 
-  /// [fetcher] - The function that fetches fresh data from the network
-  /// [fromJson] - Function to deserialize cached JSON to your data type
-  /// [toJson] - Function to serialize your data type to JSON
-  Future<T> buildWithCache({
-    required Future<T> Function() fetcher,
-    required T Function(Map<String, dynamic>) fromJson,
-    required Map<String, dynamic> Function(T) toJson,
-  }) async {
-    final cacheService = ref.read(queryCacheServiceProvider);
-    
-    // Try to load from cache first
-    final cachedData = await cacheService.getCache<T>(cacheKey, fromJson);
-    
-    // If cache exists, emit it immediately and then fetch fresh data
-    if (cachedData != null) {
-      // Set the cached data as the initial state
-      // This will be updated when fresh data arrives
-      state = AsyncValue.data(cachedData);
-      
-      // Fetch fresh data in the background (don't await)
-      unawaited(_fetchAndUpdateCache(
-        fetcher: fetcher,
-        toJson: toJson,
-        cacheService: cacheService,
-      ));
-      
-      return cachedData;
+  /// Current state (provided by AsyncNotifier)
+  AsyncValue<T> get state;
+  set state(AsyncValue<T> newState);
+
+  /// Unique key for caching this query's data
+  String get cacheKey;
+
+  /// Duration before cached data is considered stale
+  /// Even distinct from stale data, we always try to fetch fresh
+  Duration get staleDuration => const Duration(minutes: 5);
+
+  /// Helper to access cache service
+  QueryCacheService get _cacheService => ref.read(queryCacheServiceProvider);
+
+  /// Transform JSON to Data
+  T fromJson(Map<String, dynamic> json);
+
+  /// Transform Data to JSON
+  Map<String, dynamic> toJson(T data);
+
+  /// Fetch fresh data from network mechanism
+  Future<T> fetchFromNetwork();
+
+  /// Call this in your [build()] method to enable caching behavior
+  Future<T> buildCached() async {
+    // 1. Try to load from cache first
+    final cached = _cacheService.get(cacheKey, fromJson);
+
+    // If we have cache, we can return it immediately
+    if (cached != null) {
+      // If it's stale or we just want fresh data, trigger a background refresh
+      // We assume we always want fresh data in this pattern
+      _fetchAndCacheBackground();
+
+      return cached.data;
     }
-    
-    // No cache exists, fetch fresh data
+
+    // 2. If no cache, perform normal network fetch
+    final freshData = await fetchFromNetwork();
+
+    // 3. Cache the new data
+    _cacheService.set(cacheKey, freshData, toJson);
+
+    return freshData;
+  }
+
+  /// Fetch fresh data in the background and update state
+  Future<void> _fetchAndCacheBackground() async {
     try {
-      final freshData = await fetcher();
-      
-      // Cache the fresh data
-      await cacheService.setCache(cacheKey, toJson(freshData));
-      
-      return freshData;
+      final freshData = await fetchFromNetwork();
+
+      // Update cache
+      _cacheService.set(cacheKey, freshData, toJson);
+
+      // Update state if mounted
+      state = AsyncData(freshData);
     } catch (e) {
-      // If we have cached data, return it even if fresh fetch fails
-      // Note: cachedData is null here since we're in the else branch
-      // Re-throw the error since there's no cache to fall back to
-      rethrow;
+      // If background refresh fails:
+      // - If we have cached data displayed, usually we don't disrupt the user with a full error screen
+      // - You could choose to show a snackbar or silent failure
+      // - Current default: keep showing cached data, maybe log error
+      // Note: State remains AsyncData(cached)
     }
   }
 
-  /// Fetches fresh data and updates both state and cache
-  Future<void> _fetchAndUpdateCache({
-    required Future<T> Function() fetcher,
-    required Map<String, dynamic> Function(T) toJson,
-    required QueryCacheService cacheService,
-  }) async {
+  /// Force refresh (bypass cache and reload)
+  Future<void> refresh() async {
+    state = const AsyncLoading();
     try {
-      final freshData = await fetcher();
-      
-      // Update state with fresh data
-      state = AsyncValue.data(freshData);
-      
-      // Update cache with fresh data
-      await cacheService.setCache(cacheKey, toJson(freshData));
-    } catch (e) {
-      // If fetch fails, keep the cached data (already set in state)
-      // Optionally, you could emit an error here if you want to show
-      // that the data might be stale
+      final freshData = await fetchFromNetwork();
+      _cacheService.set(cacheKey, freshData, toJson);
+      state = AsyncData(freshData);
+    } catch (e, st) {
+      state = AsyncError(e, st);
     }
   }
 
-  /// Manually refresh the data (useful for pull-to-refresh)
-  Future<void> refreshData({
-    required Future<T> Function() fetcher,
-    required Map<String, dynamic> Function(T) toJson,
-  }) async {
-    final cacheService = ref.read(queryCacheServiceProvider);
-    
-    state = const AsyncValue.loading();
-    
-    try {
-      final freshData = await fetcher();
-      state = AsyncValue.data(freshData);
-      await cacheService.setCache(cacheKey, toJson(freshData));
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-    }
-  }
-
-  /// Clears the cache for this query
-  Future<void> clearCache() async {
-    final cacheService = ref.read(queryCacheServiceProvider);
-    await cacheService.clearCache(cacheKey);
+  /// Clear cache for this query
+  void invalidateCache() {
+    _cacheService.invalidate(cacheKey);
   }
 }
-
-/// Helper function to avoid awaiting background tasks
-void unawaited(Future<void> future) {
-  // Intentionally not awaiting
-}
-

@@ -33,7 +33,7 @@ final class UserProfileQueryProvider
   UserProfileQuery create() => UserProfileQuery();
 }
 
-String _$userProfileQueryHash() => r'3ab5d9a0214ea7b6e3a770faafbed4caf325bdd4';
+String _$userProfileQueryHash() => r'8047d7081f5faae2ef50e8010cacb34f0d2a87d4';
 
 abstract class _$UserProfileQuery extends $AsyncNotifier<UserProfile> {
   FutureOr<UserProfile> build();

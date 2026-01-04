@@ -154,7 +154,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   PrimaryButton(
                     text: 'Save',
                     isLoading: false,
-                    onPressed: () {}, // _onSave,
+                    onPressed: _onSave,
                   ),
                 ],
               ),

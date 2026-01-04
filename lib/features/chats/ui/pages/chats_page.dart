@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:telegram_clone/app/theme/theme_notifier.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
@@ -13,7 +12,6 @@ class ChatsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeProvider);
     final logoutState = ref.watch(logoutCommandProvider);
 
     ref.listen<AsyncValue<void>>(logoutCommandProvider, (_, next) {
@@ -27,14 +25,6 @@ class ChatsPage extends ConsumerWidget {
         title: const ChatsAppBarTitle(),
         actions: [
           IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-          IconButton(
-            icon: Icon(
-              themeMode == ThemeMode.light ? Icons.dark_mode : Icons.light_mode,
-            ),
-            onPressed: () {
-              ref.read(themeProvider.notifier).toggleTheme();
-            },
-          ),
         ],
       ),
       drawer: Drawer(
@@ -72,7 +62,10 @@ class ChatsPage extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.settings_outlined),
                   title: const Text('Settings'),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(RouteNames.settings);
+                  },
                 ),
                 const Divider(),
                 ListTile(

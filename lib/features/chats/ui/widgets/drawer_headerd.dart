@@ -1,6 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:telegram_clone/app/theme/theme_notifier.dart';
 import 'package:telegram_clone/features/profile/notifiers/query/user_profile_query.dart';
+
+// TODO: Refactor
+class Skeleton extends StatelessWidget {
+  final double width;
+  final double height;
+  final BorderRadius borderRadius;
+
+  const Skeleton({
+    super.key,
+    required this.width,
+    required this.height,
+    this.borderRadius = const BorderRadius.all(Radius.circular(4)),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.35),
+        borderRadius: borderRadius,
+      ),
+    );
+  }
+}
 
 class AppDrawerHeader extends ConsumerWidget {
   const AppDrawerHeader({super.key});
@@ -10,97 +37,80 @@ class AppDrawerHeader extends ConsumerWidget {
     final theme = Theme.of(context);
     final currentUserProfileAsync = ref.watch(userProfileQueryProvider);
 
-    return Container(
+    return UserAccountsDrawerHeader(
       decoration: BoxDecoration(color: theme.primaryColor),
-      padding: const EdgeInsets.only(top: 48, bottom: 16, left: 16, right: 16),
-      child: currentUserProfileAsync.when(
-        data: (profile) {
-          final email = profile.email ?? profile.email ?? '';
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Picture
-              CircleAvatar(
-                radius: 32,
-                backgroundColor: Colors.white,
-                backgroundImage:
-                    profile.hasProfileImage && profile.profileImageUrl != null
-                    ? NetworkImage(profile.profileImageUrl!)
-                    : null,
-                child:
-                    profile.hasProfileImage && profile.profileImageUrl != null
-                    ? null
-                    : Text(
-                        profile.initials,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: theme.primaryColor,
-                        ),
-                      ),
-              ),
-              const SizedBox(height: 16),
-              // Name
-              Text(
-                profile.displayName,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              // Email
-              if (email.isNotEmpty)
-                Text(
-                  email,
+      accountName: currentUserProfileAsync.when(
+        data: (profile) => Text(
+          profile.displayName,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        loading: () => const Skeleton(width: 120, height: 14),
+        error: (_, _) => const Text('User'),
+      ),
+      accountEmail: currentUserProfileAsync.when(
+        data: (profile) => Text(
+          profile.phone ?? profile.email ?? '',
+          style: TextStyle(color: Colors.white.withAlpha(204)),
+        ),
+        loading: () => const Skeleton(width: 120, height: 14),
+        error: (_, _) => const SizedBox.shrink(),
+      ),
+      currentAccountPicture: currentUserProfileAsync.when(
+        data: (profile) => CircleAvatar(
+          backgroundColor: Colors.white,
+          backgroundImage:
+              profile.hasProfileImage && profile.profileImageUrl != null
+              ? NetworkImage(profile.profileImageUrl!)
+              : null,
+          child: profile.hasProfileImage && profile.profileImageUrl != null
+              ? null
+              : Text(
+                  profile.initials,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 14,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColor,
                   ),
                 ),
-            ],
-          );
-        },
-        loading: () => const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              radius: 32,
-              backgroundColor: Colors.white,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            SizedBox(height: 16),
-            SizedBox(
-              width: 120,
-              height: 16,
-              child: LinearProgressIndicator(
-                backgroundColor: Colors.white30,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-          ],
         ),
-        error: (_, _) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CircleAvatar(
-              radius: 32,
-              backgroundColor: Colors.white,
-              child: Icon(Icons.error_outline, color: Colors.red),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'User',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        loading: () =>
+            const CircleAvatar(backgroundColor: Colors.white24, radius: 28),
+        error: (_, _) => const CircleAvatar(
+          backgroundColor: Colors.white,
+          child: Icon(Icons.error, color: Colors.red),
         ),
       ),
+      onDetailsPressed: () {
+        // Expand account list/switch account functionality
+        // This is the "arrow" behavior in Telegram
+      },
+      otherAccountsPictures: [
+        // Placeholder for the "Sun/Moon" theme toggle acting as a secondary action or account
+        GestureDetector(
+          onTap: () {
+            // Theme toggle logic handled in parent/main usually, but could be here
+            // For now just an icon to mimic look
+          },
+          child: Consumer(
+            builder: (context, ref, _) {
+              final themeMode = ref.watch(themeProvider);
+
+              return IconButton(
+                icon: Icon(
+                  themeMode == ThemeMode.light
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  ref.read(themeProvider.notifier).toggleTheme();
+                },
+              );
+            },
+          ),
+          
+        ),
+      ],
     );
   }
 }
