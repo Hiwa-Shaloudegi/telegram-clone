@@ -25,7 +25,7 @@ class UserApi {
   String? get _currentUserId =>
       supabase.auth.currentUser?.id ?? supabase.auth.currentSession?.user.id;
 
-  Future<UserProfile> getUserProfile() async {
+  Future<UserProfile>  getUserProfile() async {
     try {
       final userId = _currentUserId;
       if (userId == null) {

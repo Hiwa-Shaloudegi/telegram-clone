@@ -8,14 +8,9 @@ part of 'query_cache_service.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Service for caching query results locally
-/// Provides methods to store and retrieve cached data with automatic JSON serialization
 
 @ProviderFor(queryCacheService)
 const queryCacheServiceProvider = QueryCacheServiceProvider._();
-
-/// Service for caching query results locally
-/// Provides methods to store and retrieve cached data with automatic JSON serialization
 
 final class QueryCacheServiceProvider
     extends
@@ -25,8 +20,6 @@ final class QueryCacheServiceProvider
           QueryCacheService
         >
     with $Provider<QueryCacheService> {
-  /// Service for caching query results locally
-  /// Provides methods to store and retrieve cached data with automatic JSON serialization
   const QueryCacheServiceProvider._()
     : super(
         from: null,
@@ -61,4 +54,4 @@ final class QueryCacheServiceProvider
   }
 }
 
-String _$queryCacheServiceHash() => r'effc05dc06b7e4ea2b6df7406803668cef2c88f2';
+String _$queryCacheServiceHash() => r'8ece9dc33e76650149e001eec3fccd2a208309c2';

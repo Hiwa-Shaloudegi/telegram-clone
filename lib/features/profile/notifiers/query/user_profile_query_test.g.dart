@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_profile_query.dart';
+part of 'user_profile_query_test.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,33 +9,34 @@ part of 'user_profile_query.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(UserProfileQuery)
-const userProfileQueryProvider = UserProfileQueryProvider._();
+@ProviderFor(UserProfileQueryTest)
+const userProfileQueryTestProvider = UserProfileQueryTestProvider._();
 
-final class UserProfileQueryProvider
-    extends $AsyncNotifierProvider<UserProfileQuery, UserProfile> {
-  const UserProfileQueryProvider._()
+final class UserProfileQueryTestProvider
+    extends $AsyncNotifierProvider<UserProfileQueryTest, UserProfile> {
+  const UserProfileQueryTestProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'userProfileQueryProvider',
+        name: r'userProfileQueryTestProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$userProfileQueryHash();
+  String debugGetCreateSourceHash() => _$userProfileQueryTestHash();
 
   @$internal
   @override
-  UserProfileQuery create() => UserProfileQuery();
+  UserProfileQueryTest create() => UserProfileQueryTest();
 }
 
-String _$userProfileQueryHash() => r'596e87389c51a2ff35bccae2bbdbde35ed5ec670';
+String _$userProfileQueryTestHash() =>
+    r'0627a0b75f5b3c9295a2622336c8f6e5683d7bf3';
 
-abstract class _$UserProfileQuery extends $AsyncNotifier<UserProfile> {
+abstract class _$UserProfileQueryTest extends $AsyncNotifier<UserProfile> {
   FutureOr<UserProfile> build();
   @$mustCallSuper
   @override
