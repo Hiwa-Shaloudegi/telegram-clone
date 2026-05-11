@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,9 +24,7 @@ class ChatsPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const ChatsAppBarTitle(),
-        actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
       ),
       drawer: Drawer(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
@@ -35,58 +34,55 @@ class ChatsPage extends ConsumerWidget {
               padding: EdgeInsets.zero,
               children: [
                 AppDrawerHeader(),
-                ListTile(
-                  leading: const Icon(Icons.account_circle_outlined),
-                  title: const Text('My Profile'),
+                DrawerItemTile(
+                  title: 'My Profile',
+                  icon: Icons.account_circle_outlined,
                   onTap: () {
                     Navigator.pop(context);
                     context.push(RouteNames.profile);
                   },
                 ),
                 const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.group_add_outlined),
-                  title: const Text('New Group'),
-                  onTap: () {},
+                DrawerItemTile(
+                  title: 'New Group',
+                  icon: Icons.group_add_outlined,
                 ),
-                ListTile(
-                  leading: const Icon(Icons.contacts_outlined),
-                  title: const Text('Contacts'),
-                  onTap: () {},
+                DrawerItemTile(
+                  title: 'Contacts',
+                  icon: Icons.contacts_outlined,
                 ),
-                ListTile(
-                  leading: const Icon(Icons.bookmark_outline),
-                  title: const Text('Saved Messages'),
-                  onTap: () {},
+
+                DrawerItemTile(
+                  title: 'Saved Messages',
+                  icon: Icons.bookmark_outline,
                 ),
-                ListTile(
-                  leading: const Icon(Icons.settings_outlined),
-                  title: const Text('Settings'),
+
+                DrawerItemTile(
+                  title: 'Settings',
+                  icon: Icons.settings_outlined,
                   onTap: () {
                     Navigator.pop(context);
                     context.push(RouteNames.settings);
                   },
                 ),
                 const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.person_add_outlined),
-                  title: const Text('Invite Friends'),
+                DrawerItemTile(
+                  title: 'Invite Friends',
+                  icon: Icons.person_add_outlined,
                   onTap: () {},
                 ),
-                ListTile(
-                  leading: const Icon(Icons.code),
-                  title: const Text('Github'),
+                DrawerItemTile(
+                  title: 'Github',
+                  icon: Icons.code,
                   onTap: () {
                     // TODO: Add repo link
                   },
                 ),
                 const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text(
-                    'Logout',
-                    style: TextStyle(color: Colors.red),
-                  ),
+                DrawerItemTile(
+                  title: 'Logout',
+                  icon: Icons.logout,
+                  foregroundColor: Colors.red,
                   trailing: logoutState.isLoading
                       ? const SizedBox(
                           width: 20,
@@ -126,6 +122,36 @@ class ChatsPage extends ConsumerWidget {
         onPressed: () {},
         child: const Icon(Icons.edit),
       ),
+    );
+  }
+}
+
+class DrawerItemTile extends StatelessWidget {
+  const DrawerItemTile({
+    super.key,
+    required this.title,
+    required this.icon,
+    this.foregroundColor,
+    this.trailing,
+    this.onTap,
+  });
+
+  final String title;
+  final IconData icon;
+  final Color? foregroundColor;
+  final Widget? trailing;
+  final void Function()? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(icon, size: 22, color: foregroundColor),
+      title: Text(
+        title,
+        style: TextStyle(fontSize: 15, color: foregroundColor),
+      ),
+      trailing: trailing,
+      onTap: onTap,
     );
   }
 }

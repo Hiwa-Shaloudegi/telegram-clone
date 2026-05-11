@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
-import 'package:telegram_clone/core/ui/widgets/profile_info_section%20.dart';
+import 'package:telegram_clone/core/ui/widgets/profile_info_section.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/profile/notifiers/query/user_profile_query.dart';
 import 'package:telegram_clone/features/settings/ui/widgets/menu_item.dart';

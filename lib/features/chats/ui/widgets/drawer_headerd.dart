@@ -56,22 +56,27 @@ class AppDrawerHeader extends ConsumerWidget {
         error: (_, _) => const SizedBox.shrink(),
       ),
       currentAccountPicture: currentUserProfileAsync.when(
-        data: (profile) => CircleAvatar(
-          backgroundColor: Colors.white,
-          backgroundImage:
-              profile.hasProfileImage && profile.profileImageUrl != null
-              ? NetworkImage(profile.profileImageUrl!)
-              : null,
-          child: profile.hasProfileImage && profile.profileImageUrl != null
-              ? null
-              : Text(
-                  profile.initials,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
+        data: (profile) => Padding(
+          padding: const EdgeInsets.all(1),
+          child: CircleAvatar(
+            backgroundColor: Colors.white70,
+            backgroundImage:
+                profile.hasProfileImage && profile.profileImageUrl != null
+                ? NetworkImage(profile.profileImageUrl!)
+                : null,
+            child: profile.hasProfileImage && profile.profileImageUrl != null
+                ? null
+                : Center(
+                    child: Text(
+                      profile.initials,
+                      style: TextStyle(
+                        fontSize: 27,
+                        fontWeight: FontWeight.bold,
+                        color: theme.primaryColor,
+                      ),
+                    ),
                   ),
-                ),
+          ),
         ),
         loading: () =>
             const CircleAvatar(backgroundColor: Colors.white24, radius: 28),
@@ -108,7 +113,6 @@ class AppDrawerHeader extends ConsumerWidget {
               );
             },
           ),
-          
         ),
       ],
     );
