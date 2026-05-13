@@ -11,7 +11,6 @@ class ChatModel {
   final String? createdBy;
   final DateTime createdAt;
   final DateTime updatedAt;
-  
   bool isPinned;
   bool isArchived;
   bool isMuted;

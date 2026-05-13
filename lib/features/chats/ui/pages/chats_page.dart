@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
+import 'package:telegram_clone/features/chats/notifiers/query/get_user_chats_query.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/chats_app_bar_title.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/drawer_headerd.dart';
 
@@ -13,6 +14,8 @@ class ChatsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final getUserChatsState = ref.watch(getUserChatsQueryProvider);
+
     final logoutState = ref.watch(logoutCommandProvider);
 
     ref.listen<AsyncValue<void>>(logoutCommandProvider, (_, next) {
@@ -101,23 +104,29 @@ class ChatsPage extends ConsumerWidget {
           ],
         ),
       ),
-      body: ListView.builder(
-        itemCount: 15,
-        itemBuilder: (context, index) {
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: index % 2 == 0 ? Colors.orange : Colors.blue,
-              child: Text(
-                String.fromCharCode(65 + index), // A, B, C...
-                style: const TextStyle(color: Colors.white),
+      body: getUserChatsState.when(
+        data: (data) => ListView.builder(
+          itemCount: data.length + 1,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundColor: index % 2 == 0 ? Colors.orange : Colors.blue,
+                child: Text(
+                  String.fromCharCode(65 + index), // A, B, C...
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-            ),
-            title: Text("Chat ${index + 1}"),
-            subtitle: const Text("Last message preview..."),
-            trailing: Text("10:${index.toString().padLeft(2, '0')} AM"),
-          );
-        },
+              title: Text("Chat ${index + 1}"),
+              subtitle: const Text("Last message preview..."),
+              trailing: Text("10:${index.toString().padLeft(2, '0')} AM"),
+            );
+          },
+        ),
+
+        error: (error, stackTrace) => Center(child: Text(error.toString())),
+        loading: () => Center(child: CircularProgressIndicator()),
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         child: const Icon(Icons.edit),
