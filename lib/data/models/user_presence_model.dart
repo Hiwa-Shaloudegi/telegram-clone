@@ -66,16 +66,17 @@ class UserPresenceModel {
 
     // 2. Reliability Check (Timeout)
     if (isActuallyOnline) return 'online';
-    
+
     final now = DateTime.now();
     final difference = now.difference(lastSeenAt);
 
     if (difference.inMinutes < 1) return 'last seen just now';
-    if (difference.inMinutes < 60) return 'last seen ${difference.inMinutes}m ago';
+    if (difference.inMinutes < 60)
+      return 'last seen ${difference.inMinutes}m ago';
     if (difference.inHours < 24) return 'last seen ${difference.inHours}h ago';
     if (difference.inDays == 1) return 'last seen yesterday';
     if (difference.inDays < 7) return 'last seen ${difference.inDays}d ago';
-    
+
     return 'last seen recently';
   }
 }

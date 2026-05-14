@@ -11,12 +11,12 @@ class ChatModel {
   final String? createdBy;
   final DateTime createdAt;
   final DateTime updatedAt;
-  bool isPinned;
-  bool isArchived;
-  bool isMuted;
-  String? lastReadMessageId;
-  int unreadCount;
-  MessageModel? lastMessage;
+  // bool isPinned;
+  // bool isArchived;
+  // bool isMuted;
+  // String? lastReadMessageId;
+  // int unreadCount;
+  // MessageModel? lastMessage;
 
   ChatModel({
     required this.id,
@@ -29,19 +29,25 @@ class ChatModel {
     this.createdBy,
     required this.createdAt,
     required this.updatedAt,
-    this.isPinned = false,
-    this.isArchived = false,
-    this.isMuted = false,
-    this.lastReadMessageId,
-    this.unreadCount = 0,
-    this.lastMessage,
+    // this.isPinned = false,
+    // this.isArchived = false,
+    // this.isMuted = false,
+    // this.lastReadMessageId,
+    // this.unreadCount = 0,
+    // this.lastMessage,
   });
 
   factory ChatModel.fromJson(Map<String, dynamic> json) {
+    String title;
+    if (json['chat_type'] as String == 'saved') {
+      title = "Saved Messages";
+    } else {
+      title = json['title'] as String;
+    }
     return ChatModel(
       id: json['id'] as String,
       chatType: json['chat_type'] as String,
-      title: json['title'] as String?,
+      title: title,
       description: json['description'] as String?,
       imageUrl: json['image_url'] as String?,
       isPublic: json['is_public'] as bool? ?? false,
@@ -96,12 +102,12 @@ class ChatModel {
       createdBy: createdBy ?? this.createdBy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      isPinned: isPinned ?? this.isPinned,
-      isArchived: isArchived ?? this.isArchived,
-      isMuted: isMuted ?? this.isMuted,
-      lastReadMessageId: lastReadMessageId ?? this.lastReadMessageId,
-      unreadCount: unreadCount ?? this.unreadCount,
-      lastMessage: lastMessage ?? this.lastMessage,
+      // isPinned: isPinned ?? this.isPinned,
+      // isArchived: isArchived ?? this.isArchived,
+      // isMuted: isMuted ?? this.isMuted,
+      // lastReadMessageId: lastReadMessageId ?? this.lastReadMessageId,
+      // unreadCount: unreadCount ?? this.unreadCount,
+      // lastMessage: lastMessage ?? this.lastMessage,
     );
   }
 
@@ -109,5 +115,5 @@ class ChatModel {
   bool get isGroup => chatType == 'group';
   bool get isChannel => chatType == 'channel';
   bool get isSaved => chatType == 'saved';
-  bool get hasUnread => unreadCount > 0;
+  // bool get hasUnread => unreadCount > 0;
 }

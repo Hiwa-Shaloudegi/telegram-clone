@@ -1,13 +1,13 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/api/chat/chat_api.dart';
-import 'package:telegram_clone/data/models/chat_model.dart';
+import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 
 part 'get_user_chats_query.g.dart';
 
 @Riverpod()
 class GetUserChatsQuery extends _$GetUserChatsQuery {
   @override
-  FutureOr<List<ChatModel>> build() async {
+  FutureOr<List<ChatListItemModel>> build() async {
     final chatApi = ref.read(chatApiProvider);
     return await chatApi.getUserChats();
   }

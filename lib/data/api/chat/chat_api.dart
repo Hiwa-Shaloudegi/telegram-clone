@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/core/exception/app_exception.dart';
 import 'package:telegram_clone/core/exception/exception_handler.dart';
-import 'package:telegram_clone/data/models/chat_model.dart';
+import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/services/supabase_client.dart';
 
 part 'chat_api.g.dart';
@@ -25,7 +25,7 @@ class ChatApi {
   String? get _currentUserId =>
       supabase.auth.currentUser?.id ?? supabase.auth.currentSession?.user.id;
 
-  Future<List<ChatModel>> getUserChats() async {
+  Future<List<ChatListItemModel>> getUserChats() async {
     try {
       final userId = _currentUserId;
       if (userId == null) {
@@ -40,8 +40,15 @@ class ChatApi {
       Logger().i('Chat API Response: $response');
 
       return (response as List)
-          .map((json) => ChatModel.fromJson(json))
+          .map((json) => ChatListItemModel.fromJson(json))
           .toList();
+
+      //RPC way:
+      // final response = await supabase.rpc('get_user_chats');
+      // Logger().i('Chat API Response: $response');
+      // return (response as List)
+      //     .map((json) => ChatListItemModel.fromJson(json))
+      //     .toList();
     } catch (e) {
       exceptionHandler.handle(e);
     }

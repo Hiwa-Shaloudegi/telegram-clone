@@ -13,7 +13,7 @@ class MessageModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
-  
+
   UserProfile? sender;
   MessageModel? replyToMessage;
 
@@ -47,9 +47,15 @@ class MessageModel {
       forwardedFromChatId: json['forwarded_from_chat_id'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
-      deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at'] as String) : null,
-      sender: json['sender'] != null ? UserProfile.fromJson(json['sender'] as Map<String, dynamic>) : null,
-      replyToMessage: json['reply_to'] != null ? MessageModel.fromJson(json['reply_to'] as Map<String, dynamic>) : null,
+      deletedAt: json['deleted_at'] != null
+          ? DateTime.parse(json['deleted_at'] as String)
+          : null,
+      sender: json['sender'] != null
+          ? UserProfile.fromJson(json['sender'] as Map<String, dynamic>)
+          : null,
+      replyToMessage: json['reply_to'] != null
+          ? MessageModel.fromJson(json['reply_to'] as Map<String, dynamic>)
+          : null,
     );
   }
 

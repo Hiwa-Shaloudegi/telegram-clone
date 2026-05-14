@@ -11,7 +11,7 @@ class ChatMemberModel {
   final String? lastReadMessageId;
   final DateTime joinedAt;
   final DateTime? leftAt;
-  
+
   UserProfile? user;
 
   ChatMemberModel({
@@ -39,8 +39,12 @@ class ChatMemberModel {
       isMuted: json['is_muted'] as bool? ?? false,
       lastReadMessageId: json['last_read_message_id'] as String?,
       joinedAt: DateTime.parse(json['joined_at'] as String),
-      leftAt: json['left_at'] != null ? DateTime.parse(json['left_at'] as String) : null,
-      user: json['users'] != null ? UserProfile.fromJson(json['users'] as Map<String, dynamic>) : null,
+      leftAt: json['left_at'] != null
+          ? DateTime.parse(json['left_at'] as String)
+          : null,
+      user: json['users'] != null
+          ? UserProfile.fromJson(json['users'] as Map<String, dynamic>)
+          : null,
     );
   }
 

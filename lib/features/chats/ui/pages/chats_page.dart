@@ -106,19 +106,22 @@ class ChatsPage extends ConsumerWidget {
       ),
       body: getUserChatsState.when(
         data: (data) => ListView.builder(
-          itemCount: data.length + 1,
+          itemCount: data.length,
           itemBuilder: (context, index) {
+            final chatItem = data[index];
             return ListTile(
               leading: CircleAvatar(
                 backgroundColor: index % 2 == 0 ? Colors.orange : Colors.blue,
                 child: Text(
-                  String.fromCharCode(65 + index), // A, B, C...
+                  // String.fromCharCode(65 + index), // A, B, C...
+                  chatItem.chat.title?[0] ?? 'T',
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
-              title: Text("Chat ${index + 1}"),
+              title: Text(chatItem.chat.title ?? 'title'),
               subtitle: const Text("Last message preview..."),
-              trailing: Text("10:${index.toString().padLeft(2, '0')} AM"),
+              // trailing: Text("10:${index.toString().padLeft(2, '0')} AM"),
+              trailing: Text(chatItem.chat.updatedAt.toString()),
             );
           },
         ),

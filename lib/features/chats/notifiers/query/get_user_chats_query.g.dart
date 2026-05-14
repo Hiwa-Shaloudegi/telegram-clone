@@ -13,7 +13,7 @@ part of 'get_user_chats_query.dart';
 const getUserChatsQueryProvider = GetUserChatsQueryProvider._();
 
 final class GetUserChatsQueryProvider
-    extends $AsyncNotifierProvider<GetUserChatsQuery, List<ChatModel>> {
+    extends $AsyncNotifierProvider<GetUserChatsQuery, List<ChatListItemModel>> {
   const GetUserChatsQueryProvider._()
     : super(
         from: null,
@@ -33,20 +33,29 @@ final class GetUserChatsQueryProvider
   GetUserChatsQuery create() => GetUserChatsQuery();
 }
 
-String _$getUserChatsQueryHash() => r'9a8df23ebe35cd069958432972640c71aabab45e';
+String _$getUserChatsQueryHash() => r'08c91c41501c74ece8351e5043b89bb1182ce1db';
 
-abstract class _$GetUserChatsQuery extends $AsyncNotifier<List<ChatModel>> {
-  FutureOr<List<ChatModel>> build();
+abstract class _$GetUserChatsQuery
+    extends $AsyncNotifier<List<ChatListItemModel>> {
+  FutureOr<List<ChatListItemModel>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<List<ChatModel>>, List<ChatModel>>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<ChatListItemModel>>,
+              List<ChatListItemModel>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<ChatModel>>, List<ChatModel>>,
-              AsyncValue<List<ChatModel>>,
+              AnyNotifier<
+                AsyncValue<List<ChatListItemModel>>,
+                List<ChatListItemModel>
+              >,
+              AsyncValue<List<ChatListItemModel>>,
               Object?,
               Object?
             >;

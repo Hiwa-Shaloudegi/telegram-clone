@@ -6,7 +6,7 @@ class TypingIndicatorModel {
   final String userId;
   final DateTime startedAt;
   final DateTime expiresAt;
-  
+
   UserProfile? user;
 
   TypingIndicatorModel({
@@ -25,7 +25,9 @@ class TypingIndicatorModel {
       userId: json['user_id'] as String,
       startedAt: DateTime.parse(json['started_at'] as String),
       expiresAt: DateTime.parse(json['expires_at'] as String),
-      user: json['users'] != null ? UserProfile.fromJson(json['users'] as Map<String, dynamic>) : null,
+      user: json['users'] != null
+          ? UserProfile.fromJson(json['users'] as Map<String, dynamic>)
+          : null,
     );
   }
 

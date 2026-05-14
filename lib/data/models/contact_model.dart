@@ -1,12 +1,12 @@
-import 'package:telegram_clone/data/models/user_profile.dart';
 import 'package:telegram_clone/data/models/user_presence_model.dart';
+import 'package:telegram_clone/data/models/user_profile.dart';
 
 class ContactModel {
   final String id;
   final String userId;
   final String contactUserId;
   final DateTime addedAt;
-  
+
   UserProfile? contact;
   UserPresenceModel? presence;
 
@@ -25,8 +25,12 @@ class ContactModel {
       userId: json['user_id'] as String,
       contactUserId: json['contact_user_id'] as String,
       addedAt: DateTime.parse(json['added_at'] as String),
-      contact: json['contact'] != null ? UserProfile.fromJson(json['contact'] as Map<String, dynamic>) : null,
-      presence: json['presence'] != null ? UserPresenceModel.fromJson(json['presence'] as Map<String, dynamic>) : null,
+      contact: json['contact'] != null
+          ? UserProfile.fromJson(json['contact'] as Map<String, dynamic>)
+          : null,
+      presence: json['presence'] != null
+          ? UserPresenceModel.fromJson(json['presence'] as Map<String, dynamic>)
+          : null,
     );
   }
 
