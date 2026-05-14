@@ -1,21 +1,52 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/chats/notifiers/query/get_user_chats_query.dart';
+import 'package:telegram_clone/features/chats/notifiers/ui/chats_ui_state.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/chats_app_bar_title.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/drawer_headerd.dart';
 
-class ChatsPage extends ConsumerWidget {
+class ChatsPage extends ConsumerStatefulWidget {
   const ChatsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final getUserChatsState = ref.watch(getUserChatsQueryProvider);
+  ConsumerState<ChatsPage> createState() => _ChatsPageState();
+}
 
+class _ChatsPageState extends ConsumerState<ChatsPage> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController.addListener(() {
+      final direction = _scrollController.position.userScrollDirection;
+
+      final isFabVisible = ref.read(chatsUi_isFabVisibleProvider);
+
+      if (direction == ScrollDirection.reverse && isFabVisible) {
+        ref.read(chatsUi_isFabVisibleProvider.notifier).set(false);
+      } else if (direction == ScrollDirection.forward && !isFabVisible) {
+        ref.read(chatsUi_isFabVisibleProvider.notifier).set(true);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final getUserChatsState = ref.watch(getUserChatsQueryProvider);
     final logoutState = ref.watch(logoutCommandProvider);
 
     ref.listen<AsyncValue<void>>(logoutCommandProvider, (_, next) {
@@ -106,9 +137,10 @@ class ChatsPage extends ConsumerWidget {
       ),
       body: getUserChatsState.when(
         data: (data) => ListView.builder(
-          itemCount: data.length,
+          controller: _scrollController,
+          itemCount: 20,
           itemBuilder: (context, index) {
-            final chatItem = data[index];
+            final chatItem = data[0];
             return ListTile(
               leading: CircleAvatar(
                 backgroundColor: index % 2 == 0 ? Colors.orange : Colors.blue,
@@ -130,9 +162,23 @@ class ChatsPage extends ConsumerWidget {
         loading: () => Center(child: CircularProgressIndicator()),
       ),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: const Icon(Icons.edit),
+      floatingActionButton: Consumer(
+        builder: (_, ref, __) {
+          final isFabVisible = ref.watch(chatsUi_isFabVisibleProvider);
+
+          return AnimatedSlide(
+            duration: const Duration(milliseconds: 200),
+            offset: isFabVisible ? Offset.zero : const Offset(0, 1),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: isFabVisible ? 1 : 0,
+              child: FloatingActionButton(
+                onPressed: () {},
+                child: Icon(Icons.edit),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
