@@ -1,4 +1,3 @@
-import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/core/exception/app_exception.dart';
@@ -36,8 +35,6 @@ class ChatApi {
           .from('chat_members')
           .select('*, chats(*)')
           .eq('user_id', userId);
-
-      Logger().i('Chat API Response: $response');
 
       return (response as List)
           .map((json) => ChatListItemModel.fromJson(json))
