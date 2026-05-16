@@ -9,6 +9,7 @@ import 'package:telegram_clone/features/auth/ui/pages/login_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/profile_info_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/signup_page.dart';
 import 'package:telegram_clone/features/chats/ui/pages/chats_page.dart';
+import 'package:telegram_clone/features/contacts/ui/pages/contacts_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/edit_profile_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/profile_page.dart';
 import 'package:telegram_clone/features/settings/ui/pages/settings_page.dart';
@@ -60,6 +61,10 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: RouteNames.settings,
         builder: (context, state) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.contacts,
+        builder: (context, state) => const ContactsPage(),
       ),
     ],
     redirect: (context, state) {

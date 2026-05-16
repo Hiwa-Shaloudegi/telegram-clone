@@ -6,6 +6,7 @@ import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/profile_header_section.dart';
 import 'package:telegram_clone/core/ui/widgets/profile_info_section.dart';
+import 'package:telegram_clone/core/ui/widgets/section_divider.dart';
 import 'package:telegram_clone/features/profile/notifiers/query/user_profile_query.dart';
 import 'package:telegram_clone/features/settings/ui/widgets/menu_item.dart';
 
@@ -17,7 +18,7 @@ class ProfilePage extends ConsumerWidget {
     final profileAsync = ref.watch(userProfileQueryProvider);
 
     return AppScaffold(
-      appBar: AppBar( 
+      appBar: AppBar(
         actions: [
           IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
           PopupMenuButton<ProfileMenuAction>(
@@ -71,20 +72,11 @@ class ProfilePage extends ConsumerWidget {
           data: (profile) => ListView(
             children: [
               const SizedBox(height: 10),
-
-
-              /// PROFILE HEADER
               ProfileHeaderSection(profile: profile),
 
               const SizedBox(height: 16),
+              SectionDivider(),
 
-              /// SECTION DIVIDER (Telegram style)
-              Container(
-                height: 8,
-                color: Theme.of(context).colorScheme.surfaceVariant,
-              ),
-
-              /// INFO SECTION
               ProfileInfoSection(profile: profile),
             ],
           ),
