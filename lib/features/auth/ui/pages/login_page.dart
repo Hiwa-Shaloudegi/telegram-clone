@@ -3,16 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
+import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/input_text_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
 import 'package:telegram_clone/core/ui/widgets/secondary_button.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/login_command.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/login_with_google_command.dart';
+import 'package:telegram_clone/features/auth/notifiers/ui/login_ui_state.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/auth_header.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/google_sign_in_button.dart';
-import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/or_divider.dart';
-import 'package:telegram_clone/features/auth/notifiers/ui/login_ui_state.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -32,7 +32,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
- 
+
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue<void>>(loginCommandProvider, (_, next) {
@@ -67,7 +67,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       iconSize: 100,
                     ),
                     const SizedBox(height: 48),
-                    
+
                     InputTextField(
                       controller: _emailController,
                       label: 'Email',
@@ -106,7 +106,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    
+
                     PrimaryButton(
                       text: 'Log In',
                       isLoading: ref.watch(loginCommandProvider).isLoading,
@@ -121,7 +121,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         }
                       },
                     ),
-                    
+
                     const SizedBox(height: 16),
                     const OrDivider(),
                     const SizedBox(height: 16),
@@ -132,18 +132,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       onPressed: () {
                         ref.read(loginWithGoogleCommandProvider.notifier).run();
                       },
-                      
                     ),
 
                     const Spacer(),
-                    
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text("Don't have an account?"),
                         SecondaryButton(
                           text: 'Sign Up',
-                          onPressed: () => context.go(RouteNames.signup),
+                          onPressed: () => context.goNamed(RouteNames.signup),
                         ),
                       ],
                     ),

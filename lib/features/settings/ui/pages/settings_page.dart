@@ -22,12 +22,12 @@ class SettingsPage extends ConsumerWidget {
     return AppScaffold(
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.edit),),
+          IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
           PopupMenuButton<ProfileMenuAction>(
             onSelected: (action) {
               switch (action) {
                 case ProfileMenuAction.editInfo:
-                  context.push(RouteNames.editProfile);
+                  context.pushNamed(RouteNames.editProfile);
                   break;
                 case ProfileMenuAction.setPhoto:
                   AppSnackbar.showSuccess(
@@ -76,7 +76,7 @@ class SettingsPage extends ConsumerWidget {
             /// PROFILE HEADER (tappable → Profile page)
             SliverToBoxAdapter(
               child: GestureDetector(
-                onTap: () => context.push(RouteNames.profile),
+                onTap: () => context.pushNamed(RouteNames.profile),
                 child: ProfileHeader(profile: profile),
               ),
             ),
@@ -84,26 +84,25 @@ class SettingsPage extends ConsumerWidget {
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
             /// INFO SECTION DIVIDER
-            const SliverToBoxAdapter(
-              child: Divider(thickness: 8),
-            ),
+            const SliverToBoxAdapter(child: Divider(thickness: 8)),
 
             /// PROFILE INFO (shared with Profile page)
-            SliverToBoxAdapter(
-              child: ProfileInfoSection(profile: profile),
-            ),
+            SliverToBoxAdapter(child: ProfileInfoSection(profile: profile)),
 
             /// SETTINGS DIVIDER
-            const SliverToBoxAdapter(
-              child: Divider(thickness: 8),
-            ),
+            const SliverToBoxAdapter(child: Divider(thickness: 8)),
 
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              sliver:  SliverToBoxAdapter(child: Text(
-          "Settings",
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.blueAccent, fontWeight: FontWeight.bold,),
-        ),),
+              sliver: SliverToBoxAdapter(
+                child: Text(
+                  "Settings",
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Colors.blueAccent,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
 
             /// SETTINGS LIST
@@ -117,29 +116,18 @@ class SettingsPage extends ConsumerWidget {
                   icon: Icons.lock_outline,
                   title: 'Privacy and Security',
                 ),
-                SettingsTile(
-                  icon: Icons.data_usage,
-                  title: 'Data and Storage',
-                ),
+                SettingsTile(icon: Icons.data_usage, title: 'Data and Storage'),
                 SettingsTile(
                   icon: Icons.chat_bubble_outline,
                   title: 'Chat Settings',
                 ),
-                SettingsTile(
-                  icon: Icons.devices,
-                  title: 'Devices',
-                ),
-                SettingsTile(
-                  icon: Icons.language,
-                  title: 'Language',
-                ),
+                SettingsTile(icon: Icons.devices, title: 'Devices'),
+                SettingsTile(icon: Icons.language, title: 'Language'),
               ]),
             ),
 
             if (logoutState.isLoading)
-              const SliverToBoxAdapter(
-                child: LinearProgressIndicator(),
-              ),
+              const SliverToBoxAdapter(child: LinearProgressIndicator()),
           ],
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/pages/not_found_page.dart';
 import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
@@ -26,62 +27,75 @@ GoRouter router(Ref ref) {
   });
 
   return GoRouter(
-    initialLocation: RouteNames.splash,
+    initialLocation: '/splash',
     refreshListenable: userValueNotifier,
     errorBuilder: (context, state) => const NotFoundPage(),
+    debugLogDiagnostics: true,
     routes: [
       GoRoute(
-        path: RouteNames.splash,
+        path: '/splash',
+        name: RouteNames.splash,
         builder: (context, state) => const SplashPage(),
       ),
       GoRoute(
-        path: RouteNames.signup,
+        path: '/auth/signup',
+        name: RouteNames.signup,
         builder: (context, state) => const SignupPage(),
       ),
       GoRoute(
-        path: RouteNames.login,
+        path: '/auth/login',
+        name: RouteNames.login,
         builder: (context, state) => const LoginPage(),
       ),
       GoRoute(
-        path: RouteNames.chats,
+        path: '/',
+        name: RouteNames.chats,
         builder: (context, state) => const ChatsPage(),
       ),
       GoRoute(
-        path: RouteNames.profileInfo,
+        path: '/profile/info',
+        name: RouteNames.profileInfo,
         builder: (context, state) => const ProfileInfoPage(),
       ),
       GoRoute(
-        path: RouteNames.profile,
+        path: '/profile',
+        name: RouteNames.profile,
         builder: (context, state) => const ProfilePage(),
       ),
       GoRoute(
-        path: RouteNames.editProfile,
+        path: '/profile/edit',
+        name: RouteNames.editProfile,
         builder: (context, state) => const EditProfilePage(),
       ),
       GoRoute(
-        path: RouteNames.settings,
+        path: '/settings',
+        name: RouteNames.settings,
         builder: (context, state) => const SettingsPage(),
       ),
       GoRoute(
-        path: RouteNames.contacts,
-        builder: (context, state) => const ContactsPage(),
+        path: '/contacts',
+        name: RouteNames.contacts,
+        builder: (context, state) {
+          final extra = state.extra as ContactsPageExtra;
+          return ContactsPage(extra: extra);
+        },
       ),
     ],
     redirect: (context, state) {
       final isAuthRoute =
-          state.matchedLocation == RouteNames.login ||
-          state.matchedLocation == RouteNames.signup;
-      final isSplashRoute = state.matchedLocation == RouteNames.splash;
+          state.matchedLocation == '/auth/login' ||
+          state.matchedLocation == '/auth/signup';
+      final isSplashRoute = state.matchedLocation == '/splash';
 
       // Don't redirect while on splash, it has its own logic
       if (isSplashRoute) return null;
 
       if (ref.read(currentUserProvider) == null) {
         // Not logged in: allow only auth routes
-        if (!isAuthRoute) return RouteNames.login;
+        if (!isAuthRoute) return '/auth/login';
       } else {
         // Logged in: redirect away from auth routes to chats
-        if (isAuthRoute) return RouteNames.chats;
+        if (isAuthRoute) return '/';
       }
 
       return null;

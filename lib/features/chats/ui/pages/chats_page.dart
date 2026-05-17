@@ -2,6 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
+import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/chats/notifiers/query/get_user_chats_query.dart';
@@ -96,7 +99,12 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
               duration: const Duration(milliseconds: 200),
               opacity: isFabVisible ? 1 : 0,
               child: FloatingActionButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.pushNamed(
+                    RouteNames.contacts,
+                    extra: ContactsPageExtra(isOnlyAddContacts: false),
+                  );
+                },
                 child: Icon(Icons.edit),
               ),
             ),
@@ -106,4 +114,3 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
     );
   }
 }
-

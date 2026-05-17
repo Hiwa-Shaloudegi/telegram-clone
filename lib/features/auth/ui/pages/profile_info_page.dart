@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,7 +54,7 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
     ref.listen<AsyncValue<void>>(completeProfileCommandProvider, (_, next) {
       next.when(
         data: (_) {
-          context.go(RouteNames.chats);
+          context.goNamed(RouteNames.chats);
         },
         error: (error, stackTrace) {
           AppSnackbar.showError(context, error.toString());

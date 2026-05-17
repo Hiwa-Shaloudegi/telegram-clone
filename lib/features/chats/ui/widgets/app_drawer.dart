@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/drawer_headerd.dart';
@@ -24,7 +25,7 @@ class AppDrawer extends StatelessWidget {
                 icon: Icons.account_circle_outlined,
                 onTap: () {
                   Navigator.pop(context);
-                  context.push(RouteNames.profile);
+                  context.pushNamed(RouteNames.profile);
                 },
               ),
               const Divider(),
@@ -37,7 +38,10 @@ class AppDrawer extends StatelessWidget {
                 icon: Icons.contacts_outlined,
                 onTap: () {
                   Navigator.pop(context);
-                  context.push(RouteNames.contacts);
+                  context.pushNamed(
+                    RouteNames.contacts,
+                    extra: ContactsPageExtra(isOnlyAddContacts: true),
+                  );
                 },
               ),
 
@@ -51,7 +55,7 @@ class AppDrawer extends StatelessWidget {
                 icon: Icons.settings_outlined,
                 onTap: () {
                   Navigator.pop(context);
-                  context.push(RouteNames.settings);
+                  context.pushNamed(RouteNames.settings);
                 },
               ),
               const Divider(),

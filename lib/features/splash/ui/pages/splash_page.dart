@@ -13,7 +13,7 @@ class SplashPage extends ConsumerWidget {
     ref.listen(splashDestinationProvider, (previous, next) {
       next.whenData((route) {
         if (context.mounted) {
-          context.go(route);
+          context.goNamed(route);
         }
       });
     });
@@ -21,11 +21,7 @@ class SplashPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
-        child: Icon(
-          Icons.telegram,
-          size: 120,
-          color: theme.primaryColor,
-        ),
+        child: Icon(Icons.telegram, size: 120, color: theme.primaryColor),
       ),
     );
   }

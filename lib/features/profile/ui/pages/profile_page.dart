@@ -25,7 +25,7 @@ class ProfilePage extends ConsumerWidget {
             onSelected: (action) {
               switch (action) {
                 case ProfileMenuAction.editInfo:
-                  context.push(RouteNames.editProfile);
+                  context.pushNamed(RouteNames.editProfile);
                   break;
                 case ProfileMenuAction.setPhoto:
                   AppSnackbar.showSuccess(

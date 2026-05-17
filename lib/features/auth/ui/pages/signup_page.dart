@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
+import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/input_text_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
 import 'package:telegram_clone/core/ui/widgets/secondary_button.dart';
@@ -10,7 +11,6 @@ import 'package:telegram_clone/features/auth/notifiers/command/signup_command.da
 import 'package:telegram_clone/features/auth/notifiers/ui/signup_ui_state.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/auth_header.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/google_sign_in_button.dart';
-import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/ui/widgets/or_divider.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
@@ -59,7 +59,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     ref.listen<AsyncValue<void>>(signupCommandProvider, (_, next) {
       next.when(
         data: (_) {
-          context.go(RouteNames.profileInfo);
+          context.goNamed(RouteNames.profileInfo);
         },
         error: (error, stackTrace) {
           AppSnackbar.showError(context, error.toString());
@@ -183,7 +183,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         const Text("Already have an account?"),
                         SecondaryButton(
                           text: 'Log In',
-                          onPressed: () => context.go(RouteNames.login),
+                          onPressed: () => context.goNamed(RouteNames.login),
                         ),
                       ],
                     ),
