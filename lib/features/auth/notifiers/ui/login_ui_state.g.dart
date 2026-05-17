@@ -10,11 +10,11 @@ part of 'login_ui_state.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(LoginUi_isPasswordObscure)
-const loginUi_isPasswordObscureProvider = LoginUi_isPasswordObscureProvider._();
+final loginUi_isPasswordObscureProvider = LoginUi_isPasswordObscureProvider._();
 
 final class LoginUi_isPasswordObscureProvider
     extends $NotifierProvider<LoginUi_isPasswordObscure, bool> {
-  const LoginUi_isPasswordObscureProvider._()
+  LoginUi_isPasswordObscureProvider._()
     : super(
         from: null,
         argument: null,
@@ -49,7 +49,6 @@ abstract class _$LoginUi_isPasswordObscure extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -59,6 +58,6 @@ abstract class _$LoginUi_isPasswordObscure extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

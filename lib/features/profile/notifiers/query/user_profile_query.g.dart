@@ -10,11 +10,11 @@ part of 'user_profile_query.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(UserProfileQuery)
-const userProfileQueryProvider = UserProfileQueryProvider._();
+final userProfileQueryProvider = UserProfileQueryProvider._();
 
 final class UserProfileQueryProvider
     extends $AsyncNotifierProvider<UserProfileQuery, UserProfile> {
-  const UserProfileQueryProvider._()
+  UserProfileQueryProvider._()
     : super(
         from: null,
         argument: null,
@@ -40,7 +40,6 @@ abstract class _$UserProfileQuery extends $AsyncNotifier<UserProfile> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AsyncValue<UserProfile>, UserProfile>;
     final element =
         ref.element
@@ -50,6 +49,6 @@ abstract class _$UserProfileQuery extends $AsyncNotifier<UserProfile> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

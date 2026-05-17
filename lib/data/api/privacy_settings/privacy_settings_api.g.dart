@@ -10,7 +10,7 @@ part of 'privacy_settings_api.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(privacySettingsApi)
-const privacySettingsApiProvider = PrivacySettingsApiProvider._();
+final privacySettingsApiProvider = PrivacySettingsApiProvider._();
 
 final class PrivacySettingsApiProvider
     extends
@@ -20,7 +20,7 @@ final class PrivacySettingsApiProvider
           PrivacySettingsApi
         >
     with $Provider<PrivacySettingsApi> {
-  const PrivacySettingsApiProvider._()
+  PrivacySettingsApiProvider._()
     : super(
         from: null,
         argument: null,

@@ -7,7 +7,7 @@ class AppSnackbar {
     bool isError = false,
   }) {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
+
     scaffoldMessenger.hideCurrentSnackBar();
     scaffoldMessenger.showSnackBar(
       SnackBar(
@@ -33,9 +33,7 @@ class AppSnackbar {
         ),
         backgroundColor: isError ? Colors.red.shade800 : Colors.grey.shade900,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         elevation: 4,
         duration: const Duration(seconds: 3),

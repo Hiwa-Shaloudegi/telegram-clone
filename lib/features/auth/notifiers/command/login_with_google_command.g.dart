@@ -10,11 +10,11 @@ part of 'login_with_google_command.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(LoginWithGoogleCommand)
-const loginWithGoogleCommandProvider = LoginWithGoogleCommandProvider._();
+final loginWithGoogleCommandProvider = LoginWithGoogleCommandProvider._();
 
 final class LoginWithGoogleCommandProvider
     extends $AsyncNotifierProvider<LoginWithGoogleCommand, void> {
-  const LoginWithGoogleCommandProvider._()
+  LoginWithGoogleCommandProvider._()
     : super(
         from: null,
         argument: null,
@@ -41,7 +41,6 @@ abstract class _$LoginWithGoogleCommand extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
-    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element =
         ref.element
@@ -51,6 +50,6 @@ abstract class _$LoginWithGoogleCommand extends $AsyncNotifier<void> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, null);
+    element.handleCreate(ref, build);
   }
 }

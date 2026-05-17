@@ -10,11 +10,11 @@ part of 'current_user_notifier.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(currentUser)
-const currentUserProvider = CurrentUserProvider._();
+final currentUserProvider = CurrentUserProvider._();
 
 final class CurrentUserProvider extends $FunctionalProvider<User?, User?, User?>
     with $Provider<User?> {
-  const CurrentUserProvider._()
+  CurrentUserProvider._()
     : super(
         from: null,
         argument: null,

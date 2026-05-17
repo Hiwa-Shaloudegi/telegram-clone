@@ -10,11 +10,11 @@ part of 'logout_command.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(LogoutCommand)
-const logoutCommandProvider = LogoutCommandProvider._();
+final logoutCommandProvider = LogoutCommandProvider._();
 
 final class LogoutCommandProvider
     extends $AsyncNotifierProvider<LogoutCommand, void> {
-  const LogoutCommandProvider._()
+  LogoutCommandProvider._()
     : super(
         from: null,
         argument: null,
@@ -40,7 +40,6 @@ abstract class _$LogoutCommand extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
-    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element =
         ref.element
@@ -50,6 +49,6 @@ abstract class _$LogoutCommand extends $AsyncNotifier<void> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, null);
+    element.handleCreate(ref, build);
   }
 }

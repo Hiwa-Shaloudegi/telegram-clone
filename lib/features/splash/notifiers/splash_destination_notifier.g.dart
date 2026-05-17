@@ -10,12 +10,12 @@ part of 'splash_destination_notifier.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(splashDestinationNotifier)
-const splashDestinationProvider = SplashDestinationNotifierProvider._();
+final splashDestinationProvider = SplashDestinationNotifierProvider._();
 
 final class SplashDestinationNotifierProvider
     extends $FunctionalProvider<AsyncValue<String>, String, FutureOr<String>>
     with $FutureModifier<String>, $FutureProvider<String> {
-  const SplashDestinationNotifierProvider._()
+  SplashDestinationNotifierProvider._()
     : super(
         from: null,
         argument: null,

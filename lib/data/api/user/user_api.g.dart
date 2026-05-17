@@ -10,12 +10,12 @@ part of 'user_api.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(userApi)
-const userApiProvider = UserApiProvider._();
+final userApiProvider = UserApiProvider._();
 
 final class UserApiProvider
     extends $FunctionalProvider<UserApi, UserApi, UserApi>
     with $Provider<UserApi> {
-  const UserApiProvider._()
+  UserApiProvider._()
     : super(
         from: null,
         argument: null,

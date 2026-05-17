@@ -10,11 +10,11 @@ part of 'logger.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(logger)
-const loggerProvider = LoggerProvider._();
+final loggerProvider = LoggerProvider._();
 
 final class LoggerProvider extends $FunctionalProvider<Logger, Logger, Logger>
     with $Provider<Logger> {
-  const LoggerProvider._()
+  LoggerProvider._()
     : super(
         from: null,
         argument: null,

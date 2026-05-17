@@ -10,7 +10,7 @@ part of 'query_cache_service.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(queryCacheService)
-const queryCacheServiceProvider = QueryCacheServiceProvider._();
+final queryCacheServiceProvider = QueryCacheServiceProvider._();
 
 final class QueryCacheServiceProvider
     extends
@@ -20,7 +20,7 @@ final class QueryCacheServiceProvider
           QueryCacheService
         >
     with $Provider<QueryCacheService> {
-  const QueryCacheServiceProvider._()
+  QueryCacheServiceProvider._()
     : super(
         from: null,
         argument: null,

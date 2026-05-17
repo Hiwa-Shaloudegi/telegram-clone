@@ -10,7 +10,7 @@ part of 'on_auth_changes_notifier.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(onAuthChanges)
-const onAuthChangesProvider = OnAuthChangesProvider._();
+final onAuthChangesProvider = OnAuthChangesProvider._();
 
 final class OnAuthChangesProvider
     extends
@@ -20,7 +20,7 @@ final class OnAuthChangesProvider
           Stream<AuthState?>
         >
     with $FutureModifier<AuthState?>, $StreamProvider<AuthState?> {
-  const OnAuthChangesProvider._()
+  OnAuthChangesProvider._()
     : super(
         from: null,
         argument: null,

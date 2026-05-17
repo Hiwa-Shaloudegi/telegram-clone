@@ -10,11 +10,11 @@ part of 'complete_profile_command.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(CompleteProfileCommand)
-const completeProfileCommandProvider = CompleteProfileCommandProvider._();
+final completeProfileCommandProvider = CompleteProfileCommandProvider._();
 
 final class CompleteProfileCommandProvider
     extends $AsyncNotifierProvider<CompleteProfileCommand, void> {
-  const CompleteProfileCommandProvider._()
+  CompleteProfileCommandProvider._()
     : super(
         from: null,
         argument: null,
@@ -41,7 +41,6 @@ abstract class _$CompleteProfileCommand extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
-    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element =
         ref.element
@@ -51,6 +50,6 @@ abstract class _$CompleteProfileCommand extends $AsyncNotifier<void> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, null);
+    element.handleCreate(ref, build);
   }
 }

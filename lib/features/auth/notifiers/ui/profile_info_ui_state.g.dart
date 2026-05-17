@@ -10,12 +10,12 @@ part of 'profile_info_ui_state.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(ProfileInfoUi_selectedProfileImage)
-const profileInfoUi_selectedProfileImageProvider =
+final profileInfoUi_selectedProfileImageProvider =
     ProfileInfoUi_selectedProfileImageProvider._();
 
 final class ProfileInfoUi_selectedProfileImageProvider
     extends $NotifierProvider<ProfileInfoUi_selectedProfileImage, XFile?> {
-  const ProfileInfoUi_selectedProfileImageProvider._()
+  ProfileInfoUi_selectedProfileImageProvider._()
     : super(
         from: null,
         argument: null,
@@ -52,7 +52,6 @@ abstract class _$ProfileInfoUi_selectedProfileImage extends $Notifier<XFile?> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<XFile?, XFile?>;
     final element =
         ref.element
@@ -62,6 +61,6 @@ abstract class _$ProfileInfoUi_selectedProfileImage extends $Notifier<XFile?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

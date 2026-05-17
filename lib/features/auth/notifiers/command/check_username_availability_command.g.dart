@@ -10,12 +10,12 @@ part of 'check_username_availability_command.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(CheckUsernameAvailabilityCommand)
-const checkUsernameAvailabilityCommandProvider =
+final checkUsernameAvailabilityCommandProvider =
     CheckUsernameAvailabilityCommandProvider._();
 
 final class CheckUsernameAvailabilityCommandProvider
     extends $AsyncNotifierProvider<CheckUsernameAvailabilityCommand, bool?> {
-  const CheckUsernameAvailabilityCommandProvider._()
+  CheckUsernameAvailabilityCommandProvider._()
     : super(
         from: null,
         argument: null,
@@ -44,7 +44,6 @@ abstract class _$CheckUsernameAvailabilityCommand
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AsyncValue<bool?>, bool?>;
     final element =
         ref.element
@@ -54,6 +53,6 @@ abstract class _$CheckUsernameAvailabilityCommand
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

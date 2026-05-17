@@ -10,11 +10,11 @@ part of 'chats_ui_state.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(ChatsUi_isFabVisible)
-const chatsUi_isFabVisibleProvider = ChatsUi_isFabVisibleProvider._();
+final chatsUi_isFabVisibleProvider = ChatsUi_isFabVisibleProvider._();
 
 final class ChatsUi_isFabVisibleProvider
     extends $NotifierProvider<ChatsUi_isFabVisible, bool> {
-  const ChatsUi_isFabVisibleProvider._()
+  ChatsUi_isFabVisibleProvider._()
     : super(
         from: null,
         argument: null,
@@ -49,7 +49,6 @@ abstract class _$ChatsUi_isFabVisible extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -59,6 +58,6 @@ abstract class _$ChatsUi_isFabVisible extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

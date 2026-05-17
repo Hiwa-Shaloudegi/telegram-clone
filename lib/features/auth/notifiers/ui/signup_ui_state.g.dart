@@ -10,12 +10,12 @@ part of 'signup_ui_state.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(SignupUi_isPasswordObscure)
-const signupUi_isPasswordObscureProvider =
+final signupUi_isPasswordObscureProvider =
     SignupUi_isPasswordObscureProvider._();
 
 final class SignupUi_isPasswordObscureProvider
     extends $NotifierProvider<SignupUi_isPasswordObscure, bool> {
-  const SignupUi_isPasswordObscureProvider._()
+  SignupUi_isPasswordObscureProvider._()
     : super(
         from: null,
         argument: null,
@@ -50,7 +50,6 @@ abstract class _$SignupUi_isPasswordObscure extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -60,17 +59,17 @@ abstract class _$SignupUi_isPasswordObscure extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(SignupUi_isRepeatPasswordObscure)
-const signupUi_isRepeatPasswordObscureProvider =
+final signupUi_isRepeatPasswordObscureProvider =
     SignupUi_isRepeatPasswordObscureProvider._();
 
 final class SignupUi_isRepeatPasswordObscureProvider
     extends $NotifierProvider<SignupUi_isRepeatPasswordObscure, bool> {
-  const SignupUi_isRepeatPasswordObscureProvider._()
+  SignupUi_isRepeatPasswordObscureProvider._()
     : super(
         from: null,
         argument: null,
@@ -106,7 +105,6 @@ abstract class _$SignupUi_isRepeatPasswordObscure extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -116,6 +114,6 @@ abstract class _$SignupUi_isRepeatPasswordObscure extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

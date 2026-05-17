@@ -10,7 +10,7 @@ part of 'connection_service.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(connectivityStream)
-const connectivityStreamProvider = ConnectivityStreamProvider._();
+final connectivityStreamProvider = ConnectivityStreamProvider._();
 
 final class ConnectivityStreamProvider
     extends
@@ -22,7 +22,7 @@ final class ConnectivityStreamProvider
     with
         $FutureModifier<List<ConnectivityResult>>,
         $StreamProvider<List<ConnectivityResult>> {
-  const ConnectivityStreamProvider._()
+  ConnectivityStreamProvider._()
     : super(
         from: null,
         argument: null,
@@ -52,7 +52,7 @@ String _$connectivityStreamHash() =>
     r'63b6e0e427b796cdff6b172cd47ea2b1a7aca8cc';
 
 @ProviderFor(channelStatusStream)
-const channelStatusStreamProvider = ChannelStatusStreamProvider._();
+final channelStatusStreamProvider = ChannelStatusStreamProvider._();
 
 final class ChannelStatusStreamProvider
     extends
@@ -64,7 +64,7 @@ final class ChannelStatusStreamProvider
     with
         $FutureModifier<RealtimeSubscribeStatus>,
         $StreamProvider<RealtimeSubscribeStatus> {
-  const ChannelStatusStreamProvider._()
+  ChannelStatusStreamProvider._()
     : super(
         from: null,
         argument: null,
@@ -94,10 +94,10 @@ String _$channelStatusStreamHash() =>
     r'5f5e3364ed2dce2d3073cc4be79f7af1a450c9bc';
 
 @ProviderFor(IsSyncing)
-const isSyncingProvider = IsSyncingProvider._();
+final isSyncingProvider = IsSyncingProvider._();
 
 final class IsSyncingProvider extends $NotifierProvider<IsSyncing, bool> {
-  const IsSyncingProvider._()
+  IsSyncingProvider._()
     : super(
         from: null,
         argument: null,
@@ -131,7 +131,6 @@ abstract class _$IsSyncing extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -141,12 +140,12 @@ abstract class _$IsSyncing extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(appConnectionStatus)
-const appConnectionStatusProvider = AppConnectionStatusProvider._();
+final appConnectionStatusProvider = AppConnectionStatusProvider._();
 
 final class AppConnectionStatusProvider
     extends
@@ -156,7 +155,7 @@ final class AppConnectionStatusProvider
           TelegramConnectionState
         >
     with $Provider<TelegramConnectionState> {
-  const AppConnectionStatusProvider._()
+  AppConnectionStatusProvider._()
     : super(
         from: null,
         argument: null,

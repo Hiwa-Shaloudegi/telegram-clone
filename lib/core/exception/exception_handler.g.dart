@@ -10,7 +10,7 @@ part of 'exception_handler.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(exceptionHandler)
-const exceptionHandlerProvider = ExceptionHandlerProvider._();
+final exceptionHandlerProvider = ExceptionHandlerProvider._();
 
 final class ExceptionHandlerProvider
     extends
@@ -20,7 +20,7 @@ final class ExceptionHandlerProvider
           ExceptionHandler
         >
     with $Provider<ExceptionHandler> {
-  const ExceptionHandlerProvider._()
+  ExceptionHandlerProvider._()
     : super(
         from: null,
         argument: null,

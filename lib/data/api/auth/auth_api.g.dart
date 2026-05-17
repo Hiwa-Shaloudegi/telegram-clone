@@ -10,12 +10,12 @@ part of 'auth_api.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(authApi)
-const authApiProvider = AuthApiProvider._();
+final authApiProvider = AuthApiProvider._();
 
 final class AuthApiProvider
     extends $FunctionalProvider<AuthApi, AuthApi, AuthApi>
     with $Provider<AuthApi> {
-  const AuthApiProvider._()
+  AuthApiProvider._()
     : super(
         from: null,
         argument: null,

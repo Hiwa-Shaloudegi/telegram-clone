@@ -10,11 +10,11 @@ part of 'get_user_chats_query.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(GetUserChatsQuery)
-const getUserChatsQueryProvider = GetUserChatsQueryProvider._();
+final getUserChatsQueryProvider = GetUserChatsQueryProvider._();
 
 final class GetUserChatsQueryProvider
     extends $AsyncNotifierProvider<GetUserChatsQuery, List<ChatListItemModel>> {
-  const GetUserChatsQueryProvider._()
+  GetUserChatsQueryProvider._()
     : super(
         from: null,
         argument: null,
@@ -41,7 +41,6 @@ abstract class _$GetUserChatsQuery
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref =
         this.ref
             as $Ref<
@@ -59,6 +58,6 @@ abstract class _$GetUserChatsQuery
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'login_command.dart';
+part of 'add_contact_command.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,43 +9,43 @@ part of 'login_command.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(LoginCommand)
-final loginCommandProvider = LoginCommandProvider._();
+@ProviderFor(AddContactCommand)
+final addContactCommandProvider = AddContactCommandProvider._();
 
-final class LoginCommandProvider
-    extends $AsyncNotifierProvider<LoginCommand, void> {
-  LoginCommandProvider._()
+final class AddContactCommandProvider
+    extends $AsyncNotifierProvider<AddContactCommand, bool> {
+  AddContactCommandProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'loginCommandProvider',
+        name: r'addContactCommandProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$loginCommandHash();
+  String debugGetCreateSourceHash() => _$addContactCommandHash();
 
   @$internal
   @override
-  LoginCommand create() => LoginCommand();
+  AddContactCommand create() => AddContactCommand();
 }
 
-String _$loginCommandHash() => r'97019da8a16d75aa93c5bc626722a11d7b5ff23e';
+String _$addContactCommandHash() => r'3bf35d8304cf476c954577b014db3145226135b2';
 
-abstract class _$LoginCommand extends $AsyncNotifier<void> {
-  FutureOr<void> build();
+abstract class _$AddContactCommand extends $AsyncNotifier<bool> {
+  FutureOr<bool> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<void>, void>;
+    final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<void>, void>,
-              AsyncValue<void>,
+              AnyNotifier<AsyncValue<bool>, bool>,
+              AsyncValue<bool>,
               Object?,
               Object?
             >;

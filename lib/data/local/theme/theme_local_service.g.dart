@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../../data/local/theme/theme_local_service.dart';
+part of 'theme_local_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -8,9 +8,9 @@ part of '../../data/local/theme/theme_local_service.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
- 
+
 @ProviderFor(themeLocalService)
-const themeLocalServiceProvider = ThemeLocalServiceProvider._();
+final themeLocalServiceProvider = ThemeLocalServiceProvider._();
 
 final class ThemeLocalServiceProvider
     extends
@@ -20,7 +20,7 @@ final class ThemeLocalServiceProvider
           ThemeLocalService
         >
     with $Provider<ThemeLocalService> {
-  const ThemeLocalServiceProvider._()
+  ThemeLocalServiceProvider._()
     : super(
         from: null,
         argument: null,

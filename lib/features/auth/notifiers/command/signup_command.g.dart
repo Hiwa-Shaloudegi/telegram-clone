@@ -10,11 +10,11 @@ part of 'signup_command.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(SignupCommand)
-const signupCommandProvider = SignupCommandProvider._();
+final signupCommandProvider = SignupCommandProvider._();
 
 final class SignupCommandProvider
     extends $AsyncNotifierProvider<SignupCommand, void> {
-  const SignupCommandProvider._()
+  SignupCommandProvider._()
     : super(
         from: null,
         argument: null,
@@ -40,7 +40,6 @@ abstract class _$SignupCommand extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
-    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element =
         ref.element
@@ -50,6 +49,6 @@ abstract class _$SignupCommand extends $AsyncNotifier<void> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, null);
+    element.handleCreate(ref, build);
   }
 }
