@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/core/exception/app_exception.dart';
 import 'package:telegram_clone/core/exception/exception_handler.dart';
+import 'package:telegram_clone/data/models/contact_with_acount_and_presence_model.dart';
 import 'package:telegram_clone/services/supabase_client.dart';
 
 part 'contacts_api.g.dart';
@@ -64,5 +65,20 @@ class ContactsApi {
     } catch (e) {
       exceptionHandler.handle(e);
     }
+  }
+
+  Future<List<ContactWithAcountAndPresenceModel>> fetchContacts() async {
+    final response = await supabase.rpc(
+      'get_contacts_with_account_and_presence',
+    );
+    final List<dynamic> rows = (response as List<dynamic>);
+
+    return rows
+        .map(
+          (e) => ContactWithAcountAndPresenceModel.fromJson(
+            e as Map<String, dynamic>,
+          ),
+        )
+        .toList();
   }
 }

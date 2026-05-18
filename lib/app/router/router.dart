@@ -30,7 +30,7 @@ GoRouter router(Ref ref) {
     initialLocation: '/splash',
     refreshListenable: userValueNotifier,
     errorBuilder: (context, state) => const NotFoundPage(),
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: false,
     routes: [
       GoRoute(
         path: '/splash',

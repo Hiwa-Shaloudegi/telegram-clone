@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/ui/widgets/section_divider.dart';
 import 'package:telegram_clone/features/contacts/ui/widgets/add_contact_bottom_sheet.dart';
+import 'package:telegram_clone/features/contacts/ui/widgets/contacts_list.dart';
 import 'package:telegram_clone/features/contacts/ui/widgets/new_contacts_action_tile.dart';
 
 class ContactsPage extends ConsumerStatefulWidget {
@@ -49,13 +50,8 @@ class _ContactsPageState extends ConsumerState<ContactsPage> {
               onTap: () {},
             ),
           ],
-
           SectionDivider(),
-
-          // TODO: get the list of user contacts:
-          Expanded(
-            child: Center(child: Text('User contacts will be shown here')),
-          ),
+          Expanded(child: ContactsList()),
         ],
       ),
     );
