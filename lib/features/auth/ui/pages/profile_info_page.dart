@@ -36,7 +36,6 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
     if (_formKey.currentState?.validate() ?? false) {
       final firstName = _firstNameController.text.trim();
       final lastName = _lastNameController.text.trim();
-      // final displayName = '$firstName $lastName'.trim();
 
       await ref
           .read(completeProfileCommandProvider.notifier)

@@ -44,12 +44,13 @@ class ProfilePage extends ConsumerWidget {
             itemBuilder: (_) => const [
               PopupMenuItem(
                 value: ProfileMenuAction.editInfo,
-                child: MenuItem(icon: Icons.edit, text: 'Edit info'),
+                child: MenuItem(icon: Icons.edit_outlined, text: 'Edit info'),
               ),
               PopupMenuItem(
                 value: ProfileMenuAction.setPhoto,
                 child: MenuItem(
                   icon: Icons.photo_camera_outlined,
+
                   text: 'Set profile photo',
                 ),
               ),
