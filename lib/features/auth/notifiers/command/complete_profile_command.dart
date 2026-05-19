@@ -10,11 +10,15 @@ class CompleteProfileCommand extends _$CompleteProfileCommand {
   @override
   FutureOr<void> build() {}
 
-  Future<void> run({required String displayName, XFile? profileImage}) async {
+  Future<void> run({
+    required String firstName,
+    required String lastName,
+    XFile? profileImage,
+  }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final userApi = ref.read(userApiProvider);
-      await userApi.updateProfile(displayName: displayName);
+      await userApi.updateProfile(firstName: firstName, lastName: lastName);
 
       if (profileImage != null) {
         final storageApi = ref.read(storageApiProvider);

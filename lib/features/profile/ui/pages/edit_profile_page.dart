@@ -16,7 +16,8 @@ class EditProfilePage extends ConsumerStatefulWidget {
 }
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
-  late final TextEditingController _displayNameController;
+  late final TextEditingController _firstNameController;
+  late final TextEditingController _lastNameController;
   late final TextEditingController _usernameController;
   late final TextEditingController _bioController;
   final _formKey = GlobalKey<FormState>();
@@ -26,14 +27,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    _displayNameController = TextEditingController();
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
     _usernameController = TextEditingController();
     _bioController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _displayNameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _usernameController.dispose();
     _bioController.dispose();
     super.dispose();
@@ -57,7 +60,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         await ref
             .read(userApiProvider)
             .updateProfile(
-              displayName: _displayNameController.text.trim(),
+              firstName: _firstNameController.text.trim(),
+              lastName: _lastNameController.text.trim(),
               username: usernameToUpdate,
               bio: _bioController.text.trim(),
             );
@@ -106,14 +110,19 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 children: [
                   const SizedBox(height: 16),
                   InputTextField(
-                    controller: _displayNameController,
-                    label: 'Display Name',
+                    controller: _firstNameController,
+                    label: 'First Name',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Display name is required';
+                        return 'First name is required';
                       }
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 16),
+                  InputTextField(
+                    controller: _lastNameController,
+                    label: 'Last Name',
                   ),
                   const SizedBox(height: 16),
                   InputTextField(

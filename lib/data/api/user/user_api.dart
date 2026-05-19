@@ -2,8 +2,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/core/exception/app_exception.dart';
 import 'package:telegram_clone/core/exception/exception_handler.dart';
-import 'package:telegram_clone/services/supabase_client.dart';
 import 'package:telegram_clone/data/models/user_profile.dart';
+import 'package:telegram_clone/services/supabase_client.dart';
 
 part 'user_api.g.dart';
 
@@ -15,7 +15,6 @@ UserApi userApi(Ref ref) {
   );
 }
 
-
 class UserApi {
   final SupabaseClient supabase;
   final ExceptionHandler exceptionHandler;
@@ -25,7 +24,7 @@ class UserApi {
   String? get _currentUserId =>
       supabase.auth.currentUser?.id ?? supabase.auth.currentSession?.user.id;
 
-  Future<UserProfile>  getUserProfile() async {
+  Future<UserProfile> getUserProfile() async {
     try {
       final userId = _currentUserId;
       if (userId == null) {
@@ -65,7 +64,9 @@ class UserApi {
   Future<UserProfile?> getUserByUsername(String username) async {
     try {
       // Ensure username starts with @
-      final formattedUsername = username.startsWith('@') ? username : '@$username';
+      final formattedUsername = username.startsWith('@')
+          ? username
+          : '@$username';
 
       final response = await supabase
           .from('users')
@@ -75,7 +76,7 @@ class UserApi {
           .maybeSingle();
 
       if (response == null) return null;
-      
+
       return UserProfile.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
@@ -108,14 +109,17 @@ class UserApi {
   Future<bool> isUsernameAvailable(String username) async {
     try {
       // Ensure username starts with @
-      final formattedUsername = username.startsWith('@') ? username : '@$username';
+      final formattedUsername = username.startsWith('@')
+          ? username
+          : '@$username';
 
       // Validate format
       final usernameRegex = RegExp(r'^@[a-zA-Z0-9_]{3,30}$');
       if (!usernameRegex.hasMatch(formattedUsername)) {
         throw AppException(
           message: 'Invalid username format',
-          userMessage: 'Username must be 3-30 characters and contain only letters, numbers, and underscores',
+          userMessage:
+              'Username must be 3-30 characters and contain only letters, numbers, and underscores',
         );
       }
 
@@ -132,13 +136,14 @@ class UserApi {
   }
 
   Future<UserProfile> updateProfile({
-    String? displayName,
+    String? firstName,
+    String? lastName,
     String? bio,
     String? username,
   }) async {
     try {
       final userId = _currentUserId;
-      
+
       if (userId == null) {
         throw AppException(
           message: 'No authenticated user',
@@ -148,8 +153,11 @@ class UserApi {
 
       final updates = <String, dynamic>{};
 
-      if (displayName != null && displayName.trim().isNotEmpty) {
-        updates['display_name'] = displayName.trim();
+      if (firstName != null && firstName.trim().isNotEmpty) {
+        updates['first_name'] = firstName.trim();
+      }
+      if (lastName != null && lastName.trim().isNotEmpty) {
+        updates['last_name'] = lastName.trim();
       }
 
       if (bio != null) {
@@ -159,13 +167,16 @@ class UserApi {
 
       if (username != null && username.trim().isNotEmpty) {
         // Format and validate username
-        final formattedUsername = username.startsWith('@') ? username : '@$username';
+        final formattedUsername = username.startsWith('@')
+            ? username
+            : '@$username';
         final usernameRegex = RegExp(r'^@[a-zA-Z0-9_]{3,30}$');
-        
+
         if (!usernameRegex.hasMatch(formattedUsername)) {
           throw AppException(
             message: 'Invalid username format',
-            userMessage: 'Username must be 3-30 characters and contain only letters, numbers, and underscores',
+            userMessage:
+                'Username must be 3-30 characters and contain only letters, numbers, and underscores',
           );
         }
 
@@ -174,7 +185,8 @@ class UserApi {
         if (!isAvailable) {
           throw AppException(
             message: 'Username already taken',
-            userMessage: 'This username is already in use. Please choose another.',
+            userMessage:
+                'This username is already in use. Please choose another.',
           );
         }
 
@@ -206,7 +218,7 @@ class UserApi {
   Future<UserProfile> updateProfileImage(String imageUrl) async {
     try {
       final userId = _currentUserId;
-      
+
       if (userId == null) {
         throw AppException(
           message: 'No authenticated user',
@@ -240,7 +252,7 @@ class UserApi {
   Future<UserProfile> removeProfileImage() async {
     try {
       final userId = _currentUserId;
-      
+
       if (userId == null) {
         throw AppException(
           message: 'No authenticated user',
@@ -267,7 +279,7 @@ class UserApi {
   Future<UserProfile> addAdditionalImage(String imageUrl) async {
     try {
       final userId = _currentUserId;
-      
+
       if (userId == null) {
         throw AppException(
           message: 'No authenticated user',
@@ -316,7 +328,7 @@ class UserApi {
   Future<UserProfile> removeAdditionalImage(String imageUrl) async {
     try {
       final userId = _currentUserId;
-      
+
       if (userId == null) {
         throw AppException(
           message: 'No authenticated user',
@@ -355,7 +367,7 @@ class UserApi {
   Future<void> deleteAccount() async {
     try {
       final userId = _currentUserId;
-      
+
       if (userId == null) {
         throw AppException(
           message: 'No authenticated user',
