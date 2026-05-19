@@ -68,7 +68,7 @@ class AppDrawerHeader extends ConsumerWidget {
                 ? null
                 : Center(
                     child: Text(
-                      profile.initials,
+                      profile.shortDisplayName,
                       style: TextStyle(
                         fontSize: 27,
                         fontWeight: FontWeight.bold,

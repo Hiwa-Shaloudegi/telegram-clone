@@ -1,4 +1,4 @@
-import 'package:telegram_clone/data/models/user_profile.dart';
+import 'package:telegram_clone/data/models/user_profile_model.dart';
 
 class MessageModel {
   final String id;
@@ -14,7 +14,7 @@ class MessageModel {
   final DateTime updatedAt;
   final DateTime? deletedAt;
 
-  UserProfile? sender;
+  UserProfileModel? sender;
   MessageModel? replyToMessage;
 
   MessageModel({
@@ -51,7 +51,7 @@ class MessageModel {
           ? DateTime.parse(json['deleted_at'] as String)
           : null,
       sender: json['sender'] != null
-          ? UserProfile.fromJson(json['sender'] as Map<String, dynamic>)
+          ? UserProfileModel.fromJson(json['sender'] as Map<String, dynamic>)
           : null,
       replyToMessage: json['reply_to'] != null
           ? MessageModel.fromJson(json['reply_to'] as Map<String, dynamic>)
@@ -89,7 +89,7 @@ class MessageModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? deletedAt,
-    UserProfile? sender,
+    UserProfileModel? sender,
     MessageModel? replyToMessage,
   }) {
     return MessageModel(

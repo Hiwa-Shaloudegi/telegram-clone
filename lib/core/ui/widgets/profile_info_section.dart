@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:telegram_clone/data/models/user_profile.dart';
+import 'package:telegram_clone/data/models/user_profile_model.dart';
 import 'package:telegram_clone/features/settings/ui/widgets/info_tile.dart';
 
 class ProfileInfoSection extends StatelessWidget {
-  final UserProfile profile;
+  final UserProfileModel profile;
 
-  const ProfileInfoSection({
-    super.key,
-    required this.profile,
-  });
+  const ProfileInfoSection({super.key, required this.profile});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +28,7 @@ class ProfileInfoSection extends StatelessWidget {
     }
 
     if ((profile.username ?? '').isNotEmpty) {
-      addTile(
-        title: '@${profile.usernameWithoutAt}',
-        subtitle: 'Username',
-      );
+      addTile(title: '@${profile.usernameWithoutAt}', subtitle: 'Username');
     }
 
     if ((profile.bio ?? '').isNotEmpty) {
@@ -56,13 +50,18 @@ class ProfileInfoSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-      Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text(
-          "Info",
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.blueAccent, fontWeight: FontWeight.bold,),
-        ),
-      ),...items],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "Info",
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Colors.blueAccent,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          ...items,
+        ],
       ),
     );
   }

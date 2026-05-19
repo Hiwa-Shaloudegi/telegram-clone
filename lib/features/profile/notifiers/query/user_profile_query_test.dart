@@ -1,14 +1,14 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/core/cache/query_cache_service.dart';
 import 'package:telegram_clone/data/api/user/user_api.dart';
-import 'package:telegram_clone/data/models/user_profile.dart';
+import 'package:telegram_clone/data/models/user_profile_model.dart';
 
 part 'user_profile_query_test.g.dart';
 
 @Riverpod(keepAlive: true)
 class UserProfileQueryTest extends _$UserProfileQueryTest {
   @override
-  Future<UserProfile> build() async {
+  Future<UserProfileModel> build() async {
     final cache = ref.read(queryCacheServiceProvider);
 
     // 1️⃣ Emit cached data immediately (no loading)

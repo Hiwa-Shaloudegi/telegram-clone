@@ -3,30 +3,31 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/core/cache/cacheable_mixin.dart';
 import 'package:telegram_clone/core/constants/cache_keys.dart';
 import 'package:telegram_clone/data/api/user/user_api.dart';
-import 'package:telegram_clone/data/models/user_profile.dart';
+import 'package:telegram_clone/data/models/user_profile_model.dart';
 import 'package:telegram_clone/features/auth/notifiers/on_auth_changes_notifier.dart';
 
 part 'user_profile_query.g.dart';
 
 @Riverpod(keepAlive: true)
 class UserProfileQuery extends _$UserProfileQuery
-    with CacheableMixin<UserProfile> {
+    with CacheableMixin<UserProfileModel> {
   @override
   String get cacheKey => CacheKeys.currentUser;
 
   @override
-  UserProfile fromJson(Map<String, dynamic> json) => UserProfile.fromJson(json);
+  UserProfileModel fromJson(Map<String, dynamic> json) =>
+      UserProfileModel.fromJson(json);
 
   @override
-  Map<String, dynamic> toJson(UserProfile data) => data.toJson();
+  Map<String, dynamic> toJson(UserProfileModel data) => data.toJson();
 
   @override
-  Future<UserProfile> fetchFromNetwork() {
+  Future<UserProfileModel> fetchFromNetwork() {
     return ref.read(userApiProvider).getUserProfile();
   }
 
   @override
-  FutureOr<UserProfile> build() {
+  FutureOr<UserProfileModel> build() {
     // Watch for auth changes to automatically react
     final authState = ref.watch(onAuthChangesProvider).asData?.value;
 

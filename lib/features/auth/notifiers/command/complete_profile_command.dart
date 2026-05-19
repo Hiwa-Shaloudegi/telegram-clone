@@ -13,12 +13,17 @@ class CompleteProfileCommand extends _$CompleteProfileCommand {
   Future<void> run({
     required String firstName,
     required String lastName,
+    required String phone,
     XFile? profileImage,
   }) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final userApi = ref.read(userApiProvider);
-      await userApi.updateProfile(firstName: firstName, lastName: lastName);
+      await userApi.updateProfile(
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,
+      );
 
       if (profileImage != null) {
         final storageApi = ref.read(storageApiProvider);

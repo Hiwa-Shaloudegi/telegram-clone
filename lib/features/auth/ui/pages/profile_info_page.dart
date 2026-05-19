@@ -8,6 +8,7 @@ import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/input_text_field.dart';
+import 'package:telegram_clone/core/ui/widgets/phone_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/complete_profile_command.dart';
 import 'package:telegram_clone/features/auth/notifiers/ui/profile_info_ui_state.dart';
@@ -22,6 +23,7 @@ class ProfileInfoPage extends ConsumerStatefulWidget {
 class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _phoneController = TextEditingController();
   // final _usernameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -29,10 +31,11 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
-  void _onComplete() async {
+  void _onComplete({required String phoneNumber}) async {
     if (_formKey.currentState?.validate() ?? false) {
       final firstName = _firstNameController.text.trim();
       final lastName = _lastNameController.text.trim();
@@ -42,6 +45,7 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
           .run(
             firstName: firstName,
             lastName: lastName,
+            phone: phoneNumber,
             profileImage: ref.read(profileInfoUi_selectedProfileImageProvider),
           );
     }
@@ -49,6 +53,7 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    String phoneNumber = '';
     final theme = Theme.of(context);
 
     ref.listen<AsyncValue<void>>(completeProfileCommandProvider, (_, next) {
@@ -138,7 +143,13 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
                           controller: _lastNameController,
                           label: 'Last Name (Optional)',
                         ),
-
+                        const SizedBox(height: 16),
+                        PhoneField(
+                          controller: _phoneController,
+                          onChanged: (phone) {
+                            phoneNumber = phone.completeNumber;
+                          },
+                        ),
                         // Consumer(
                         //   builder: (context, ref, _) {
                         //     final isUsernameAvailableAsync = ref.watch(
@@ -250,7 +261,7 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
                     isLoading: ref
                         .watch(completeProfileCommandProvider)
                         .isLoading,
-                    onPressed: _onComplete,
+                    onPressed: () => _onComplete(phoneNumber: phoneNumber),
                   ),
 
                   const SizedBox(height: 24),

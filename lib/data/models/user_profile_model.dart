@@ -1,9 +1,10 @@
-class UserProfile {
+class UserProfileModel {
   final String id;
   final String? email;
   final String? phone;
   final String? username;
-  final String displayName;
+  final String firstName;
+  final String? lastName;
   final String? bio;
   final String? profileImageUrl;
   final List<String> additionalImages;
@@ -13,12 +14,24 @@ class UserProfile {
   final bool isActive;
   final DateTime? birthday;
 
-  UserProfile({
+  String get displayName => '$firstName $lastName'.trim();
+  String get shortDisplayName {
+    final nameList = displayName.split(' ');
+    final f = nameList[0][0].toUpperCase();
+    if (nameList.length > 1) {
+      final l = nameList[1][0].toUpperCase();
+      return '$f$l';
+    }
+    return f;
+  }
+
+  UserProfileModel({
     required this.id,
     this.email,
     this.phone,
     this.username,
-    required this.displayName,
+    required this.firstName,
+    this.lastName,
     this.bio,
     this.profileImageUrl,
     this.additionalImages = const [],
@@ -29,13 +42,14 @@ class UserProfile {
     this.birthday,
   });
 
-  factory UserProfile.fromJson(Map<String, dynamic> json) {
-    return UserProfile(
+  factory UserProfileModel.fromJson(Map<String, dynamic> json) {
+    return UserProfileModel(
       id: json['id'] as String,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
       username: json['username'] as String?,
-      displayName: json['display_name'] as String,
+      firstName: json['first_name'] as String,
+      lastName: json['last_name'] as String?,
       bio: json['bio'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
       additionalImages: json['additional_images'] != null
@@ -57,7 +71,8 @@ class UserProfile {
       'email': email,
       'phone': phone,
       'username': username,
-      'display_name': displayName,
+      'first_name': firstName,
+      'last_name': lastName,
       'bio': bio,
       'profile_image_url': profileImageUrl,
       'additional_images': additionalImages,
@@ -69,12 +84,13 @@ class UserProfile {
     };
   }
 
-  UserProfile copyWith({
+  UserProfileModel copyWith({
     String? id,
     String? email,
     String? phone,
     String? username,
-    String? displayName,
+    String? firstName,
+    String? lastName,
     String? bio,
     String? profileImageUrl,
     List<String>? additionalImages,
@@ -84,12 +100,13 @@ class UserProfile {
     bool? isActive,
     DateTime? birthday,
   }) {
-    return UserProfile(
+    return UserProfileModel(
       id: id ?? this.id,
       email: email ?? this.email,
       phone: phone ?? this.phone,
       username: username ?? this.username,
-      displayName: displayName ?? this.displayName,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
       bio: bio ?? this.bio,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       additionalImages: additionalImages ?? this.additionalImages,
@@ -101,16 +118,16 @@ class UserProfile {
     );
   }
 
-  String get initials {
-    if (displayName.isNotEmpty) {
-      final parts = displayName.trim().split(' ');
-      if (parts.length >= 2) {
-        return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-      }
-      return displayName[0].toUpperCase();
-    }
-    return email?.substring(0, 1).toUpperCase() ?? 'U';
-  }
+  // String get initials {
+  //   if (displayName.isNotEmpty) {
+  //     final parts = displayName.trim().split(' ');
+  //     if (parts.length >= 2) {
+  //       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+  //     }
+  //     return displayName[0].toUpperCase();
+  //   }
+  //   return email?.substring(0, 1).toUpperCase() ?? 'U';
+  // }
 
   String? get usernameWithoutAt {
     if (username == null) return null;

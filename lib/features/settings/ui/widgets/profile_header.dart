@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:telegram_clone/data/models/user_profile.dart';
+import 'package:telegram_clone/data/models/user_profile_model.dart';
 
 class ProfileHeader extends StatelessWidget {
-  final UserProfile profile;
+  final UserProfileModel profile;
 
   const ProfileHeader({super.key, required this.profile});
 
@@ -23,7 +23,7 @@ class ProfileHeader extends StatelessWidget {
             child: profile.hasProfileImage
                 ? null
                 : Text(
-                    profile.initials,
+                    profile.shortDisplayName,
                     style: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,

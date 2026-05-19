@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
+import 'package:telegram_clone/core/ui/widgets/phone_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
 import 'package:telegram_clone/features/contacts/notifiers/command/add_contact_command.dart';
 
@@ -115,25 +115,10 @@ class _AddContactBottomSheetState extends ConsumerState<AddContactBottomSheet> {
                 ),
               ),
               SizedBox(height: 16),
-              IntlPhoneField(
+              PhoneField(
                 controller: _phoneController,
-                showDropdownIcon: false,
-                flagsButtonPadding: EdgeInsets.only(left: 8),
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  labelText: 'Phone number',
-                  border: OutlineInputBorder(),
-                ),
-                initialCountryCode: 'US',
                 onChanged: (phone) {
                   phoneNumber = phone.completeNumber;
-                },
-                disableLengthCheck: false,
-                validator: (value) {
-                  if (value == null || value.number.trim().isEmpty) {
-                    return 'Please enter phone number';
-                  }
-                  return null;
                 },
               ),
 

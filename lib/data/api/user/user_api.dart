@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/core/exception/app_exception.dart';
 import 'package:telegram_clone/core/exception/exception_handler.dart';
-import 'package:telegram_clone/data/models/user_profile.dart';
+import 'package:telegram_clone/data/models/user_profile_model.dart';
 import 'package:telegram_clone/services/supabase_client.dart';
 
 part 'user_api.g.dart';
@@ -24,7 +24,7 @@ class UserApi {
   String? get _currentUserId =>
       supabase.auth.currentUser?.id ?? supabase.auth.currentSession?.user.id;
 
-  Future<UserProfile> getUserProfile() async {
+  Future<UserProfileModel> getUserProfile() async {
     try {
       final userId = _currentUserId;
       if (userId == null) {
@@ -40,13 +40,13 @@ class UserApi {
           .eq('id', userId)
           .single();
 
-      return UserProfile.fromJson(response);
+      return UserProfileModel.fromJson(response);
     } on Exception catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserProfile> getUserById(String userId) async {
+  Future<UserProfileModel> getUserById(String userId) async {
     try {
       final response = await supabase
           .from('users')
@@ -55,13 +55,13 @@ class UserApi {
           .eq('is_active', true)
           .single();
 
-      return UserProfile.fromJson(response);
+      return UserProfileModel.fromJson(response);
     } on Exception catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserProfile?> getUserByUsername(String username) async {
+  Future<UserProfileModel?> getUserByUsername(String username) async {
     try {
       // Ensure username starts with @
       final formattedUsername = username.startsWith('@')
@@ -77,13 +77,16 @@ class UserApi {
 
       if (response == null) return null;
 
-      return UserProfile.fromJson(response);
+      return UserProfileModel.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<List<UserProfile>> searchUsers(String query, {int limit = 20}) async {
+  Future<List<UserProfileModel>> searchUsers(
+    String query, {
+    int limit = 20,
+  }) async {
     try {
       if (query.trim().isEmpty) {
         return [];
@@ -99,7 +102,7 @@ class UserApi {
           .limit(limit);
 
       return (response as List)
-          .map((json) => UserProfile.fromJson(json))
+          .map((json) => UserProfileModel.fromJson(json))
           .toList();
     } catch (e, st) {
       exceptionHandler.handle(e, st);
@@ -135,9 +138,10 @@ class UserApi {
     }
   }
 
-  Future<UserProfile> updateProfile({
+  Future<UserProfileModel> updateProfile({
     String? firstName,
     String? lastName,
+    String? phone,
     String? bio,
     String? username,
   }) async {
@@ -158,6 +162,9 @@ class UserApi {
       }
       if (lastName != null && lastName.trim().isNotEmpty) {
         updates['last_name'] = lastName.trim();
+      }
+      if (phone != null && phone.trim().isNotEmpty) {
+        updates['phone'] = phone.trim();
       }
 
       if (bio != null) {
@@ -209,13 +216,13 @@ class UserApi {
           .select()
           .single();
 
-      return UserProfile.fromJson(response);
+      return UserProfileModel.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserProfile> updateProfileImage(String imageUrl) async {
+  Future<UserProfileModel> updateProfileImage(String imageUrl) async {
     try {
       final userId = _currentUserId;
 
@@ -243,13 +250,13 @@ class UserApi {
           .select()
           .single();
 
-      return UserProfile.fromJson(response);
+      return UserProfileModel.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserProfile> removeProfileImage() async {
+  Future<UserProfileModel> removeProfileImage() async {
     try {
       final userId = _currentUserId;
 
@@ -270,13 +277,13 @@ class UserApi {
           .select()
           .single();
 
-      return UserProfile.fromJson(response);
+      return UserProfileModel.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserProfile> addAdditionalImage(String imageUrl) async {
+  Future<UserProfileModel> addAdditionalImage(String imageUrl) async {
     try {
       final userId = _currentUserId;
 
@@ -319,13 +326,13 @@ class UserApi {
           .select()
           .single();
 
-      return UserProfile.fromJson(response);
+      return UserProfileModel.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
   }
 
-  Future<UserProfile> removeAdditionalImage(String imageUrl) async {
+  Future<UserProfileModel> removeAdditionalImage(String imageUrl) async {
     try {
       final userId = _currentUserId;
 
@@ -358,7 +365,7 @@ class UserApi {
           .select()
           .single();
 
-      return UserProfile.fromJson(response);
+      return UserProfileModel.fromJson(response);
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
@@ -391,7 +398,7 @@ class UserApi {
     }
   }
 
-  Future<List<UserProfile>> getUsersByIds(List<String> userIds) async {
+  Future<List<UserProfileModel>> getUsersByIds(List<String> userIds) async {
     try {
       if (userIds.isEmpty) {
         return [];
@@ -404,7 +411,7 @@ class UserApi {
           .eq('is_active', true);
 
       return (response as List)
-          .map((json) => UserProfile.fromJson(json))
+          .map((json) => UserProfileModel.fromJson(json))
           .toList();
     } catch (e, st) {
       exceptionHandler.handle(e, st);
