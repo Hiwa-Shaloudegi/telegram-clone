@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:logger/logger.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
 import 'package:telegram_clone/features/contacts/notifiers/command/add_contact_command.dart';
@@ -48,7 +47,6 @@ class _AddContactBottomSheetState extends ConsumerState<AddContactBottomSheet> {
     ref.listen(addContactCommandProvider, (previous, next) {
       next.when(
         data: (data) {
-          Logger().w("NEXT VALUE: ${next.value}");
           final hasAccount = next.value as bool;
 
           if (hasAccount) {

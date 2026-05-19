@@ -22,6 +22,26 @@ class ContactWithAcountAndPresenceModel {
   final bool isOnline;
   final DateTime? lastSeenAt;
 
+  String get displayName => '$firstName ${lastName ?? ''} ';
+  String get contactDisplayName => '$contactFirstName ${contactLastName ?? ''}';
+  String get shortDisplayName {
+    String res = '${firstName?.substring(0, 1).toUpperCase()}';
+
+    if (lastName != null) {
+      res += '${lastName?.substring(0, 1).toUpperCase()}';
+    }
+    return res;
+  }
+
+  String get shortContactDisplayName {
+    String res = '${contactFirstName?.substring(0, 1).toUpperCase()}';
+
+    if (contactLastName != null) {
+      res += '${contactLastName?.substring(0, 1).toUpperCase()}';
+    }
+    return res;
+  }
+
   ContactWithAcountAndPresenceModel({
     required this.contactId,
     required this.ownerUserId,

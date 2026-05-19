@@ -33,7 +33,7 @@ final class AddContactCommandProvider
   AddContactCommand create() => AddContactCommand();
 }
 
-String _$addContactCommandHash() => r'2e222790865564c77aa05c0cb496ed9effee4937';
+String _$addContactCommandHash() => r'd59d6215e6c374cc3d96aa5e625ea28da1057cc4';
 
 abstract class _$AddContactCommand extends $AsyncNotifier<bool> {
   FutureOr<bool> build();

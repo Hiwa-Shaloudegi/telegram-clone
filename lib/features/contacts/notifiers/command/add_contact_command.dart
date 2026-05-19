@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/api/contacts/contacts_api.dart';
-import 'package:telegram_clone/features/contacts/notifiers/query/get_user_contacts_query.dart';
+import 'package:telegram_clone/features/contacts/notifiers/query/get_contacts_query.dart';
 
 part 'add_contact_command.g.dart';
 
@@ -26,7 +26,7 @@ class AddContactCommand extends _$AddContactCommand {
 
     if (state is AsyncData) {
       // TODO: First update localy, then invalidate.
-      ref.invalidate(getUserContactsQueryProvider, asReload: true);
+      ref.invalidate(getContactsQueryProvider, asReload: true);
     }
 
     link.close();

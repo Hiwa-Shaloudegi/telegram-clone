@@ -28,7 +28,10 @@ class _ContactsPageState extends ConsumerState<ContactsPage> {
           IconButton(onPressed: () {}, icon: Icon(Icons.sort)),
         ],
       ),
-
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showAddContactBottomSheet(context),
+        child: Icon(Icons.person_add_outlined),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
