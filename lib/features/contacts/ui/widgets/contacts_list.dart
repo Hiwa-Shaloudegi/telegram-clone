@@ -4,6 +4,7 @@ import 'package:telegram_clone/core/ui/widgets/section_divider.dart';
 import 'package:telegram_clone/core/utils/date_helper.dart';
 import 'package:telegram_clone/data/models/contact_with_acount_and_presence_model.dart';
 import 'package:telegram_clone/features/contacts/notifiers/query/get_contacts_query.dart';
+import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.dart';
 
 class ContactsList extends ConsumerWidget {
   const ContactsList({super.key});
@@ -38,7 +39,34 @@ class ContactsList extends ConsumerWidget {
 
             // 2. Logic for the Divider
             if (showDivider && index == withAccount.length) {
-              return const SectionDivider();
+              return SectionDivider(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 16, top: 3, bottom: 3),
+                      child: Consumer(
+                        builder: (context, ref, _) {
+                          final sortBy = ref.watch(contactsUi_sortByProvider);
+                          late String msg;
+                          switch (sortBy) {
+                            case ContactsSortBy.alphabet:
+                              msg = 'name';
+                              break;
+                            case ContactsSortBy.lastSeen:
+                              msg = 'last seen time';
+                              break;
+                          }
+                          return Text(
+                            'Sorted by $msg',
+                            style: TextStyle(fontSize: 13),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
             }
 
             // 3. Logic for the second list

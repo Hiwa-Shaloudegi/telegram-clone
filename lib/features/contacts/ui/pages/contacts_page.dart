@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/ui/widgets/section_divider.dart';
+import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.dart';
 import 'package:telegram_clone/features/contacts/ui/widgets/add_contact_bottom_sheet.dart';
 import 'package:telegram_clone/features/contacts/ui/widgets/contacts_list.dart';
 import 'package:telegram_clone/features/contacts/ui/widgets/new_contacts_action_tile.dart';
@@ -25,7 +26,37 @@ class _ContactsPageState extends ConsumerState<ContactsPage> {
         ),
         actions: [
           IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-          IconButton(onPressed: () {}, icon: Icon(Icons.sort)),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                onPressed: () {
+                  ref.read(contactsUi_sortByProvider.notifier).toggle();
+                },
+                icon: Icon(Icons.sort),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 2,
+                child: Consumer(
+                  builder: (_, ref, _) {
+                    final sortBy = ref.watch(contactsUi_sortByProvider);
+                    return switch (sortBy) {
+                      ContactsSortBy.alphabet => Icon(
+                        Icons.sort_by_alpha,
+                        size: 18,
+                      ),
+
+                      ContactsSortBy.lastSeen => Icon(
+                        Icons.timelapse_outlined,
+                        size: 18,
+                      ),
+                    };
+                  },
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
