@@ -29,52 +29,55 @@ class ContactsList extends ConsumerWidget {
         final int itemCount =
             withAccount.length + (showDivider ? 1 : 0) + withoutAccount.length;
 
-        return ListView.builder(
-          itemCount: itemCount,
-          itemBuilder: (context, index) {
-            // 1. Logic for the first list
-            if (index < withAccount.length) {
-              return _buildContactTile(withAccount[index]);
-            }
+        return RefreshIndicator(
+          onRefresh: () async => ref.refresh(getContactsQueryProvider),
+          child: ListView.builder(
+            itemCount: itemCount,
+            itemBuilder: (context, index) {
+              // 1. Logic for the first list
+              if (index < withAccount.length) {
+                return _buildContactTile(withAccount[index]);
+              }
 
-            // 2. Logic for the Divider
-            if (showDivider && index == withAccount.length) {
-              return SectionDivider(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 16, top: 3, bottom: 3),
-                      child: Consumer(
-                        builder: (context, ref, _) {
-                          final sortBy = ref.watch(contactsUi_sortByProvider);
-                          late String msg;
-                          switch (sortBy) {
-                            case ContactsSortBy.alphabet:
-                              msg = 'name';
-                              break;
-                            case ContactsSortBy.lastSeen:
-                              msg = 'last seen time';
-                              break;
-                          }
-                          return Text(
-                            'Sorted by $msg',
-                            style: TextStyle(fontSize: 13),
-                          );
-                        },
+              // 2. Logic for the Divider
+              if (showDivider && index == withAccount.length) {
+                return SectionDivider(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 16, top: 3, bottom: 3),
+                        child: Consumer(
+                          builder: (context, ref, _) {
+                            final sortBy = ref.watch(contactsUi_sortByProvider);
+                            late String msg;
+                            switch (sortBy) {
+                              case ContactsSortBy.alphabet:
+                                msg = 'name';
+                                break;
+                              case ContactsSortBy.lastSeen:
+                                msg = 'last seen time';
+                                break;
+                            }
+                            return Text(
+                              'Sorted by $msg',
+                              style: TextStyle(fontSize: 13),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            }
+                    ],
+                  ),
+                );
+              }
 
-            // 3. Logic for the second list
-            final secondListIndex = showDivider
-                ? index - withAccount.length - 1
-                : index - withAccount.length;
-            return _buildContactTile(withoutAccount[secondListIndex]);
-          },
+              // 3. Logic for the second list
+              final secondListIndex = showDivider
+                  ? index - withAccount.length - 1
+                  : index - withAccount.length;
+              return _buildContactTile(withoutAccount[secondListIndex]);
+            },
+          ),
         );
       },
       error: (e, st) => const Center(child: Text('Failed to load contacts')),
