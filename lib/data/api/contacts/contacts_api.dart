@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -80,5 +82,18 @@ class ContactsApi {
           ),
         )
         .toList();
+  }
+
+  Future<int> bulkDeleteContacts(HashSet<String> contactIds) async {
+    try {
+      final response = await supabase.rpc(
+        'bulk_delete_user_contacts',
+        params: {'p_contact_ids': contactIds.toList()},
+      );
+
+      return response as int;
+    } catch (e) {
+      exceptionHandler.handle(e);
+    }
   }
 }

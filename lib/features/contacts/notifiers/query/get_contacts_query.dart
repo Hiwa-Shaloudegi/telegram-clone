@@ -11,6 +11,19 @@ class GetContactsQuery extends _$GetContactsQuery {
   FutureOr<List<ContactWithAcountAndPresenceModel>> build() async {
     return await ref.read(contactsApiProvider).fetchContacts();
   }
+
+  void set(
+    List<ContactWithAcountAndPresenceModel> Function(
+      List<ContactWithAcountAndPresenceModel> contacts,
+    )
+    cb,
+  ) {
+    final current = state.value;
+
+    if (current == null) return;
+
+    state = AsyncData(cb(current));
+  }
 }
 
 @riverpod

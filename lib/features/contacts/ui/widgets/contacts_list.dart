@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/core/ui/widgets/section_divider.dart';
-import 'package:telegram_clone/core/utils/date_helper.dart';
-import 'package:telegram_clone/data/models/contact_with_acount_and_presence_model.dart';
 import 'package:telegram_clone/features/contacts/notifiers/query/get_contacts_query.dart';
 import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.dart';
+import 'package:telegram_clone/features/contacts/ui/widgets/contact_tile.dart';
 
 class ContactsList extends ConsumerWidget {
   const ContactsList({super.key});
@@ -36,7 +35,7 @@ class ContactsList extends ConsumerWidget {
             itemBuilder: (context, index) {
               // 1. Logic for the first list
               if (index < withAccount.length) {
-                return _buildContactTile(withAccount[index]);
+                return ContactTile(contact: withAccount[index]);
               }
 
               // 2. Logic for the Divider
@@ -75,44 +74,13 @@ class ContactsList extends ConsumerWidget {
               final secondListIndex = showDivider
                   ? index - withAccount.length - 1
                   : index - withAccount.length;
-              return _buildContactTile(withoutAccount[secondListIndex]);
+              return ContactTile(contact: withoutAccount[secondListIndex]);
             },
           ),
         );
       },
       error: (e, st) => const Center(child: Text('Failed to load contacts')),
       loading: () => const Center(child: CircularProgressIndicator()),
-    );
-  }
-
-  Widget _buildContactTile(ContactWithAcountAndPresenceModel contact) {
-    return ListTile(
-      leading: Transform.scale(
-        scale: 1.11,
-        child: Padding(
-          padding: const EdgeInsets.only(right: 4),
-          child: CircleAvatar(
-            foregroundImage: contact.profileImageUrl == null
-                ? null
-                : NetworkImage(contact.profileImageUrl!),
-            child: contact.profileImageUrl == null
-                ? Text(contact.shortContactDisplayName)
-                : null,
-          ),
-        ),
-      ),
-      title: Text(
-        contact.contactDisplayName,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      subtitle: Text(
-        contact.isOnline ? 'online' : formatLastSeen(contact.lastSeenAt),
-        style: const TextStyle(fontSize: 12),
-      ),
-      trailing: contact.hasAccount
-          ? null
-          : TextButton(onPressed: () {}, child: Text('Invite Friend')),
-      onTap: () {},
     );
   }
 }
