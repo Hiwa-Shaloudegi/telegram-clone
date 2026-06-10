@@ -8,5 +8,6 @@ abstract class RouteNames {
   static const String editProfile = 'edit-profile';
   static const String settings = 'settings';
   static const String contacts = 'contacts';
+  static const String chat = 'chat';
   static const String error = 'error';
 }

@@ -9,11 +9,19 @@ part of 'get_user_chats_query.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(GetUserChatsQuery)
+@ProviderFor(getUserChatsQuery)
 final getUserChatsQueryProvider = GetUserChatsQueryProvider._();
 
 final class GetUserChatsQueryProvider
-    extends $AsyncNotifierProvider<GetUserChatsQuery, List<ChatListItemModel>> {
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ChatListItemModel>>,
+          List<ChatListItemModel>,
+          Stream<List<ChatListItemModel>>
+        >
+    with
+        $FutureModifier<List<ChatListItemModel>>,
+        $StreamProvider<List<ChatListItemModel>> {
   GetUserChatsQueryProvider._()
     : super(
         from: null,
@@ -30,34 +38,14 @@ final class GetUserChatsQueryProvider
 
   @$internal
   @override
-  GetUserChatsQuery create() => GetUserChatsQuery();
-}
+  $StreamProviderElement<List<ChatListItemModel>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
 
-String _$getUserChatsQueryHash() => r'08c91c41501c74ece8351e5043b89bb1182ce1db';
-
-abstract class _$GetUserChatsQuery
-    extends $AsyncNotifier<List<ChatListItemModel>> {
-  FutureOr<List<ChatListItemModel>> build();
-  @$mustCallSuper
   @override
-  void runBuild() {
-    final ref =
-        this.ref
-            as $Ref<
-              AsyncValue<List<ChatListItemModel>>,
-              List<ChatListItemModel>
-            >;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<List<ChatListItemModel>>,
-                List<ChatListItemModel>
-              >,
-              AsyncValue<List<ChatListItemModel>>,
-              Object?,
-              Object?
-            >;
-    element.handleCreate(ref, build);
+  Stream<List<ChatListItemModel>> create(Ref ref) {
+    return getUserChatsQuery(ref);
   }
 }
+
+String _$getUserChatsQueryHash() => r'529ca0d0d939275f3a912eed496063641f875010';
