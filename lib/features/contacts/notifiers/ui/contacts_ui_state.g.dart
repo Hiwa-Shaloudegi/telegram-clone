@@ -95,7 +95,7 @@ final class ContactsUi_selectedContactsProvider
 }
 
 String _$contactsUi_selectedContactsHash() =>
-    r'283904a0f7bf1e799092c9558c1594ec10c1d6e6';
+    r'3605603be472e74a06a824a4085b4c7d6711c0ca';
 
 abstract class _$ContactsUi_selectedContacts
     extends $Notifier<HashSet<String>> {
