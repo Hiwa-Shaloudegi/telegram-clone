@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'get_user_chats_query.dart';
+part of 'watch_user_chats_query.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,10 +9,10 @@ part of 'get_user_chats_query.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(getUserChatsQuery)
-final getUserChatsQueryProvider = GetUserChatsQueryProvider._();
+@ProviderFor(watchUserChatsQuery)
+final watchUserChatsQueryProvider = WatchUserChatsQueryProvider._();
 
-final class GetUserChatsQueryProvider
+final class WatchUserChatsQueryProvider
     extends
         $FunctionalProvider<
           AsyncValue<List<ChatListItemModel>>,
@@ -22,19 +22,19 @@ final class GetUserChatsQueryProvider
     with
         $FutureModifier<List<ChatListItemModel>>,
         $StreamProvider<List<ChatListItemModel>> {
-  GetUserChatsQueryProvider._()
+  WatchUserChatsQueryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'getUserChatsQueryProvider',
+        name: r'watchUserChatsQueryProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$getUserChatsQueryHash();
+  String debugGetCreateSourceHash() => _$watchUserChatsQueryHash();
 
   @$internal
   @override
@@ -44,8 +44,9 @@ final class GetUserChatsQueryProvider
 
   @override
   Stream<List<ChatListItemModel>> create(Ref ref) {
-    return getUserChatsQuery(ref);
+    return watchUserChatsQuery(ref);
   }
 }
 
-String _$getUserChatsQueryHash() => r'529ca0d0d939275f3a912eed496063641f875010';
+String _$watchUserChatsQueryHash() =>
+    r'153148feab27d9385c2ccf57e841059e431eee47';

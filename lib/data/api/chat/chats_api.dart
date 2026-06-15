@@ -24,19 +24,7 @@ class ChatsApi {
 
   ChatsApi({required this.supabase, required this.exceptionHandler});
 
-  /// Returns a stream of the current user's chat list.
-  ///
-  /// The stream emits a new list whenever:
-  ///   - A new message arrives in any of the user's chats  (messages INSERT)
-  ///   - A chat_members row changes (pin / archive / mute / last_read)
-  ///   - A chat row changes (title, image, etc.)
-  ///
-  /// We achieve live updates by subscribing to Supabase Realtime on the
-  /// `messages` and `chat_members` tables (filtered to the current user)
-  /// and re-fetching the full list via the `get_user_chats` RPC on every
-  /// relevant event.
   Stream<List<ChatListItemModel>> watchUserChats() {
-    // StreamController so we can push new data from multiple realtime callbacks
     final controller = StreamController<List<ChatListItemModel>>.broadcast();
 
     final currentUserId = supabase.auth.currentUser?.id;
@@ -45,7 +33,7 @@ class ChatsApi {
       return controller.stream;
     }
 
-    // --- helper: fetch and push ---
+    // helper: fetch and push
     Future<void> fetch() async {
       try {
         final raw = await supabase.rpc('get_user_chats') as List<dynamic>;
@@ -62,21 +50,14 @@ class ChatsApi {
     // initial load
     fetch();
 
-    // --- Realtime subscriptions ---
-    // 1. New messages in any chat → re-fetch list (last message + unread)
-    // 2. chat_members changes for current user → re-fetch (pin/archive/mute/read)
-    // 3. chats changes → re-fetch (title/image updates)
     final channel = supabase
         .channel('chats_list_$currentUserId')
-        // messages: any INSERT (we don't filter by chat_id here because
-        // the user may be in many chats — the RPC will handle the filtering)
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
           schema: 'public',
           table: 'messages',
           callback: (_) => fetch(),
         )
-        // chat_members: changes for the current user
         .onPostgresChanges(
           event: PostgresChangeEvent.update,
           schema: 'public',
@@ -88,7 +69,6 @@ class ChatsApi {
           ),
           callback: (_) => fetch(),
         )
-        // chats: any update (title, image_url, etc.)
         .onPostgresChanges(
           event: PostgresChangeEvent.update,
           schema: 'public',
@@ -101,7 +81,6 @@ class ChatsApi {
           }
         });
 
-    // Clean up channel when the stream is no longer listened to
     controller.onCancel = () {
       supabase.removeChannel(channel);
     };
