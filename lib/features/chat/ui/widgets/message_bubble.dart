@@ -4,26 +4,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:telegram_clone/app/enums/send_status.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 
-/// Renders a single message bubble with:
-///   - own vs others styling
-///   - text / image / video / audio / file types
-///   - reply preview
-///   - forwarded indicator
-///   - sender name (shown in groups when [showSenderInfo] = true)
-///   - long-press context menu (reply, copy, delete)
 class MessageBubble extends StatelessWidget {
   final MessageModel message;
   final bool showSenderInfo;
   final VoidCallback onReply;
   final bool isDateSearchResult;
+  final SendStatus sendStatus;
 
   const MessageBubble({
     super.key,
     required this.message,
     required this.showSenderInfo,
     required this.onReply,
+    required this.sendStatus,
     this.isDateSearchResult = false,
   });
 
@@ -83,7 +79,11 @@ class MessageBubble extends StatelessWidget {
                       _MessageContent(message: message),
 
                       // Timestamp
-                      _Timestamp(message: message, isOwn: isOwn),
+                      _Timestamp(
+                        message: message,
+                        isOwn: isOwn,
+                        sendStatus: sendStatus,
+                      ),
                     ],
                   ),
                 ),
@@ -505,7 +505,13 @@ class _FileContent extends StatelessWidget {
 class _Timestamp extends StatelessWidget {
   final MessageModel message;
   final bool isOwn;
-  const _Timestamp({required this.message, required this.isOwn});
+  final SendStatus sendStatus;
+
+  const _Timestamp({
+    required this.message,
+    required this.isOwn,
+    required this.sendStatus,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -521,7 +527,11 @@ class _Timestamp extends StatelessWidget {
           Text(timeStr, style: TextStyle(fontSize: 11, color: subtleColor)),
           if (isOwn) ...[
             const SizedBox(width: 4),
-            Icon(Icons.done_all, size: 14, color: subtleColor),
+            sendStatus == SendStatus.sent
+                ? Icon(Icons.done, size: 14, color: subtleColor)
+                : sendStatus == SendStatus.read
+                ? Icon(Icons.done_all, size: 14, color: subtleColor)
+                : Icon(Icons.error, size: 14, color: subtleColor),
           ],
         ],
       ),

@@ -34,7 +34,7 @@ final class SendMessageCommandProvider
 }
 
 String _$sendMessageCommandHash() =>
-    r'b82b1c8d4bf4b1e2c0d2b971bec99e967d443d3d';
+    r'5aeec8fb049781875475e702e594bf237f96255f';
 
 abstract class _$SendMessageCommand extends $AsyncNotifier<void> {
   FutureOr<void> build();

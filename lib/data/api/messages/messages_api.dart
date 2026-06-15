@@ -1,6 +1,3 @@
-// lib/data/api/messages/messages_api.dart
-// ignore_for_file: public_member_api_docs
-
 import 'dart:async';
 import 'dart:io';
 
@@ -29,17 +26,6 @@ class MessagesApi {
 
   MessagesApi({required this.supabase, required this.exceptionHandler});
 
-  // ----------------------------------------------------------------
-  // Watch messages for a chat (live stream)
-  // ----------------------------------------------------------------
-
-  /// Returns a live stream of messages for [chatId].
-  ///
-  /// Strategy:
-  ///   1. Initial load via `get_chat_messages` RPC (returns enriched rows).
-  ///   2. Subscribe to Realtime INSERT on `messages` filtered by chat_id.
-  ///      On new message, fetch the enriched version and prepend to list.
-  ///   3. Subscribe to Realtime UPDATE/DELETE so edits & soft-deletes propagate.
   Stream<List<MessageModel>> watchMessages(String chatId) {
     final controller = StreamController<List<MessageModel>>.broadcast();
 
@@ -49,10 +35,8 @@ class MessagesApi {
       return controller.stream;
     }
 
-    // Mutable in-memory list — newest first (index 0 = latest)
     List<MessageModel> messages = [];
 
-    // ── initial fetch ────────────────────────────────────────────
     Future<void> initialLoad() async {
       try {
         final raw =
@@ -64,7 +48,7 @@ class MessagesApi {
 
         messages = raw
             .map((e) => MessageModel.fromJson(e as Map<String, dynamic>))
-            .toList(); // already DESC from RPC
+            .toList();
 
         if (!controller.isClosed) controller.add(List.unmodifiable(messages));
       } catch (e, st) {
@@ -73,7 +57,7 @@ class MessagesApi {
       }
     }
 
-    // ── fetch a single message by id (to enrich realtime inserts) ─
+    // fetch a single message by id (to enrich realtime inserts)
     Future<MessageModel?> fetchSingleMessage(String messageId) async {
       try {
         final raw = await supabase
@@ -140,7 +124,6 @@ class MessagesApi {
 
     initialLoad();
 
-    // ── Realtime subscription ─────────────────────────────────────
     final channel = supabase
         .channel('messages_$chatId')
         .onPostgresChanges(
@@ -160,7 +143,6 @@ class MessagesApi {
             final enriched = await fetchSingleMessage(newId);
             if (enriched == null) return;
 
-            // Prepend (newest first) — avoid duplicates
             if (messages.any((m) => m.id == newId)) return;
             messages = [enriched, ...messages];
             if (!controller.isClosed) {

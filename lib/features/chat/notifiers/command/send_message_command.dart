@@ -1,10 +1,8 @@
-// lib/features/chat/notifiers/command/send_message_command.dart
-// ignore_for_file: public_member_api_docs
-
 import 'dart:io';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/api/messages/messages_api.dart';
+import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
 
 part 'send_message_command.g.dart';
 
@@ -19,6 +17,14 @@ class SendMessageCommand extends _$SendMessageCommand {
     String? replyToMessageId,
   }) async {
     state = const AsyncValue.loading();
+    ref
+        .read(watchMessagesQueryProvider(chatId).notifier)
+        .addOptimisticMessage(
+          chatId: chatId,
+          content: content,
+          messageType: 'text',
+        );
+
     state = await AsyncValue.guard(
       () => ref
           .read(messagesApiProvider)

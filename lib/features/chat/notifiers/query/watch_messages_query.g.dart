@@ -8,24 +8,12 @@ part of 'watch_messages_query.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Live stream of messages for the given [chatId].
 
-@ProviderFor(watchMessagesQuery)
+@ProviderFor(WatchMessagesQuery)
 final watchMessagesQueryProvider = WatchMessagesQueryFamily._();
 
-/// Live stream of messages for the given [chatId].
-
 final class WatchMessagesQueryProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<MessageModel>>,
-          List<MessageModel>,
-          Stream<List<MessageModel>>
-        >
-    with
-        $FutureModifier<List<MessageModel>>,
-        $StreamProvider<List<MessageModel>> {
-  /// Live stream of messages for the given [chatId].
+    extends $StreamNotifierProvider<WatchMessagesQuery, List<MessageModel>> {
   WatchMessagesQueryProvider._({
     required WatchMessagesQueryFamily super.from,
     required String super.argument,
@@ -49,15 +37,7 @@ final class WatchMessagesQueryProvider
 
   @$internal
   @override
-  $StreamProviderElement<List<MessageModel>> $createElement(
-    $ProviderPointer pointer,
-  ) => $StreamProviderElement(pointer);
-
-  @override
-  Stream<List<MessageModel>> create(Ref ref) {
-    final argument = this.argument as String;
-    return watchMessagesQuery(ref, argument);
-  }
+  WatchMessagesQuery create() => WatchMessagesQuery();
 
   @override
   bool operator ==(Object other) {
@@ -71,12 +51,17 @@ final class WatchMessagesQueryProvider
 }
 
 String _$watchMessagesQueryHash() =>
-    r'4d54ff9556a7163db158033210de65dfb72378e6';
-
-/// Live stream of messages for the given [chatId].
+    r'ae2753bef0d0d412fb3accf6344ee49c04d98eb8';
 
 final class WatchMessagesQueryFamily extends $Family
-    with $FunctionalFamilyOverride<Stream<List<MessageModel>>, String> {
+    with
+        $ClassFamilyOverride<
+          WatchMessagesQuery,
+          AsyncValue<List<MessageModel>>,
+          List<MessageModel>,
+          Stream<List<MessageModel>>,
+          String
+        > {
   WatchMessagesQueryFamily._()
     : super(
         retry: null,
@@ -86,11 +71,32 @@ final class WatchMessagesQueryFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// Live stream of messages for the given [chatId].
-
   WatchMessagesQueryProvider call(String chatId) =>
       WatchMessagesQueryProvider._(argument: chatId, from: this);
 
   @override
   String toString() => r'watchMessagesQueryProvider';
+}
+
+abstract class _$WatchMessagesQuery
+    extends $StreamNotifier<List<MessageModel>> {
+  late final _$args = ref.$arg as String;
+  String get chatId => _$args;
+
+  Stream<List<MessageModel>> build(String chatId);
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<MessageModel>>, List<MessageModel>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<MessageModel>>, List<MessageModel>>,
+              AsyncValue<List<MessageModel>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
+  }
 }
