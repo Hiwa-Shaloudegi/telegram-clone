@@ -51,7 +51,7 @@ final class WatchMessagesQueryProvider
 }
 
 String _$watchMessagesQueryHash() =>
-    r'ae2753bef0d0d412fb3accf6344ee49c04d98eb8';
+    r'0f3dd4dddca16ab6120d6d6df96d972014db32bf';
 
 final class WatchMessagesQueryFamily extends $Family
     with

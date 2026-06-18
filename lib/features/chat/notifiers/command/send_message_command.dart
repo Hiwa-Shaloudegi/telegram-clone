@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/api/messages/messages_api.dart';
+import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
 
 part 'send_message_command.g.dart';
@@ -14,8 +15,9 @@ class SendMessageCommand extends _$SendMessageCommand {
   Future<void> sendText({
     required String chatId,
     required String content,
-    String? replyToMessageId,
+    required MessageModel? replyingToMessage,
   }) async {
+    final link = ref.keepAlive();
     state = const AsyncValue.loading();
     ref
         .read(watchMessagesQueryProvider(chatId).notifier)
@@ -23,6 +25,7 @@ class SendMessageCommand extends _$SendMessageCommand {
           chatId: chatId,
           content: content,
           messageType: 'text',
+          replyingToMessage: replyingToMessage,
         );
 
     state = await AsyncValue.guard(
@@ -31,9 +34,10 @@ class SendMessageCommand extends _$SendMessageCommand {
           .sendTextMessage(
             chatId: chatId,
             content: content,
-            replyToMessageId: replyToMessageId,
+            replyToMessageId: replyingToMessage?.id,
           ),
     );
+    link.close();
   }
 
   Future<void> sendMedia({

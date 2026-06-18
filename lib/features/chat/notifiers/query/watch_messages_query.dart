@@ -1,10 +1,8 @@
-// lib/features/chat/notifiers/query/watch_messages_query.dart
-// ignore_for_file: public_member_api_docs
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/api/messages/messages_api.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/profile/notifiers/query/user_profile_query.dart';
+import 'package:uuid/uuid.dart';
 
 part 'watch_messages_query.g.dart';
 
@@ -19,10 +17,13 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
     required String chatId,
     required String content,
     required String messageType,
+    required MessageModel? replyingToMessage,
   }) {
     ref.read(userProfileQueryProvider).whenData((userProfile) {
+      final tempId = 'temp_${Uuid().v4()}';
+
       final msg = MessageModel(
-        id: '',
+        id: tempId,
         chatId: chatId,
         senderId: userProfile.id,
         senderName: userProfile.displayName,
@@ -30,6 +31,9 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
         messageType: messageType,
         isForwarded: false,
         createdAt: DateTime.now(),
+        replyToContent: replyingToMessage?.content,
+        replyToMessageId: replyingToMessage?.id,
+        replyToSenderName: replyingToMessage?.senderName,
         updatedAt: DateTime.now(),
         isOwnMessage: true,
       );

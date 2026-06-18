@@ -139,8 +139,6 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     _textController.clear();
 
     MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
-
-    final replyId = replyingTo?.id;
     ref.read(chatUi_replyingToProvider.notifier).set(null);
 
     await ref
@@ -148,7 +146,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         .sendText(
           chatId: widget.chatInfo.chatId,
           content: text,
-          replyToMessageId: replyId,
+          replyingToMessage: replyingTo,
         );
 
     // Scroll to bottom (newest)
