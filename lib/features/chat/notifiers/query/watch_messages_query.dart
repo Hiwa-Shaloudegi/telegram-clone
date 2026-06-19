@@ -18,26 +18,27 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
     required String content,
     required String messageType,
     required MessageModel? replyingToMessage,
-  }) {
-    ref.read(userProfileQueryProvider).whenData((userProfile) {
-      final tempId = 'temp_${Uuid().v4()}';
+  }) async {
+    final userProfile = await ref.read(userProfileQueryProvider.future);
+    if (userProfile == null) return;
 
-      final msg = MessageModel(
-        id: tempId,
-        chatId: chatId,
-        senderId: userProfile.id,
-        senderName: userProfile.displayName,
-        content: content,
-        messageType: messageType,
-        isForwarded: false,
-        createdAt: DateTime.now(),
-        replyToContent: replyingToMessage?.content,
-        replyToMessageId: replyingToMessage?.id,
-        replyToSenderName: replyingToMessage?.senderName,
-        updatedAt: DateTime.now(),
-        isOwnMessage: true,
-      );
-      state = AsyncValue.data([msg, ...?state.asData?.value]);
-    });
+    final tempId = 'temp_${Uuid().v4()}';
+
+    final msg = MessageModel(
+      id: tempId,
+      chatId: chatId,
+      senderId: userProfile.id,
+      senderName: userProfile.displayName,
+      content: content,
+      messageType: messageType,
+      isForwarded: false,
+      createdAt: DateTime.now(),
+      replyToContent: replyingToMessage?.content,
+      replyToMessageId: replyingToMessage?.id,
+      replyToSenderName: replyingToMessage?.senderName,
+      updatedAt: DateTime.now(),
+      isOwnMessage: true,
+    );
+    state = AsyncValue.data([msg, ...?state.asData?.value]);
   }
 }

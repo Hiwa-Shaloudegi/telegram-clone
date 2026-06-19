@@ -73,7 +73,7 @@ class ProfilePage extends ConsumerWidget {
           data: (profile) => ListView(
             children: [
               const SizedBox(height: 10),
-              ProfileHeaderSection(profile: profile),
+              ProfileHeaderSection(profile: profile!),
 
               const SizedBox(height: 16),
               SectionDivider(),

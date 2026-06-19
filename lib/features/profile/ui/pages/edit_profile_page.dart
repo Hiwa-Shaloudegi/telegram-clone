@@ -49,7 +49,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       try {
         final currentProfile = await ref.read(userProfileQueryProvider.future);
         final newUsername = _usernameController.text.trim();
-        final currentUsername = currentProfile.usernameWithoutAt ?? '';
+        final currentUsername = currentProfile?.usernameWithoutAt ?? '';
 
         // Only update username if it has changed
         final usernameToUpdate =

@@ -41,7 +41,7 @@ class AppDrawerHeader extends ConsumerWidget {
       decoration: BoxDecoration(color: theme.primaryColor),
       accountName: currentUserProfileAsync.when(
         data: (profile) => Text(
-          profile.displayName,
+          profile?.displayName ?? 'User',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         loading: () => const Skeleton(width: 120, height: 14),
@@ -49,7 +49,7 @@ class AppDrawerHeader extends ConsumerWidget {
       ),
       accountEmail: currentUserProfileAsync.when(
         data: (profile) => Text(
-          profile.phone ?? profile.email ?? '',
+          profile?.phone ?? profile?.email ?? '',
           style: TextStyle(color: Colors.white.withAlpha(204)),
         ),
         loading: () => const Skeleton(width: 120, height: 14),
@@ -61,14 +61,17 @@ class AppDrawerHeader extends ConsumerWidget {
           child: CircleAvatar(
             backgroundColor: Colors.white70,
             backgroundImage:
-                profile.hasProfileImage && profile.profileImageUrl != null
-                ? NetworkImage(profile.profileImageUrl!)
+                profile?.hasProfileImage == true &&
+                    profile?.profileImageUrl != null
+                ? NetworkImage(profile!.profileImageUrl!)
                 : null,
-            child: profile.hasProfileImage && profile.profileImageUrl != null
+            child:
+                profile?.hasProfileImage == true &&
+                    profile?.profileImageUrl != null
                 ? null
                 : Center(
                     child: Text(
-                      profile.shortDisplayName,
+                      profile?.shortDisplayName ?? 'User',
                       style: TextStyle(
                         fontSize: 27,
                         fontWeight: FontWeight.bold,

@@ -77,7 +77,7 @@ class SettingsPage extends ConsumerWidget {
             SliverToBoxAdapter(
               child: GestureDetector(
                 onTap: () => context.pushNamed(RouteNames.profile),
-                child: ProfileHeader(profile: profile),
+                child: ProfileHeader(profile: profile!),
               ),
             ),
 

@@ -13,7 +13,7 @@ part of 'user_profile_query.dart';
 final userProfileQueryProvider = UserProfileQueryProvider._();
 
 final class UserProfileQueryProvider
-    extends $AsyncNotifierProvider<UserProfileQuery, UserProfileModel> {
+    extends $AsyncNotifierProvider<UserProfileQuery, UserProfileModel?> {
   UserProfileQueryProvider._()
     : super(
         from: null,
@@ -33,20 +33,20 @@ final class UserProfileQueryProvider
   UserProfileQuery create() => UserProfileQuery();
 }
 
-String _$userProfileQueryHash() => r'fb5d36f15e24d0936ad14a78f10ecd39ee87f776';
+String _$userProfileQueryHash() => r'ab9cc5c5ada8ff0556498107f0708fd83052bf0d';
 
-abstract class _$UserProfileQuery extends $AsyncNotifier<UserProfileModel> {
-  FutureOr<UserProfileModel> build();
+abstract class _$UserProfileQuery extends $AsyncNotifier<UserProfileModel?> {
+  FutureOr<UserProfileModel?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final ref =
-        this.ref as $Ref<AsyncValue<UserProfileModel>, UserProfileModel>;
+        this.ref as $Ref<AsyncValue<UserProfileModel?>, UserProfileModel?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<UserProfileModel>, UserProfileModel>,
-              AsyncValue<UserProfileModel>,
+              AnyNotifier<AsyncValue<UserProfileModel?>, UserProfileModel?>,
+              AsyncValue<UserProfileModel?>,
               Object?,
               Object?
             >;
