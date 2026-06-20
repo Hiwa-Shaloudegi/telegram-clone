@@ -7,20 +7,20 @@ import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/chats/notifiers/query/watch_user_chats_query.dart';
-import 'package:telegram_clone/features/chats/notifiers/ui/chats_ui_state.dart';
+import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/app_drawer.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/chat_tile.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/chats_app_bar_title.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/chats_empty_state.dart';
 
-class ChatsPage extends ConsumerStatefulWidget {
-  const ChatsPage({super.key});
+class MainPage extends ConsumerStatefulWidget {
+  const MainPage({super.key});
 
   @override
-  ConsumerState<ChatsPage> createState() => _ChatsPageState();
+  ConsumerState<MainPage> createState() => _ChatsPageState();
 }
 
-class _ChatsPageState extends ConsumerState<ChatsPage> {
+class _ChatsPageState extends ConsumerState<MainPage> {
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -31,11 +31,11 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
 
   void _onScroll() {
     final direction = _scrollController.position.userScrollDirection;
-    final isFabVisible = ref.read(chatsUi_isFabVisibleProvider);
+    final isFabVisible = ref.read(mainUi_isFabVisibleProvider);
     if (direction == ScrollDirection.reverse && isFabVisible) {
-      ref.read(chatsUi_isFabVisibleProvider.notifier).set(false);
+      ref.read(mainUi_isFabVisibleProvider.notifier).set(false);
     } else if (direction == ScrollDirection.forward && !isFabVisible) {
-      ref.read(chatsUi_isFabVisibleProvider.notifier).set(true);
+      ref.read(mainUi_isFabVisibleProvider.notifier).set(true);
     }
   }
 
@@ -94,11 +94,12 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
             ],
           ),
         ),
+        // TODO: Replace with shimmer effect
         loading: () => _ChatListSkeleton(),
       ),
       floatingActionButton: Consumer(
         builder: (_, ref, _) {
-          final isFabVisible = ref.watch(chatsUi_isFabVisibleProvider);
+          final isFabVisible = ref.watch(mainUi_isFabVisibleProvider);
           return AnimatedSlide(
             duration: const Duration(milliseconds: 200),
             offset: isFabVisible ? Offset.zero : const Offset(0, 2),

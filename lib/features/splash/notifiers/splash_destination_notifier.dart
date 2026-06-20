@@ -17,7 +17,7 @@ Future<String> splashDestinationNotifier(Ref ref) async {
     storageService.markAsNotFirstTime();
     return RouteNames.signup;
   } else if (user != null) {
-    return RouteNames.chats;
+    return RouteNames.main;
   } else {
     return RouteNames.login;
   }

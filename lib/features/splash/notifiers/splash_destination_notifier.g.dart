@@ -41,4 +41,4 @@ final class SplashDestinationNotifierProvider
 }
 
 String _$splashDestinationNotifierHash() =>
-    r'544ee88c53678d3bc22e888efa55f48cced81f89';
+    r'302fa70a295d3fb405fb58c96b8a3d93d675ec80';

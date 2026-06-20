@@ -1,9 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'chats_ui_state.g.dart';
+part 'main_ui_state.g.dart';
 
 @riverpod
-class ChatsUi_isFabVisible extends _$ChatsUi_isFabVisible {
+class MainUi_isFabVisible extends _$MainUi_isFabVisible {
   @override
   bool build() => true;
 

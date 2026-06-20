@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chats_ui_state.dart';
+part of 'main_ui_state.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,28 +9,28 @@ part of 'chats_ui_state.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(ChatsUi_isFabVisible)
-final chatsUi_isFabVisibleProvider = ChatsUi_isFabVisibleProvider._();
+@ProviderFor(MainUi_isFabVisible)
+final mainUi_isFabVisibleProvider = MainUi_isFabVisibleProvider._();
 
-final class ChatsUi_isFabVisibleProvider
-    extends $NotifierProvider<ChatsUi_isFabVisible, bool> {
-  ChatsUi_isFabVisibleProvider._()
+final class MainUi_isFabVisibleProvider
+    extends $NotifierProvider<MainUi_isFabVisible, bool> {
+  MainUi_isFabVisibleProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'chatsUi_isFabVisibleProvider',
+        name: r'mainUi_isFabVisibleProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$chatsUi_isFabVisibleHash();
+  String debugGetCreateSourceHash() => _$mainUi_isFabVisibleHash();
 
   @$internal
   @override
-  ChatsUi_isFabVisible create() => ChatsUi_isFabVisible();
+  MainUi_isFabVisible create() => MainUi_isFabVisible();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
@@ -41,10 +41,10 @@ final class ChatsUi_isFabVisibleProvider
   }
 }
 
-String _$chatsUi_isFabVisibleHash() =>
-    r'32a2f6b462d48e6a48f33d6bf0e32f971cdf840d';
+String _$mainUi_isFabVisibleHash() =>
+    r'1ef8e427af29a06a5592d483550ffcb09a283ed6';
 
-abstract class _$ChatsUi_isFabVisible extends $Notifier<bool> {
+abstract class _$MainUi_isFabVisible extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override

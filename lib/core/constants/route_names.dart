@@ -1,5 +1,5 @@
 abstract class RouteNames {
-  static const String chats = 'chats';
+  static const String main = 'chats';
   static const String splash = 'splash';
   static const String signup = 'signup';
   static const String login = 'login';

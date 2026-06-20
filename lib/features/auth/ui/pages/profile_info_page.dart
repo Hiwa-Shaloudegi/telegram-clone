@@ -59,7 +59,7 @@ class _ProfileInfoPageState extends ConsumerState<ProfileInfoPage> {
     ref.listen<AsyncValue<void>>(completeProfileCommandProvider, (_, next) {
       next.when(
         data: (_) {
-          context.goNamed(RouteNames.chats);
+          context.goNamed(RouteNames.main);
         },
         error: (error, stackTrace) {
           AppSnackbar.showError(context, error.toString());
