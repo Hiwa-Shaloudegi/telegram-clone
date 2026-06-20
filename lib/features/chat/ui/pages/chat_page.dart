@@ -439,7 +439,8 @@ class DateSearchPage extends ConsumerWidget {
                   return MessageBubble(
                     message: messages[index],
                     showSenderInfo: true,
-                    isDateSearchResult: true,
+                    // isDateSearchResult: true,
+
                     // TODO:
                     // sendStatus: SendStatus.read,
                     onReply: () {},

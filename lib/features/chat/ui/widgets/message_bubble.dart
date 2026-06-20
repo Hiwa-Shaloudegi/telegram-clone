@@ -13,8 +13,11 @@ import 'package:telegram_clone/features/chat/notifiers/command/send_message_comm
 class MessageBubble extends StatelessWidget {
   final MessageModel message;
   final bool showSenderInfo;
+  final Color? tileBackgroundColor;
   final VoidCallback onReply;
-  final bool isDateSearchResult;
+  final Function()? onTap;
+  final Function()? onLongPress;
+  // final bool isDateSearchResult;
   // final SendStatus sendStatus;
 
   const MessageBubble({
@@ -22,8 +25,11 @@ class MessageBubble extends StatelessWidget {
     required this.message,
     required this.showSenderInfo,
     required this.onReply,
+    this.tileBackgroundColor,
+    this.onTap,
+    this.onLongPress,
     // required this.sendStatus,
-    this.isDateSearchResult = false,
+    // this.isDateSearchResult = false,
   });
 
   @override
@@ -32,67 +38,69 @@ class MessageBubble extends StatelessWidget {
 
     final isOwn = message.isOwnMessage;
 
-    return Align(
-      alignment: isOwn ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.78,
-        ),
-        child: GestureDetector(
-          onLongPress: isDateSearchResult
-              ? null
-              : () => _showContextMenu(context),
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: isOwn ? 48 : 0,
-              right: isOwn ? 0 : 48,
-              bottom: 2,
-              top: showSenderInfo ? 6 : 1,
+    return Material(
+      color: tileBackgroundColor ?? Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Align(
+          alignment: isOwn ? Alignment.centerRight : Alignment.centerLeft,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.78,
             ),
-            child: Column(
-              crossAxisAlignment: isOwn
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
-              children: [
-                if (showSenderInfo && !isOwn)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12, bottom: 2),
-                    child: Text(
-                      message.senderName,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: _senderColor(message.senderId),
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: isOwn ? 48 : 0,
+                right: isOwn ? 0 : 48,
+                bottom: 2,
+                top: showSenderInfo ? 6 : 1,
+              ),
+              child: Column(
+                crossAxisAlignment: isOwn
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
+                children: [
+                  if (showSenderInfo && !isOwn)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12, bottom: 2),
+                      child: Text(
+                        message.senderName,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: _senderColor(message.senderId),
+                        ),
                       ),
                     ),
+                  _BubbleContainer(
+                    isOwn: isOwn,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Forwarded
+                        if (message.isForwarded)
+                          _ForwardedHeader(message: message),
+
+                        // Reply
+                        if (message.replyToMessageId != null)
+                          _ReplyPreviewInBubble(message: message, isOwn: isOwn),
+
+                        // Content
+                        _MessageContent(message: message),
+
+                        // Timestamp
+                        _Timestamp(
+                          message: message,
+                          isOwn: isOwn,
+                          // sendStatus: sendStatus,
+                        ),
+                      ],
+                    ),
                   ),
-                _BubbleContainer(
-                  isOwn: isOwn,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Forwarded
-                      if (message.isForwarded)
-                        _ForwardedHeader(message: message),
-
-                      // Reply
-                      if (message.replyToMessageId != null)
-                        _ReplyPreviewInBubble(message: message, isOwn: isOwn),
-
-                      // Content
-                      _MessageContent(message: message),
-
-                      // Timestamp
-                      _Timestamp(
-                        message: message,
-                        isOwn: isOwn,
-                        // sendStatus: sendStatus,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

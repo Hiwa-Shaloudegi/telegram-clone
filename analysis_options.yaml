@@ -12,6 +12,7 @@ analyzer:
     - riverpod_lint
   errors:
     camel_case_types: ignore
+    non_constant_identifier_names: ignore
 include: package:flutter_lints/flutter.yaml
 
 plugins:

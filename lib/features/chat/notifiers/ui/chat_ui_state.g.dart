@@ -218,3 +218,98 @@ abstract class _$ChatUi_hasText extends $Notifier<bool> {
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(ChatUi_selectedMessages)
+final chatUi_selectedMessagesProvider = ChatUi_selectedMessagesProvider._();
+
+final class ChatUi_selectedMessagesProvider
+    extends $NotifierProvider<ChatUi_selectedMessages, HashSet<String>> {
+  ChatUi_selectedMessagesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chatUi_selectedMessagesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chatUi_selectedMessagesHash();
+
+  @$internal
+  @override
+  ChatUi_selectedMessages create() => ChatUi_selectedMessages();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(HashSet<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<HashSet<String>>(value),
+    );
+  }
+}
+
+String _$chatUi_selectedMessagesHash() =>
+    r'f9827b6fe2d8664628ffa3ff250ec41ce86e483e';
+
+abstract class _$ChatUi_selectedMessages extends $Notifier<HashSet<String>> {
+  HashSet<String> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<HashSet<String>, HashSet<String>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<HashSet<String>, HashSet<String>>,
+              HashSet<String>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(ChatUi_isSelectionMode)
+final chatUi_isSelectionModeProvider = ChatUi_isSelectionModeProvider._();
+
+final class ChatUi_isSelectionModeProvider
+    extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  ChatUi_isSelectionModeProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chatUi_isSelectionModeProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chatUi_isSelectionModeHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return ChatUi_isSelectionMode(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$chatUi_isSelectionModeHash() =>
+    r'b2991e8a8b7e3d675a13dab30f99fc4c866009d2';

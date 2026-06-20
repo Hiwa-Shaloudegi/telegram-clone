@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
+import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/date_divider.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/message_bubble.dart';
 
@@ -67,11 +69,51 @@ class ChatMessagesList extends StatelessWidget {
         return Column(
           children: [
             if (showDateDivider) DateDivider(date: msg.createdAt),
-            MessageBubble(
-              message: msg,
-              showSenderInfo: showSenderInfo,
-              // messageStatus: MessageStatus.sent, // TODO: msg.isRead ? MessageStatus.read : MessageStatus.sent,
-              onReply: () => onReply(msg),
+            Consumer(
+              builder: (_, ref, _) {
+                final isSelected = ref.watch(
+                  chatUi_selectedMessagesProvider.select(
+                    (selected) => selected.contains(msg.id),
+                  ),
+                );
+
+                final isSelectionMode = ref.watch(
+                  chatUi_isSelectionModeProvider,
+                );
+                return MessageBubble(
+                  message: msg,
+                  showSenderInfo: showSenderInfo,
+                  tileBackgroundColor: isSelected
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.12)
+                      : Colors.transparent,
+                  onTap: isSelectionMode
+                      ? () => ref
+                            .read(chatUi_selectedMessagesProvider.notifier)
+                            .toggle(msg.id)
+                      : () {},
+
+                  onLongPress: isSelectionMode
+                      ? null
+                      : () => ref
+                            .read(chatUi_selectedMessagesProvider.notifier)
+                            .toggle(msg.id),
+                  // messageStatus: MessageStatus.sent, // TODO: msg.isRead ? MessageStatus.read : MessageStatus.sent,
+                  // onTap: isSelectionMode
+                  //     ? () => ref
+                  //           .read(chatUi_selectedMessagesProvider.notifier)
+                  //           .toggle(msg.id)
+                  //     : () {},
+
+                  // onLongPress: isSelectionMode
+                  //     ? null
+                  //     : () => ref
+                  //           .read(chatUi_selectedMessagesProvider.notifier)
+                  //           .toggle(msg.id),
+                  onReply: () => onReply(msg),
+                );
+              },
             ),
           ],
         );
