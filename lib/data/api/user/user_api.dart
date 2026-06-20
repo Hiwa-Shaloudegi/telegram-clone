@@ -1,4 +1,3 @@
-import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/core/exception/app_exception.dart';
@@ -26,7 +25,6 @@ class UserApi {
       supabase.auth.currentUser?.id ?? supabase.auth.currentSession?.user.id;
 
   Future<UserProfileModel> getUserProfile() async {
-    Logger().t("API CALLING getUserProfile");
     try {
       final userId = _currentUserId;
       if (userId == null) {

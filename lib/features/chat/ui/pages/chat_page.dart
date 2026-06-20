@@ -1,12 +1,7 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:record/record.dart';
-import 'package:telegram_clone/app/enums/send_status.dart';
 import 'package:telegram_clone/data/api/messages/messages_api.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
@@ -19,6 +14,7 @@ import 'package:telegram_clone/features/chat/ui/widgets/chat_message_list.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/input_text.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/message_bubble.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/reply_preview.dart';
+import 'package:uuid/uuid.dart';
 
 class ChatPage extends ConsumerStatefulWidget {
   final ChatListItemModel chatInfo;
@@ -105,7 +101,9 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                 onReply: (msg) =>
                     ref.read(chatUi_replyingToProvider.notifier).set(msg),
               ),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ), // TODO: change the loading widget
               error: (e, _) => Center(child: Text(e.toString())),
             ),
           ),
@@ -123,8 +121,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             isRecording: isRecording,
             onSendText: _sendText,
             onAttach: _showAttachMenu,
-            onRecordStart: _startRecording,
-            onRecordStop: _stopRecording,
+            onRecordStart: () {}, //_startRecording,
+            onRecordStop: () {}, //_stopRecording,
           ),
         ],
       ),
@@ -141,8 +139,10 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
     ref.read(chatUi_replyingToProvider.notifier).set(null);
 
+    final messageTempId = 'temp_${Uuid().v4()}';
+
     await ref
-        .read(sendMessageCommandProvider.notifier)
+        .read(sendMessageCommandProvider(messageTempId).notifier)
         .sendText(
           chatId: widget.chatInfo.chatId,
           content: text,
@@ -164,84 +164,84 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => _AttachMenu(
-        onPickImage: () => _pickMedia(ImageSource.gallery, 'image'),
-        onPickVideo: () => _pickMedia(ImageSource.gallery, 'video'),
-        onPickFile: _pickFile,
-        onTakePhoto: () => _pickMedia(ImageSource.camera, 'image'),
+        onPickImage: () {}, // _pickMedia(ImageSource.gallery, 'image'),
+        onPickVideo: () {}, // _pickMedia(ImageSource.gallery, 'video'),
+        onPickFile: () {}, //_pickFile,
+        onTakePhoto: () {}, // _pickMedia(ImageSource.camera, 'image'),
       ),
     );
   }
 
-  Future<void> _pickMedia(ImageSource source, String type) async {
-    MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
+  // Future<void> _pickMedia(ImageSource source, String type) async {
+  //   MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
 
-    Navigator.pop(context);
-    final picker = ImagePicker();
-    final XFile? file = type == 'image'
-        ? await picker.pickImage(source: source, imageQuality: 80)
-        : await picker.pickVideo(source: source);
-    if (file == null) return;
+  //   Navigator.pop(context);
+  //   final picker = ImagePicker();
+  //   final XFile? file = type == 'image'
+  //       ? await picker.pickImage(source: source, imageQuality: 80)
+  //       : await picker.pickVideo(source: source);
+  //   if (file == null) return;
 
-    await ref
-        .read(sendMessageCommandProvider.notifier)
-        .sendMedia(
-          chatId: widget.chatInfo.chatId,
-          file: File(file.path),
-          messageType: type,
-          replyToMessageId: replyingTo?.id,
-        );
-    ref.read(chatUi_replyingToProvider.notifier).set(null);
-  }
+  //   await ref
+  //       .read(sendMessageCommandProvider.notifier)
+  //       .sendMedia(
+  //         chatId: widget.chatInfo.chatId,
+  //         file: File(file.path),
+  //         messageType: type,
+  //         replyToMessageId: replyingTo?.id,
+  //       );
+  //   ref.read(chatUi_replyingToProvider.notifier).set(null);
+  // }
 
-  Future<void> _pickFile() async {
-    MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
+  // Future<void> _pickFile() async {
+  //   MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
 
-    Navigator.pop(context);
-    final result = await FilePicker.pickFiles();
-    if (result == null || result.files.single.path == null) return;
+  //   Navigator.pop(context);
+  //   final result = await FilePicker.pickFiles();
+  //   if (result == null || result.files.single.path == null) return;
 
-    await ref
-        .read(sendMessageCommandProvider.notifier)
-        .sendMedia(
-          chatId: widget.chatInfo.chatId,
-          file: File(result.files.single.path!),
-          messageType: 'file',
-          replyToMessageId: replyingTo?.id,
-        );
-    ref.read(chatUi_replyingToProvider.notifier).set(null);
-  }
+  //   await ref
+  //       .read(sendMessageCommandProvider.notifier)
+  //       .sendMedia(
+  //         chatId: widget.chatInfo.chatId,
+  //         file: File(result.files.single.path!),
+  //         messageType: 'file',
+  //         replyToMessageId: replyingTo?.id,
+  //       );
+  //   ref.read(chatUi_replyingToProvider.notifier).set(null);
+  // }
 
-  Future<void> _startRecording() async {
-    if (!await _recorder.hasPermission()) return;
-    final path =
-        '${Directory.systemTemp.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
-    await _recorder.start(
-      const RecordConfig(encoder: AudioEncoder.aacLc),
-      path: path,
-    );
+  // Future<void> _startRecording() async {
+  //   if (!await _recorder.hasPermission()) return;
+  //   final path =
+  //       '${Directory.systemTemp.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+  //   await _recorder.start(
+  //     const RecordConfig(encoder: AudioEncoder.aacLc),
+  //     path: path,
+  //   );
 
-    ref.read(chatUi_isRecordingProvider.notifier).set(true);
-    ref.read(chatUi_recordingPathProvider.notifier).set(path);
-  }
+  //   ref.read(chatUi_isRecordingProvider.notifier).set(true);
+  //   ref.read(chatUi_recordingPathProvider.notifier).set(path);
+  // }
 
-  Future<void> _stopRecording() async {
-    MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
+  // Future<void> _stopRecording() async {
+  //   MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
 
-    final path = await _recorder.stop();
-    ref.read(chatUi_isRecordingProvider.notifier).set(false);
+  //   final path = await _recorder.stop();
+  //   ref.read(chatUi_isRecordingProvider.notifier).set(false);
 
-    if (path == null) return;
+  //   if (path == null) return;
 
-    await ref
-        .read(sendMessageCommandProvider.notifier)
-        .sendMedia(
-          chatId: widget.chatInfo.chatId,
-          file: File(path),
-          messageType: 'audio',
-          replyToMessageId: replyingTo?.id,
-        );
-    ref.read(chatUi_replyingToProvider.notifier).set(null);
-  }
+  //   await ref
+  //       .read(sendMessageCommandProvider.notifier)
+  //       .sendMedia(
+  //         chatId: widget.chatInfo.chatId,
+  //         file: File(path),
+  //         messageType: 'audio',
+  //         replyToMessageId: replyingTo?.id,
+  //       );
+  //   ref.read(chatUi_replyingToProvider.notifier).set(null);
+  // }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -441,7 +441,7 @@ class DateSearchPage extends ConsumerWidget {
                     showSenderInfo: true,
                     isDateSearchResult: true,
                     // TODO:
-                    sendStatus: SendStatus.read,
+                    // sendStatus: SendStatus.read,
                     onReply: () {},
                   );
                 },

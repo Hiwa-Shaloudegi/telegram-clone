@@ -10,7 +10,7 @@ part 'send_message_command.g.dart';
 @riverpod
 class SendMessageCommand extends _$SendMessageCommand {
   @override
-  FutureOr<void> build() {}
+  FutureOr<void> build(String messageTempId) {}
 
   Future<void> sendText({
     required String chatId,
@@ -23,6 +23,7 @@ class SendMessageCommand extends _$SendMessageCommand {
         .read(watchMessagesQueryProvider(chatId).notifier)
         .addOptimisticMessage(
           chatId: chatId,
+          messageTempId: messageTempId,
           content: content,
           messageType: 'text',
           replyingToMessage: replyingToMessage,

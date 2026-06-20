@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:telegram_clone/app/enums/send_status.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/date_divider.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/message_bubble.dart';
@@ -73,7 +72,7 @@ class ChatMessagesList extends StatelessWidget {
               message: msg,
               showSenderInfo: showSenderInfo,
               // TODO:
-              sendStatus: SendStatus.read,
+              // messageStatus: MessageStatus.read,
               onReply: () => onReply(msg),
             ),
           ],

@@ -3,28 +3,33 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:telegram_clone/app/enums/send_status.dart';
+import 'package:logger/logger.dart';
+import 'package:telegram_clone/app/enums/message_status.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
+import 'package:telegram_clone/features/chat/notifiers/command/send_message_command.dart';
 
 class MessageBubble extends StatelessWidget {
   final MessageModel message;
   final bool showSenderInfo;
   final VoidCallback onReply;
   final bool isDateSearchResult;
-  final SendStatus sendStatus;
+  // final SendStatus sendStatus;
 
   const MessageBubble({
     super.key,
     required this.message,
     required this.showSenderInfo,
     required this.onReply,
-    required this.sendStatus,
+    // required this.sendStatus,
     this.isDateSearchResult = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    Logger().d('MessageBubble: ${message.content}');
+
     final isOwn = message.isOwnMessage;
 
     return Align(
@@ -82,7 +87,7 @@ class MessageBubble extends StatelessWidget {
                       _Timestamp(
                         message: message,
                         isOwn: isOwn,
-                        sendStatus: sendStatus,
+                        // sendStatus: sendStatus,
                       ),
                     ],
                   ),
@@ -502,19 +507,43 @@ class _FileContent extends StatelessWidget {
 // Timestamp + read tick
 // ─────────────────────────────────────────────────────────────
 
-class _Timestamp extends StatelessWidget {
+class _Timestamp extends ConsumerWidget {
   final MessageModel message;
   final bool isOwn;
-  final SendStatus sendStatus;
+  // final SendStatus sendStatus;
 
   const _Timestamp({
     required this.message,
     required this.isOwn,
-    required this.sendStatus,
+    // required this.sendStatus,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    late MessageStatus messageStatus;
+
+    if (message.id.startsWith('temp_') && message.isOwnMessage) {
+      final sendMessageStatus = ref.watch(
+        sendMessageCommandProvider(message.id),
+      );
+
+      if (sendMessageStatus.isLoading) {
+        messageStatus = MessageStatus.sending;
+      } else if (sendMessageStatus.hasError) {
+        messageStatus = MessageStatus.error;
+      } else {
+        // TODO: if it is saved message
+        if (true) {
+          messageStatus = MessageStatus.sent;
+        } else {
+          messageStatus = MessageStatus.read;
+        }
+      }
+    } else {
+      // TODO: add "is_read" in db ==> messageStatus = message.isRead ? MessageStatus.read : MessageStatus.sent;
+      messageStatus = MessageStatus.read;
+    }
+
     final timeStr = DateFormat('HH:mm').format(message.createdAt.toLocal());
     final subtleColor = Theme.of(context).colorScheme.onSurfaceVariant;
 
@@ -527,11 +556,15 @@ class _Timestamp extends StatelessWidget {
           Text(timeStr, style: TextStyle(fontSize: 11, color: subtleColor)),
           if (isOwn) ...[
             const SizedBox(width: 4),
-            sendStatus == SendStatus.sent
+            messageStatus == MessageStatus.sent
                 ? Icon(Icons.done, size: 14, color: subtleColor)
-                : sendStatus == SendStatus.read
+                : messageStatus == MessageStatus.read
                 ? Icon(Icons.done_all, size: 14, color: subtleColor)
-                : Icon(Icons.error, size: 14, color: subtleColor),
+                : messageStatus == MessageStatus.error
+                ? Icon(Icons.error, size: 14, color: Colors.red)
+                : messageStatus == MessageStatus.sending
+                ? Icon(Icons.access_time, size: 14, color: subtleColor)
+                : const SizedBox.shrink(),
           ],
         ],
       ),

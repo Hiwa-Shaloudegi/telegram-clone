@@ -2,7 +2,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/api/messages/messages_api.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/profile/notifiers/query/user_profile_query.dart';
-import 'package:uuid/uuid.dart';
 
 part 'watch_messages_query.g.dart';
 
@@ -15,6 +14,7 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
 
   void addOptimisticMessage({
     required String chatId,
+    required String messageTempId,
     required String content,
     required String messageType,
     required MessageModel? replyingToMessage,
@@ -22,10 +22,8 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
     final userProfile = await ref.read(userProfileQueryProvider.future);
     if (userProfile == null) return;
 
-    final tempId = 'temp_${Uuid().v4()}';
-
     final msg = MessageModel(
-      id: tempId,
+      id: messageTempId,
       chatId: chatId,
       senderId: userProfile.id,
       senderName: userProfile.displayName,
