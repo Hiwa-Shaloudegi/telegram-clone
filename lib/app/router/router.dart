@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/pages/not_found_page.dart';
-import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
 import 'package:telegram_clone/features/auth/ui/pages/login_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/profile_info_page.dart';
@@ -85,10 +84,7 @@ GoRouter router(Ref ref) {
       GoRoute(
         name: RouteNames.chat,
         path: '/chat/:chatId',
-        builder: (context, state) {
-          final chatInfo = state.extra as ChatListItemModel;
-          return ChatPage(chatInfo: chatInfo);
-        },
+        builder: (context, state) => ChatPage(),
       ),
     ],
     redirect: (context, state) {

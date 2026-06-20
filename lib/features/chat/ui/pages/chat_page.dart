@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:record/record.dart';
-import 'package:telegram_clone/data/api/messages/messages_api.dart';
-import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/send_message_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/messages_by_date_query.dart';
@@ -14,12 +12,11 @@ import 'package:telegram_clone/features/chat/ui/widgets/chat_message_list.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/input_text.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/message_bubble.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/reply_preview.dart';
+import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatPage extends ConsumerStatefulWidget {
-  final ChatListItemModel chatInfo;
-
-  const ChatPage({super.key, required this.chatInfo});
+  const ChatPage({super.key});
 
   @override
   ConsumerState<ChatPage> createState() => _ChatPageState();
@@ -46,26 +43,26 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 300 &&
         !_isLoadingMore) {
-      _loadMore();
+      // _loadMore();
     }
   }
 
-  Future<void> _loadMore() async {
-    final messages = ref
-        .read(watchMessagesQueryProvider(widget.chatInfo.chatId))
-        .value;
-    if (messages == null || messages.isEmpty) return;
+  // Future<void> _loadMore() async {
+  //   final messages = ref
+  //       .read(watchMessagesQueryProvider(widget.chatInfo.chatId))
+  //       .value;
+  //   if (messages == null || messages.isEmpty) return;
 
-    setState(() => _isLoadingMore = true);
-    final oldest = messages.last;
-    await ref
-        .read(messagesApiProvider)
-        .loadMoreMessages(
-          chatId: widget.chatInfo.chatId,
-          beforeMessageId: oldest.id,
-        );
-    if (mounted) setState(() => _isLoadingMore = false);
-  }
+  //   setState(() => _isLoadingMore = true);
+  //   final oldest = messages.last;
+  //   await ref
+  //       .read(messagesApiProvider)
+  //       .loadMoreMessages(
+  //         chatId: widget.chatInfo.chatId,
+  //         beforeMessageId: oldest.id,
+  //       );
+  //   if (mounted) setState(() => _isLoadingMore = false);
+  // }
 
   @override
   void dispose() {
@@ -81,52 +78,60 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
     bool isRecording = ref.watch(chatUi_isRecordingProvider);
 
-    final chatInfo = widget.chatInfo;
-    final messagesState = ref.watch(
-      watchMessagesQueryProvider(chatInfo.chatId),
-    );
+    final chatInfo = ref.watch(mainUi_selectedChatItemProviderProvider);
 
-    return Scaffold(
-      appBar: ChatAppBar(chatInfo: chatInfo),
-      body: Column(
-        children: [
-          // Messages list
-          Expanded(
-            child: messagesState.when(
-              data: (messages) => ChatMessagesList(
-                chatId: chatInfo.chatId,
-                messages: messages,
-                scrollController: _scrollController,
-                isLoadingMore: _isLoadingMore,
-                onReply: (msg) =>
-                    ref.read(chatUi_replyingToProvider.notifier).set(msg),
+    // TODO: use a proper UI
+    if (chatInfo == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(child: Text('No chat selected')),
+      );
+    } else {
+      final messagesState = ref.watch(
+        watchMessagesQueryProvider(chatInfo.chatId),
+      );
+      return Scaffold(
+        appBar: ChatAppBar(chatInfo: chatInfo),
+        body: Column(
+          children: [
+            // Messages list
+            Expanded(
+              child: messagesState.when(
+                data: (messages) => ChatMessagesList(
+                  chatId: chatInfo.chatId,
+                  messages: messages,
+                  scrollController: _scrollController,
+                  isLoadingMore: _isLoadingMore,
+                  onReply: (msg) =>
+                      ref.read(chatUi_replyingToProvider.notifier).set(msg),
+                ),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(),
+                ), // TODO: change the loading widget
+                error: (e, _) => Center(child: Text(e.toString())),
               ),
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ), // TODO: change the loading widget
-              error: (e, _) => Center(child: Text(e.toString())),
-            ),
-          ),
-
-          if (replyingTo != null)
-            ReplyPreview(
-              message: replyingTo,
-              onCancel: () =>
-                  ref.read(chatUi_replyingToProvider.notifier).set(null),
             ),
 
-          InputBar(
-            controller: _textController,
-            focusNode: _inputFocus,
-            isRecording: isRecording,
-            onSendText: _sendText,
-            onAttach: _showAttachMenu,
-            onRecordStart: () {}, //_startRecording,
-            onRecordStop: () {}, //_stopRecording,
-          ),
-        ],
-      ),
-    );
+            if (replyingTo != null)
+              ReplyPreview(
+                message: replyingTo,
+                onCancel: () =>
+                    ref.read(chatUi_replyingToProvider.notifier).set(null),
+              ),
+
+            InputBar(
+              controller: _textController,
+              focusNode: _inputFocus,
+              isRecording: isRecording,
+              onSendText: _sendText,
+              onAttach: _showAttachMenu,
+              onRecordStart: () {}, //_startRecording,
+              onRecordStop: () {}, //_stopRecording,
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   // TODO: Organize functions
@@ -144,7 +149,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     await ref
         .read(sendMessageCommandProvider(messageTempId).notifier)
         .sendText(
-          chatId: widget.chatInfo.chatId,
+          chatId: ref.read(mainUi_selectedChatItemProviderProvider)!.chatId,
           content: text,
           replyingToMessage: replyingTo,
         );

@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:telegram_clone/app/enums/chat_type.dart';
 import 'package:telegram_clone/core/exception/exception_handler.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/services/supabase_client.dart';
@@ -22,6 +24,8 @@ class MessagesApi {
   final ExceptionHandler exceptionHandler;
 
   MessagesApi({required this.supabase, required this.exceptionHandler});
+
+  User? get currentUser => supabase.auth.currentUser;
 
   Stream<List<MessageModel>> watchMessages(String chatId) {
     try {
@@ -212,6 +216,29 @@ class MessagesApi {
           .update({'deleted_at': DateTime.now().toIso8601String()})
           .eq('id', messageId)
           .eq('sender_id', supabase.auth.currentUser!.id);
+    } catch (e) {
+      exceptionHandler.handle(e);
+    }
+  }
+
+  Future<int> bulkDeleteMessages({
+    required HashSet<String> messageIds,
+    required ChatType chatType,
+    bool deleteForEveryone = false,
+  }) async {
+    try {
+      final response = await supabase.rpc(
+        'bulk_delete_messages',
+        params: {
+          'p_message_ids': messageIds.toList(),
+          'p_acting_user_id': currentUser?.id,
+          'p_delete_for_everyone': chatType != ChatType.private
+              ? true // always hard-delete in groups/channels
+              : deleteForEveryone,
+        },
+      );
+
+      return response as int;
     } catch (e) {
       exceptionHandler.handle(e);
     }

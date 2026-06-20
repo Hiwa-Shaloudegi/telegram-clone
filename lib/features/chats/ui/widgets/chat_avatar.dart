@@ -1,13 +1,14 @@
 // lib/features/chats/ui/widgets/chat_avatar.dart
 
 import 'package:flutter/material.dart';
+import 'package:telegram_clone/app/enums/chat_type.dart';
 
 /// Displays a chat avatar. Falls back to coloured initials when no [imageUrl].
 /// Shows a special icon for channels and saved messages.
 class ChatAvatar extends StatelessWidget {
   final String displayTitle;
   final String? imageUrl;
-  final String chatType; // dm | group | channel | saved
+  final ChatType chatType;
   final double size;
 
   const ChatAvatar({
@@ -20,7 +21,7 @@ class ChatAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (chatType == 'saved') {
+    if (chatType == ChatType.saved) {
       return _iconAvatar(context, Icons.bookmark, Colors.blue);
     }
 
@@ -32,7 +33,7 @@ class ChatAvatar extends StatelessWidget {
       );
     }
 
-    if (chatType == 'channel') {
+    if (chatType == ChatType.channel) {
       return _iconAvatar(context, Icons.campaign_outlined, Colors.blueGrey);
     }
 

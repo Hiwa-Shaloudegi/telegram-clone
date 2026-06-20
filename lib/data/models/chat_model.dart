@@ -1,8 +1,9 @@
+import 'package:telegram_clone/app/enums/chat_type.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 
 class ChatModel {
   final String id;
-  final String chatType;
+  final ChatType chatType;
   final String? title;
   final String? description;
   final String? imageUrl;
@@ -46,7 +47,7 @@ class ChatModel {
     }
     return ChatModel(
       id: json['id'] as String,
-      chatType: json['chat_type'] as String,
+      chatType: ChatType.values.firstWhere((e) => e.name == json['chat_type']),
       title: title,
       description: json['description'] as String?,
       imageUrl: json['image_url'] as String?,
@@ -75,7 +76,7 @@ class ChatModel {
 
   ChatModel copyWith({
     String? id,
-    String? chatType,
+    ChatType? chatType,
     String? title,
     String? description,
     String? imageUrl,
@@ -111,9 +112,9 @@ class ChatModel {
     );
   }
 
-  bool get isDM => chatType == 'dm';
-  bool get isGroup => chatType == 'group';
-  bool get isChannel => chatType == 'channel';
-  bool get isSaved => chatType == 'saved';
+  bool get isPrivate => chatType == ChatType.private;
+  bool get isGroup => chatType == ChatType.group;
+  bool get isChannel => chatType == ChatType.channel;
+  bool get isSaved => chatType == ChatType.saved;
   // bool get hasUnread => unreadCount > 0;
 }

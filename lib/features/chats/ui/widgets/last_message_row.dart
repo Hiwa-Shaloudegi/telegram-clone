@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:telegram_clone/app/enums/chat_type.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 
 class LastMessageRow extends StatelessWidget {
@@ -22,7 +22,8 @@ class LastMessageRow extends StatelessWidget {
       );
     }
 
-    final isGroup = item.chatType == 'group' || item.chatType == 'channel';
+    final isGroup =
+        item.chatType == ChatType.group || item.chatType == ChatType.channel;
     final senderName = item.lastMessageSenderName ?? '';
     final preview = item.lastMessagePreview;
 

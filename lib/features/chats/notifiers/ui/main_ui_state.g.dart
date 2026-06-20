@@ -61,3 +61,59 @@ abstract class _$MainUi_isFabVisible extends $Notifier<bool> {
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(MainUi_selectedChatItemProvider)
+final mainUi_selectedChatItemProviderProvider =
+    MainUi_selectedChatItemProviderProvider._();
+
+final class MainUi_selectedChatItemProviderProvider
+    extends
+        $NotifierProvider<MainUi_selectedChatItemProvider, ChatListItemModel?> {
+  MainUi_selectedChatItemProviderProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mainUi_selectedChatItemProviderProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$mainUi_selectedChatItemProviderHash();
+
+  @$internal
+  @override
+  MainUi_selectedChatItemProvider create() => MainUi_selectedChatItemProvider();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ChatListItemModel? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ChatListItemModel?>(value),
+    );
+  }
+}
+
+String _$mainUi_selectedChatItemProviderHash() =>
+    r'f0d17937d1b494db07e7d84d9bb6d72bc95be712';
+
+abstract class _$MainUi_selectedChatItemProvider
+    extends $Notifier<ChatListItemModel?> {
+  ChatListItemModel? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<ChatListItemModel?, ChatListItemModel?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<ChatListItemModel?, ChatListItemModel?>,
+              ChatListItemModel?,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

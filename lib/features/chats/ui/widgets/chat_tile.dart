@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/data/api/chat/chats_api.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
+import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/chat_avatar.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/last_message_row.dart';
 import 'package:telegram_clone/features/chats/ui/widgets/unread_badge.dart';
@@ -21,12 +22,15 @@ class ChatTile extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
+        // TODO: is it necessary to mark as read here? maybe just do it in chat page when messages are loaded?
         // Mark as read then navigate
-        ref.read(chatsApiProvider).markChatRead(item.chatId);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(mainUi_selectedChatItemProviderProvider.notifier).set(item);
+        });
+        // TODO: if it's mobile view, then navigate and select chat, else just update selected chat
         context.pushNamed(
           RouteNames.chat,
           pathParameters: {'chatId': item.chatId},
-          extra: item,
         );
       },
       onLongPress: () => _showContextMenu(context, ref),

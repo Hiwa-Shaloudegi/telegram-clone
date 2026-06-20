@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:telegram_clone/app/enums/chat_type.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 
 class ChatProfileSubtitle extends StatelessWidget {
@@ -9,7 +10,7 @@ class ChatProfileSubtitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (chatInfo.chatType) {
-      case 'channel':
+      case ChatType.channel:
         return Text(
           'Channel',
           style: TextStyle(
@@ -17,7 +18,7 @@ class ChatProfileSubtitle extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         );
-      case 'group':
+      case ChatType.group:
         return Text(
           'Group',
           style: TextStyle(
@@ -25,7 +26,7 @@ class ChatProfileSubtitle extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         );
-      case 'saved':
+      case ChatType.saved:
         return Text(
           'Your saved messages',
           style: TextStyle(

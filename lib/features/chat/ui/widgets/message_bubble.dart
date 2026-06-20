@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
 import 'package:telegram_clone/app/enums/message_status.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/send_message_command.dart';
+import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
 
-class MessageBubble extends StatelessWidget {
+class MessageBubble extends ConsumerWidget {
   final MessageModel message;
   final bool showSenderInfo;
   final Color? tileBackgroundColor;
@@ -33,10 +33,12 @@ class MessageBubble extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    Logger().d('MessageBubble: ${message.content}');
-
+  Widget build(BuildContext context, WidgetRef ref) {
     final isOwn = message.isOwnMessage;
+    final isSelectionMode = ref.watch(chatUi_isSelectionModeProvider);
+    final selected = ref
+        .watch(chatUi_selectedMessagesProvider)
+        .contains(message.id);
 
     return Material(
       color: tileBackgroundColor ?? Colors.transparent,
@@ -56,45 +58,88 @@ class MessageBubble extends StatelessWidget {
                 bottom: 2,
                 top: showSenderInfo ? 6 : 1,
               ),
-              child: Column(
-                crossAxisAlignment: isOwn
-                    ? CrossAxisAlignment.end
-                    : CrossAxisAlignment.start,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  if (showSenderInfo && !isOwn)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12, bottom: 2),
-                      child: Text(
-                        message.senderName,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: _senderColor(message.senderId),
+                  if (isSelectionMode) ...[
+                    GestureDetector(
+                      onTap: () => ref
+                          .read(chatUi_selectedMessagesProvider.notifier)
+                          .toggle(message.id),
+                      child: SizedBox(
+                        width: 32,
+                        height: 32,
+                        child: Center(
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: selected
+                                  ? Colors.green
+                                  : Colors.transparent,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.6,
+                              ),
+                            ),
+                            child: selected
+                                ? Icon(
+                                    Icons.check,
+                                    size: 14,
+                                    color: Colors.white,
+                                  )
+                                : null,
+                          ),
                         ),
                       ),
                     ),
-                  _BubbleContainer(
-                    isOwn: isOwn,
+                    const SizedBox(width: 8),
+                  ],
+
+                  Flexible(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: isOwn
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
                       children: [
-                        // Forwarded
-                        if (message.isForwarded)
-                          _ForwardedHeader(message: message),
-
-                        // Reply
-                        if (message.replyToMessageId != null)
-                          _ReplyPreviewInBubble(message: message, isOwn: isOwn),
-
-                        // Content
-                        _MessageContent(message: message),
-
-                        // Timestamp
-                        _Timestamp(
-                          message: message,
+                        if (showSenderInfo && !isOwn)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12, bottom: 2),
+                            child: Text(
+                              message.senderName,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: _senderColor(message.senderId),
+                              ),
+                            ),
+                          ),
+                        _BubbleContainer(
                           isOwn: isOwn,
-                          // sendStatus: sendStatus,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Forwarded
+                              if (message.isForwarded)
+                                _ForwardedHeader(message: message),
+
+                              // Reply
+                              if (message.replyToMessageId != null)
+                                _ReplyPreviewInBubble(
+                                  message: message,
+                                  isOwn: isOwn,
+                                ),
+
+                              // Content
+                              _MessageContent(message: message),
+
+                              // Timestamp
+                              _Timestamp(message: message, isOwn: isOwn),
+                            ],
+                          ),
                         ),
                       ],
                     ),

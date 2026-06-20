@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
+import 'package:telegram_clone/features/chat/notifiers/command/delete_messages_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_avatar.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_profile_subtitle.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/show_date_search.dart';
+import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
 
 class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const ChatAppBar({super.key, required this.chatInfo});
@@ -103,7 +105,17 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        // ref.read(deleteMessagesCommandProvider.notifier).run();
+                        final selectedChat = ref.read(
+                          mainUi_selectedChatItemProviderProvider,
+                        );
+                        if (selectedChat == null) return;
+
+                        ref
+                            .read(deleteMessagesCommandProvider.notifier)
+                            .run(
+                              chatId: selectedChat.chatId,
+                              chatType: selectedChat.chatType,
+                            );
                         ref
                             .read(chatUi_selectedMessagesProvider.notifier)
                             .clear();

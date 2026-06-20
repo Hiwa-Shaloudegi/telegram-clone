@@ -1,8 +1,10 @@
 // lib/data/models/chat_list_item_model.dart
 
+import 'package:telegram_clone/app/enums/chat_type.dart';
+
 class ChatListItemModel {
   final String chatId;
-  final String chatType; // dm | group | channel | saved
+  final ChatType chatType;
   final String? title;
   final String? description;
   final String? imageUrl;
@@ -60,7 +62,10 @@ class ChatListItemModel {
   factory ChatListItemModel.fromJson(Map<String, dynamic> json) {
     return ChatListItemModel(
       chatId: json['chat_id'] as String,
-      chatType: json['chat_type'] as String,
+      chatType: ChatType.values.firstWhere(
+        (e) => e.name == json['chat_type'],
+        orElse: () => ChatType.private,
+      ),
       title: json['title'] as String?,
       description: json['description'] as String?,
       imageUrl: json['image_url'] as String?,
@@ -88,14 +93,14 @@ class ChatListItemModel {
 
   /// Display name — for DMs uses other user's name; for groups/channels uses title
   String get displayTitle {
-    if (chatType == 'dm') return otherUserName ?? 'Unknown';
-    if (chatType == 'saved') return 'Saved Messages';
+    if (chatType == ChatType.private) return otherUserName ?? 'Unknown';
+    if (chatType == ChatType.saved) return 'Saved Messages';
     return title ?? '';
   }
 
   /// Avatar URL
   String? get avatarUrl {
-    if (chatType == 'dm') return otherUserImage;
+    if (chatType == ChatType.private) return otherUserImage;
     return imageUrl;
   }
 
