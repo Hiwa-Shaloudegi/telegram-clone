@@ -45,86 +45,85 @@ class _InputBarState extends ConsumerState<InputBar> {
 
     return Container(
       color: colorScheme.surface,
-      padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+      // padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+      padding: const EdgeInsets.only(top: 6),
       child: SafeArea(
         top: false,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Attach
-            IconButton(
-              icon: Icon(
-                Icons.attach_file,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              onPressed: () => widget.onAttach(context),
-            ),
-
-            // Text field
             Expanded(
-              child: Container(
-                constraints: const BoxConstraints(maxHeight: 160),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: widget.controller,
-                        focusNode: widget.focusNode,
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
-                        decoration: const InputDecoration(
-                          hintText: 'Message',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
+              child: Stack(
+                alignment: Alignment.centerRight,
+                children: [
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 160),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      // borderRadius: BorderRadius.circular(24),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.attach_file,
+                            color: colorScheme.onSurfaceVariant,
+                            size: 20,
+                          ),
+                          onPressed: () => widget.onAttach(context),
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: TextField(
+                            controller: widget.controller,
+                            focusNode: widget.focusNode,
+                            maxLines: null,
+                            textCapitalization: TextCapitalization.sentences,
+                            decoration: const InputDecoration(
+                              hintText: 'Message',
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              isDense: true,
+                            ),
+                            onSubmitted: (_) => widget.onSendText(),
                           ),
                         ),
-                        onSubmitted: (_) => widget.onSendText(),
-                      ),
+                        const SizedBox(width: 48),
+                      ],
                     ),
-                    // Emoji button
-                    IconButton(
-                      icon: Icon(
-                        Icons.emoji_emotions_outlined,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      onPressed: () {},
-                      padding: const EdgeInsets.only(right: 4, bottom: 4),
+                  ),
+
+                  // Floating send / mic button overlapping right
+                  Positioned(
+                    right: 6,
+                    child: Consumer(
+                      builder: (_, ref, __) {
+                        final hasText = ref.watch(chatUi_hasTextProvider);
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: hasText
+                              ? SendButton(onTap: widget.onSendText)
+                              : widget.isRecording
+                              ? RecordingButton(
+                                  key: const ValueKey('recording'),
+                                  onStop: widget.onRecordStop,
+                                )
+                              : MicButton(
+                                  key: const ValueKey('mic'),
+                                  onStart: widget.onRecordStart,
+                                ),
+                        );
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-
-            const SizedBox(width: 6),
-
-            // Send / mic button
-            Consumer(
-              builder: (_, ref, _) {
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: ref.watch(chatUi_hasTextProvider)
-                      ? SendButton(
-                          key: const ValueKey('send'),
-                          onTap: widget.onSendText,
-                        )
-                      : widget.isRecording
-                      ? RecordingButton(
-                          key: const ValueKey('recording'),
-                          onStop: widget.onRecordStop,
-                        )
-                      : MicButton(
-                          key: const ValueKey('mic'),
-                          onStart: widget.onRecordStart,
-                        ),
-                );
-              },
             ),
           ],
         ),
