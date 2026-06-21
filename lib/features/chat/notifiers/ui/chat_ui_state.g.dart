@@ -313,3 +313,45 @@ final class ChatUi_isSelectionModeProvider
 
 String _$chatUi_isSelectionModeHash() =>
     r'b2991e8a8b7e3d675a13dab30f99fc4c866009d2';
+
+@ProviderFor(ChatUI_canEditMessage)
+final chatUI_canEditMessageProvider = ChatUI_canEditMessageProvider._();
+
+final class ChatUI_canEditMessageProvider
+    extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  ChatUI_canEditMessageProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chatUI_canEditMessageProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chatUI_canEditMessageHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return ChatUI_canEditMessage(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$chatUI_canEditMessageHash() =>
+    r'ee1c265fe2637096f1d8466510b361762eeeedcb';

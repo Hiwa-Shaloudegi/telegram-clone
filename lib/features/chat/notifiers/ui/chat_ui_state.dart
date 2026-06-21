@@ -2,6 +2,8 @@ import 'dart:collection';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
+import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
+import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
 
 part 'chat_ui_state.g.dart';
 
@@ -70,4 +72,29 @@ class ChatUi_selectedMessages extends _$ChatUi_selectedMessages {
 @riverpod
 bool ChatUi_isSelectionMode(Ref ref) {
   return ref.watch(chatUi_selectedMessagesProvider).isNotEmpty;
+}
+
+@riverpod
+bool ChatUI_canEditMessage(Ref ref) {
+  final selectedMessageIds = ref.watch(chatUi_selectedMessagesProvider);
+  final selectedCounts = selectedMessageIds.length;
+
+  if (selectedCounts != 1) return false;
+
+  final selectedMessageId = selectedMessageIds.first;
+  final selectedChat = ref.watch(mainUi_selectedChatItemProviderProvider);
+  if (selectedChat == null) return false;
+
+  final selectedMessage = ref
+      .watch(watchMessagesQueryProvider(selectedChat.chatId))
+      .whenData((messages) {
+        for (final msg in messages) {
+          if (msg.id == selectedMessageId) return msg;
+        }
+        return null;
+      })
+      .value;
+  if (selectedMessage == null) return false;
+
+  return selectedMessage.isOwnMessage == true;
 }

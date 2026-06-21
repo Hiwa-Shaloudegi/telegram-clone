@@ -35,7 +35,23 @@ class ContactsList extends ConsumerWidget {
             itemBuilder: (context, index) {
               // 1. Logic for the first list
               if (index < withAccount.length) {
-                return ContactTile(contact: withAccount[index]);
+                return ContactTile(
+                  contact: withAccount[index],
+                  onTap: () {
+                    // WidgetsBinding.instance.addPostFrameCallback((_) {
+                    //   ref
+                    //       .read(
+                    //         mainUi_selectedChatItemProviderProvider.notifier,
+                    //       )
+                    //       .set(item);
+                    // });
+                    // // TODO: if it's mobile view, then navigate and select chat, else just update selected chat
+                    // context.pushNamed(
+                    //   RouteNames.chat,
+                    //   pathParameters: {'chatId': item.chatId},
+                    // );
+                  },
+                );
               }
 
               // 2. Logic for the Divider

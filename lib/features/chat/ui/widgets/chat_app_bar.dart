@@ -65,6 +65,7 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCounts = ref.watch(chatUi_selectedMessagesProvider).length;
+    final canEdit = ref.watch(chatUI_canEditMessageProvider);
 
     return AppBar(
       leading: IconButton(
@@ -74,7 +75,7 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
       ),
       title: Text('$selectedCounts'),
       actions: [
-        if (selectedCounts == 1)
+        if (canEdit)
           IconButton(onPressed: () {}, icon: Icon(Icons.mode_edit_outlined)),
 
         IconButton(onPressed: () {}, icon: Icon(Icons.copy_outlined)),
