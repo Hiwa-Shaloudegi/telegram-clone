@@ -6,12 +6,12 @@ import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
-import 'package:telegram_clone/features/chats/notifiers/query/watch_user_chats_query.dart';
-import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
-import 'package:telegram_clone/features/chats/ui/widgets/app_drawer.dart';
-import 'package:telegram_clone/features/chats/ui/widgets/chat_tile.dart';
-import 'package:telegram_clone/features/chats/ui/widgets/chats_app_bar_title.dart';
-import 'package:telegram_clone/features/chats/ui/widgets/chats_empty_state.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
+import 'package:telegram_clone/features/chat_list/ui/widgets/app_drawer.dart';
+import 'package:telegram_clone/features/chat_list/ui/widgets/chat_tile.dart';
+import 'package:telegram_clone/features/chat_list/ui/widgets/chats_app_bar_title.dart';
+import 'package:telegram_clone/features/chat_list/ui/widgets/chats_empty_state.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});

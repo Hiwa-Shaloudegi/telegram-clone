@@ -355,3 +355,56 @@ final class ChatUI_canEditMessageProvider
 
 String _$chatUI_canEditMessageHash() =>
     r'ee1c265fe2637096f1d8466510b361762eeeedcb';
+
+@ProviderFor(ChatUi_editingMessage)
+final chatUi_editingMessageProvider = ChatUi_editingMessageProvider._();
+
+final class ChatUi_editingMessageProvider
+    extends $NotifierProvider<ChatUi_editingMessage, MessageModel?> {
+  ChatUi_editingMessageProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chatUi_editingMessageProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chatUi_editingMessageHash();
+
+  @$internal
+  @override
+  ChatUi_editingMessage create() => ChatUi_editingMessage();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MessageModel? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MessageModel?>(value),
+    );
+  }
+}
+
+String _$chatUi_editingMessageHash() =>
+    r'67fdae3a4c68dad5d303c8bb7db89999feb11244';
+
+abstract class _$ChatUi_editingMessage extends $Notifier<MessageModel?> {
+  MessageModel? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<MessageModel?, MessageModel?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<MessageModel?, MessageModel?>,
+              MessageModel?,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

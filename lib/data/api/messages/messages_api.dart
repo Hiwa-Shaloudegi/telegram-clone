@@ -73,10 +73,6 @@ class MessagesApi {
     }
   }
 
-  // ----------------------------------------------------------------
-  // Load older messages (pagination)
-  // ----------------------------------------------------------------
-
   Future<List<MessageModel>> loadMoreMessages({
     required String chatId,
     required String beforeMessageId,
@@ -176,10 +172,6 @@ class MessagesApi {
     }
   }
 
-  // ----------------------------------------------------------------
-  // Search messages by date
-  // ----------------------------------------------------------------
-
   Future<List<MessageModel>> getMessagesByDate({
     required String chatId,
     required DateTime date,
@@ -205,9 +197,6 @@ class MessagesApi {
     }
   }
 
-  // ----------------------------------------------------------------
-  // Delete / soft-delete a message
-  // ----------------------------------------------------------------
 
   Future<void> deleteMessage(String messageId) async {
     try {
@@ -239,6 +228,22 @@ class MessagesApi {
       );
 
       return response as int;
+    } catch (e) {
+      exceptionHandler.handle(e);
+    }
+  }
+
+  /// Edit a text message. Only the sender may edit their message.
+  Future<void> editMessage({
+    required String messageId,
+    required String newContent,
+  }) async {
+    try {
+      await supabase
+          .from('messages')
+          .update({'content': newContent, 'updated_at': DateTime.now().toIso8601String()})
+          .eq('id', messageId)
+          .eq('sender_id', supabase.auth.currentUser!.id);
     } catch (e) {
       exceptionHandler.handle(e);
     }

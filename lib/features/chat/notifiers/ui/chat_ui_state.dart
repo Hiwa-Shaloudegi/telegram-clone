@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
-import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 
 part 'chat_ui_state.g.dart';
 
@@ -97,4 +97,14 @@ bool ChatUI_canEditMessage(Ref ref) {
   if (selectedMessage == null) return false;
 
   return selectedMessage.isOwnMessage == true;
+}
+
+@riverpod
+class ChatUi_editingMessage extends _$ChatUi_editingMessage {
+  @override
+  MessageModel? build() => null;
+
+  void set(MessageModel? value) {
+    state = value;
+  }
 }
