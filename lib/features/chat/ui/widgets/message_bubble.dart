@@ -607,6 +607,10 @@ class _Timestamp extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(timeStr, style: TextStyle(fontSize: 11, color: subtleColor)),
+          if (message.updatedAt.isAfter(message.createdAt)) ...[
+            const SizedBox(width: 6),
+            Text('edited', style: TextStyle(fontSize: 10, color: subtleColor)),
+          ],
           if (isOwn) ...[
             const SizedBox(width: 4),
             messageStatus == MessageStatus.sent

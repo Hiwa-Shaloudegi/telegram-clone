@@ -39,4 +39,38 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
     );
     state = AsyncValue.data([msg, ...?state.asData?.value]);
   }
+
+  void updateOptimisticMessage({
+    required String messageId,
+    required String newContent,
+  }) {
+    final now = DateTime.now();
+    final current = state.asData?.value ?? [];
+    final updated = current.map((m) {
+      if (m.id == messageId) {
+        return MessageModel(
+          id: m.id,
+          chatId: m.chatId,
+          senderId: m.senderId,
+          senderName: m.senderName,
+          senderImage: m.senderImage,
+          content: newContent,
+          messageType: m.messageType,
+          mediaUrl: m.mediaUrl,
+          replyToMessageId: m.replyToMessageId,
+          replyToContent: m.replyToContent,
+          replyToSenderName: m.replyToSenderName,
+          isForwarded: m.isForwarded,
+          forwardedFromChatId: m.forwardedFromChatId,
+          forwardedFromTitle: m.forwardedFromTitle,
+          createdAt: m.createdAt,
+          updatedAt: now,
+          isOwnMessage: m.isOwnMessage,
+        );
+      }
+      return m;
+    }).toList();
+
+    state = AsyncValue.data(updated);
+  }
 }

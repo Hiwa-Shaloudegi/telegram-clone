@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:record/record.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
+import 'package:telegram_clone/features/chat/notifiers/command/edit_message_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/send_message_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/messages_by_date_query.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
@@ -76,6 +77,14 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   @override
   Widget build(BuildContext context) {
     MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
+    MessageModel? editingMessage = ref.watch(chatUi_editingMessageProvider);
+    // when editing is started elsewhere (app bar), populate input
+    ref.listen<MessageModel?>(chatUi_editingMessageProvider, (prev, next) {
+      if (next != null) {
+        _textController.text = next.content;
+        _inputFocus.requestFocus();
+      }
+    });
     bool isRecording = ref.watch(chatUi_isRecordingProvider);
 
     final chatInfo = ref.watch(mainUi_selectedChatItemProviderProvider);
@@ -139,9 +148,28 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
 
+    final selectedChat = ref.read(mainUi_selectedChatItemProviderProvider)!;
+
+    // If editing an existing message, call edit command
+    final editing = ref.read(chatUi_editingMessageProvider);
+    if (editing != null) {
+      _textController.clear();
+      ref.read(chatUi_editingMessageProvider.notifier).set(null);
+
+      await ref
+          .read(editMessageCommandProvider(editing.id).notifier)
+          .editText(
+            chatId: selectedChat.chatId,
+            messageId: editing.id,
+            newContent: text,
+          );
+
+      return;
+    }
+
     _textController.clear();
 
-    MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
+    MessageModel? replyingTo = ref.read(chatUi_replyingToProvider);
     ref.read(chatUi_replyingToProvider.notifier).set(null);
 
     final messageTempId = 'temp_${Uuid().v4()}';
@@ -149,7 +177,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     await ref
         .read(sendMessageCommandProvider(messageTempId).notifier)
         .sendText(
-          chatId: ref.read(mainUi_selectedChatItemProviderProvider)!.chatId,
+          chatId: selectedChat.chatId,
           content: text,
           replyingToMessage: replyingTo,
         );

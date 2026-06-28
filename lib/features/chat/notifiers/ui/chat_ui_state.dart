@@ -98,3 +98,13 @@ bool ChatUI_canEditMessage(Ref ref) {
 
   return selectedMessage.isOwnMessage == true;
 }
+
+@riverpod
+class ChatUi_editingMessage extends _$ChatUi_editingMessage {
+  @override
+  MessageModel? build() => null;
+
+  void set(MessageModel? value) {
+    state = value;
+  }
+}

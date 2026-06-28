@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/delete_messages_command.dart';
+import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
 import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_avatar.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_profile_subtitle.dart';
@@ -76,7 +77,30 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
       title: Text('$selectedCounts'),
       actions: [
         if (canEdit)
-          IconButton(onPressed: () {}, icon: Icon(Icons.mode_edit_outlined)),
+          IconButton(
+            onPressed: () {
+              final selectedMessageIds = ref.read(chatUi_selectedMessagesProvider);
+              if (selectedMessageIds.isEmpty) return;
+
+              final selectedChat = ref.read(mainUi_selectedChatItemProviderProvider);
+              if (selectedChat == null) return;
+
+              final selectedMessageId = selectedMessageIds.first;
+              final messagesAsync = ref.read(watchMessagesQueryProvider(selectedChat.chatId));
+              final selectedMessage = messagesAsync.whenData((messages) {
+                for (final msg in messages) {
+                  if (msg.id == selectedMessageId) return msg;
+                }
+                return null;
+              }).value;
+
+              if (selectedMessage == null) return;
+
+              ref.read(chatUi_editingMessageProvider.notifier).set(selectedMessage);
+              ref.read(chatUi_selectedMessagesProvider.notifier).clear();
+            },
+            icon: Icon(Icons.mode_edit_outlined),
+          ),
 
         IconButton(onPressed: () {}, icon: Icon(Icons.copy_outlined)),
         IconButton(onPressed: () {}, icon: Icon(Icons.turn_right_outlined)),
