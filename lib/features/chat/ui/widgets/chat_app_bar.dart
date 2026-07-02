@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:telegram_clone/app/enums/chat_type.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/delete_messages_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
@@ -19,7 +20,7 @@ class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final isSelectionMode = ref.watch(chatUi_isSelectionModeProvider);
 
     return isSelectionMode
-        ? SelectionAppBar()
+        ? SelectionAppBar(chatId: chatInfo.chatId, chatType: chatInfo.chatType)
         : AppBar(
             titleSpacing: 0,
             leadingWidth: 40,
@@ -61,7 +62,10 @@ class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
 }
 
 class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
-  const SelectionAppBar({super.key});
+  const SelectionAppBar({super.key, required this.chatId, required this.chatType});
+
+  final String chatId;
+  final ChatType chatType;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -84,14 +88,9 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
               );
               if (selectedMessageIds.isEmpty) return;
 
-              final selectedChat = ref.read(
-                mainUi_selectedChatItemProviderProvider,
-              );
-              if (selectedChat == null) return;
-
               final selectedMessageId = selectedMessageIds.first;
               final messagesAsync = ref.read(
-                watchMessagesQueryProvider(selectedChat.chatId),
+                watchMessagesQueryProvider(chatId),
               );
               final selectedMessage = messagesAsync.whenData((messages) {
                 for (final msg in messages) {
@@ -138,16 +137,11 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        final selectedChat = ref.read(
-                          mainUi_selectedChatItemProviderProvider,
-                        );
-                        if (selectedChat == null) return;
-
                         ref
                             .read(deleteMessagesCommandProvider.notifier)
                             .run(
-                              chatId: selectedChat.chatId,
-                              chatType: selectedChat.chatType,
+                              chatId: chatId,
+                              chatType: chatType,
                             );
                         ref
                             .read(chatUi_selectedMessagesProvider.notifier)

@@ -97,6 +97,20 @@ class ChatsApi {
     }
   }
 
+  /// Find an existing DM chat with [otherUserId], or create a new one.
+  /// Returns the chat ID.
+  Future<String> getOrCreatePrivateChat(String otherUserId) async {
+    try {
+      final result = await supabase.rpc(
+        'get_or_create_private_chat',
+        params: {'p_other_user_id': otherUserId},
+      );
+      return result as String;
+    } catch (e) {
+      exceptionHandler.handle(e);
+    }
+  }
+
   /// Toggle pin status for the current user in [chatId].
   Future<void> togglePin(String chatId, {required bool pin}) async {
     try {

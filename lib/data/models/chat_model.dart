@@ -47,7 +47,10 @@ class ChatModel {
     }
     return ChatModel(
       id: json['id'] as String,
-      chatType: ChatType.values.firstWhere((e) => e.name == json['chat_type']),
+      chatType: ChatType.values.firstWhere(
+        (e) => e.name == json['chat_type'],
+        orElse: () => ChatType.private,
+      ),
       title: title,
       description: json['description'] as String?,
       imageUrl: json['image_url'] as String?,
@@ -62,7 +65,7 @@ class ChatModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'chat_type': chatType,
+      'chat_type': chatType == ChatType.private ? 'dm' : chatType.name,
       'title': title,
       'description': description,
       'image_url': imageUrl,

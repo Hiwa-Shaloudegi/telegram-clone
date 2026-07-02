@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/ui/widgets/section_divider.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/command/create_private_chat_command.dart';
 import 'package:telegram_clone/features/contacts/notifiers/query/get_contacts_query.dart';
 import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.dart';
 import 'package:telegram_clone/features/contacts/ui/widgets/contact_tile.dart';
@@ -38,18 +40,14 @@ class ContactsList extends ConsumerWidget {
                 return ContactTile(
                   contact: withAccount[index],
                   onTap: () {
-                    // WidgetsBinding.instance.addPostFrameCallback((_) {
-                    //   ref
-                    //       .read(
-                    //         mainUi_selectedChatItemProviderProvider.notifier,
-                    //       )
-                    //       .set(item);
-                    // });
-                    // // TODO: if it's mobile view, then navigate and select chat, else just update selected chat
-                    // context.pushNamed(
-                    //   RouteNames.chat,
-                    //   pathParameters: {'chatId': item.chatId},
-                    // );
+                    final contactUserId = withAccount[index].contactUserId;
+                    if (contactUserId == null) return;
+                    ref
+                        .read(createPrivateChatCommandProvider.notifier)
+                        .run(
+                          otherUserId: contactUserId,
+                          router: GoRouter.of(context),
+                        );
                   },
                 );
               }

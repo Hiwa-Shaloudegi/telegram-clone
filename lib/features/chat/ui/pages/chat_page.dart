@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:record/record.dart';
+import 'package:telegram_clone/app/enums/chat_type.dart';
+import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/edit_message_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/send_message_command.dart';
@@ -13,6 +16,7 @@ import 'package:telegram_clone/features/chat/ui/widgets/chat_message_list.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/input_text.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/message_bubble.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/reply_preview.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 import 'package:uuid/uuid.dart';
 
@@ -87,60 +91,79 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     });
     bool isRecording = ref.watch(chatUi_isRecordingProvider);
 
-    final chatInfo = ref.watch(mainUi_selectedChatItemProviderProvider);
+    final chatId = GoRouterState.of(context).pathParameters['chatId']!;
 
-    // TODO: use a proper UI
-    if (chatInfo == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: Text('No chat selected')),
-      );
-    } else {
-      final messagesState = ref.watch(
-        watchMessagesQueryProvider(chatInfo.chatId),
-      );
-      return Scaffold(
-        appBar: ChatAppBar(chatInfo: chatInfo),
-        body: Column(
-          children: [
-            // Messages list
-            Expanded(
-              child: messagesState.when(
-                data: (messages) => ChatMessagesList(
-                  chatId: chatInfo.chatId,
-                  messages: messages,
-                  scrollController: _scrollController,
-                  isLoadingMore: _isLoadingMore,
-                  onReply: (msg) =>
-                      ref.read(chatUi_replyingToProvider.notifier).set(msg),
-                ),
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ), // TODO: change the loading widget
-                error: (e, _) => Center(child: Text(e.toString())),
+    // Try to get chat info from the selected provider first, then from the
+    // chat list stream, and finally fall back to a minimal object.
+    final selectedChat = ref.watch(mainUi_selectedChatItemProviderProvider);
+    final chatsAsync = ref.watch(watchUserChatsQueryProvider);
+    final ChatListItemModel chatInfo = selectedChat ??
+        chatsAsync.whenData((chats) {
+          for (final c in chats) {
+            if (c.chatId == chatId) return c;
+          }
+          return null;
+        }).value ??
+        ChatListItemModel(
+          chatId: chatId,
+          chatType: ChatType.private,
+          isPublic: false,
+          updatedAt: DateTime.now(),
+          memberRole: 'member',
+          isPinned: false,
+          isArchived: false,
+          isMuted: false,
+          unreadCount: 0,
+        );
+
+    final messagesState = ref.watch(
+      watchMessagesQueryProvider(chatInfo.chatId),
+    );
+
+    // Sync the selected chat provider so child widgets can access it.
+    ref.listen(mainUi_selectedChatItemProviderProvider, (prev, next) {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(mainUi_selectedChatItemProviderProvider.notifier).set(chatInfo);
+    });
+
+    return Scaffold(
+      appBar: ChatAppBar(chatInfo: chatInfo),
+      body: Column(
+        children: [
+          Expanded(
+            child: messagesState.when(
+              data: (messages) => ChatMessagesList(
+                chatId: chatInfo.chatId,
+                messages: messages,
+                scrollController: _scrollController,
+                isLoadingMore: _isLoadingMore,
+                onReply: (msg) =>
+                    ref.read(chatUi_replyingToProvider.notifier).set(msg),
               ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text(e.toString())),
+            ),
+          ),
+
+          if (replyingTo != null)
+            ReplyPreview(
+              message: replyingTo,
+              onCancel: () =>
+                  ref.read(chatUi_replyingToProvider.notifier).set(null),
             ),
 
-            if (replyingTo != null)
-              ReplyPreview(
-                message: replyingTo,
-                onCancel: () =>
-                    ref.read(chatUi_replyingToProvider.notifier).set(null),
-              ),
-
-            InputBar(
-              controller: _textController,
-              focusNode: _inputFocus,
-              isRecording: isRecording,
-              onSendText: _sendText,
-              onAttach: _showAttachMenu,
-              onRecordStart: () {}, //_startRecording,
-              onRecordStop: () {}, //_stopRecording,
-            ),
-          ],
-        ),
-      );
-    }
+          InputBar(
+            controller: _textController,
+            focusNode: _inputFocus,
+            isRecording: isRecording,
+            onSendText: _sendText,
+            onAttach: _showAttachMenu,
+            onRecordStart: () {},
+            onRecordStop: () {},
+          ),
+        ],
+      ),
+    );
   }
 
   // TODO: Organize functions
@@ -148,7 +171,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
 
-    final selectedChat = ref.read(mainUi_selectedChatItemProviderProvider)!;
+    final chatId = GoRouterState.of(context).pathParameters['chatId']!;
 
     // If editing an existing message, call edit command
     final editing = ref.read(chatUi_editingMessageProvider);
@@ -159,7 +182,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       await ref
           .read(editMessageCommandProvider(editing.id).notifier)
           .editText(
-            chatId: selectedChat.chatId,
+            chatId: chatId,
             messageId: editing.id,
             newContent: text,
           );
@@ -177,7 +200,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     await ref
         .read(sendMessageCommandProvider(messageTempId).notifier)
         .sendText(
-          chatId: selectedChat.chatId,
+          chatId: chatId,
           content: text,
           replyingToMessage: replyingTo,
         );
