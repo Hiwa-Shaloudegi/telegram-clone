@@ -7,7 +7,7 @@ part 'user_profile_query.g.dart';
 @Riverpod(keepAlive: true)
 class UserProfileQuery extends _$UserProfileQuery {
   @override
-  FutureOr<UserProfileModel?> build() {
-    return ref.read(userApiProvider).getUserProfile();
+  FutureOr<UserProfileModel?> build() async {
+    return await ref.read(userApiProvider).getUserProfile();
   }
 }
