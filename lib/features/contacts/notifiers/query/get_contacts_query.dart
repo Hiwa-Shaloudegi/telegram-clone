@@ -5,7 +5,7 @@ import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.
 
 part 'get_contacts_query.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class GetContactsQuery extends _$GetContactsQuery {
   @override
   FutureOr<List<ContactWithAcountAndPresenceModel>> build() async {
