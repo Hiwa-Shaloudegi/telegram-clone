@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
-import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 
 part 'chat_ui_state.g.dart';
 

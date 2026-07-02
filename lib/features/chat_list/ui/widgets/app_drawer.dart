@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
-import 'package:telegram_clone/features/chats/ui/widgets/drawer_headerd.dart';
-import 'package:telegram_clone/features/chats/ui/widgets/drawer_item_tile.dart';
+import 'package:telegram_clone/features/chat_list/ui/widgets/drawer_headerd.dart';
+import 'package:telegram_clone/features/chat_list/ui/widgets/drawer_item_tile.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});

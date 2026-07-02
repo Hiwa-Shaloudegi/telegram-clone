@@ -13,7 +13,7 @@ import 'package:telegram_clone/features/chat/ui/widgets/chat_message_list.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/input_text.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/message_bubble.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/reply_preview.dart';
-import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatPage extends ConsumerStatefulWidget {

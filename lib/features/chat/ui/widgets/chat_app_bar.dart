@@ -7,7 +7,7 @@ import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_avatar.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_profile_subtitle.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/show_date_search.dart';
-import 'package:telegram_clone/features/chats/notifiers/ui/main_ui_state.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 
 class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const ChatAppBar({super.key, required this.chatInfo});
@@ -79,14 +79,20 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
         if (canEdit)
           IconButton(
             onPressed: () {
-              final selectedMessageIds = ref.read(chatUi_selectedMessagesProvider);
+              final selectedMessageIds = ref.read(
+                chatUi_selectedMessagesProvider,
+              );
               if (selectedMessageIds.isEmpty) return;
 
-              final selectedChat = ref.read(mainUi_selectedChatItemProviderProvider);
+              final selectedChat = ref.read(
+                mainUi_selectedChatItemProviderProvider,
+              );
               if (selectedChat == null) return;
 
               final selectedMessageId = selectedMessageIds.first;
-              final messagesAsync = ref.read(watchMessagesQueryProvider(selectedChat.chatId));
+              final messagesAsync = ref.read(
+                watchMessagesQueryProvider(selectedChat.chatId),
+              );
               final selectedMessage = messagesAsync.whenData((messages) {
                 for (final msg in messages) {
                   if (msg.id == selectedMessageId) return msg;
@@ -96,7 +102,9 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
               if (selectedMessage == null) return;
 
-              ref.read(chatUi_editingMessageProvider.notifier).set(selectedMessage);
+              ref
+                  .read(chatUi_editingMessageProvider.notifier)
+                  .set(selectedMessage);
               ref.read(chatUi_selectedMessagesProvider.notifier).clear();
             },
             icon: Icon(Icons.mode_edit_outlined),

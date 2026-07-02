@@ -10,7 +10,7 @@ import 'package:telegram_clone/features/auth/ui/pages/login_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/profile_info_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/signup_page.dart';
 import 'package:telegram_clone/features/chat/ui/pages/chat_page.dart';
-import 'package:telegram_clone/features/chats/ui/pages/main_page.dart';
+import 'package:telegram_clone/features/chat_list/ui/pages/main_page.dart';
 import 'package:telegram_clone/features/contacts/ui/pages/contacts_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/edit_profile_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/profile_page.dart';
