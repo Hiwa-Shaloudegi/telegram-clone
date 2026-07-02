@@ -11,6 +11,7 @@ class ChatMessagesList extends StatelessWidget {
   final ScrollController scrollController;
   final bool isLoadingMore;
   final void Function(MessageModel) onReply;
+  final void Function(MessageModel) onDelete;
 
   const ChatMessagesList({
     super.key,
@@ -19,6 +20,7 @@ class ChatMessagesList extends StatelessWidget {
     required this.scrollController,
     required this.isLoadingMore,
     required this.onReply,
+    required this.onDelete,
   });
 
   @override
@@ -99,6 +101,7 @@ class ChatMessagesList extends StatelessWidget {
                       : () => ref
                             .read(chatUi_selectedMessagesProvider.notifier)
                             .toggle(msg.id),
+                  onDelete: () => onDelete(msg),
                   // messageStatus: MessageStatus.sent, // TODO: msg.isRead ? MessageStatus.read : MessageStatus.sent,
                   // onTap: isSelectionMode
                   //     ? () => ref

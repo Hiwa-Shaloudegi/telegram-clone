@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:record/record.dart';
 import 'package:telegram_clone/app/enums/chat_type.dart';
+import 'package:telegram_clone/data/api/messages/messages_api.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/edit_message_command.dart';
@@ -139,6 +140,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                 isLoadingMore: _isLoadingMore,
                 onReply: (msg) =>
                     ref.read(chatUi_replyingToProvider.notifier).set(msg),
+                onDelete: (msg) => _deleteMessage(chatInfo.chatId, msg),
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text(e.toString())),
@@ -213,6 +215,11 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         curve: Curves.easeOut,
       );
     }
+  }
+
+  Future<void> _deleteMessage(String chatId, MessageModel msg) async {
+    ref.read(watchMessagesQueryProvider(chatId).notifier).removeMessage(msg.id);
+    await ref.read(messagesApiProvider).deleteMessage(msg.id);
   }
 
   void _showAttachMenu(BuildContext context) {

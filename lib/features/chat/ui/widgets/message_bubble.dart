@@ -17,6 +17,7 @@ class MessageBubble extends ConsumerWidget {
   final VoidCallback onReply;
   final Function()? onTap;
   final Function()? onLongPress;
+  final Function()? onDelete;
   // final bool isDateSearchResult;
   // final SendStatus sendStatus;
 
@@ -28,6 +29,7 @@ class MessageBubble extends ConsumerWidget {
     this.tileBackgroundColor,
     this.onTap,
     this.onLongPress,
+    this.onDelete,
     // required this.sendStatus,
     // this.isDateSearchResult = false,
   });
@@ -44,7 +46,9 @@ class MessageBubble extends ConsumerWidget {
       color: tileBackgroundColor ?? Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        onLongPress: onLongPress,
+        onLongPress: isSelectionMode
+            ? onLongPress
+            : () => _showContextMenu(context, ref),
         child: Align(
           alignment: isOwn ? Alignment.centerRight : Alignment.centerLeft,
           child: ConstrainedBox(
@@ -167,7 +171,7 @@ class MessageBubble extends ConsumerWidget {
     return colors[hash % colors.length];
   }
 
-  void _showContextMenu(BuildContext context) {
+  void _showContextMenu(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -206,6 +210,16 @@ class MessageBubble extends ConsumerWidget {
                   ).showSnackBar(const SnackBar(content: Text('Copied')));
                 },
               ),
+            ListTile(
+              leading: const Icon(Icons.check_circle_outline),
+              title: const Text('Select'),
+              onTap: () {
+                Navigator.pop(context);
+                ref
+                    .read(chatUi_selectedMessagesProvider.notifier)
+                    .toggle(message.id);
+              },
+            ),
             if (message.isOwnMessage)
               ListTile(
                 leading: const Icon(Icons.delete_outline, color: Colors.red),
@@ -215,7 +229,7 @@ class MessageBubble extends ConsumerWidget {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  // deletion handled via messagesApi in caller
+                  onDelete?.call();
                 },
               ),
             const SizedBox(height: 8),

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
+import 'package:telegram_clone/app/router/extra/pending_dm_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/pages/not_found_page.dart';
 import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
@@ -10,6 +11,7 @@ import 'package:telegram_clone/features/auth/ui/pages/login_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/profile_info_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/signup_page.dart';
 import 'package:telegram_clone/features/chat/ui/pages/chat_page.dart';
+import 'package:telegram_clone/features/chat/ui/pages/pending_dm_page.dart';
 import 'package:telegram_clone/features/chat_list/ui/pages/main_page.dart';
 import 'package:telegram_clone/features/contacts/ui/pages/contacts_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/edit_profile_page.dart';
@@ -85,6 +87,15 @@ GoRouter router(Ref ref) {
         name: RouteNames.chat,
         path: '/chat/:chatId',
         builder: (context, state) => ChatPage(),
+      ),
+      GoRoute(
+        name: RouteNames.pendingDm,
+        path: '/dm/:otherUserId',
+        builder: (context, state) {
+          final otherUserId = state.pathParameters['otherUserId']!;
+          final extra = state.extra as PendingDmExtra;
+          return PendingDmPage(otherUserId: otherUserId, extra: extra);
+        },
       ),
     ],
     redirect: (context, state) {
