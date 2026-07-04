@@ -4,7 +4,7 @@ import 'package:telegram_clone/data/models/user_profile_model.dart';
 
 part 'user_profile_query.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class UserProfileQuery extends _$UserProfileQuery {
   @override
   FutureOr<UserProfileModel?> build() async {

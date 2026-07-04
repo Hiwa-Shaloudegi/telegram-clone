@@ -24,7 +24,7 @@ final class GetContactsQueryProvider
         argument: null,
         retry: null,
         name: r'getContactsQueryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -37,7 +37,7 @@ final class GetContactsQueryProvider
   GetContactsQuery create() => GetContactsQuery();
 }
 
-String _$getContactsQueryHash() => r'4ea3e049f4bff3c44359abb6a86d195d5538ea45';
+String _$getContactsQueryHash() => r'c4122a2fe3f0e0cc05472a7ba824857e32b7be06';
 
 abstract class _$GetContactsQuery
     extends $AsyncNotifier<List<ContactWithAcountAndPresenceModel>> {

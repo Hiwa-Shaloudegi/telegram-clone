@@ -75,7 +75,7 @@ final class MainUi_selectedChatItemProviderProvider
         argument: null,
         retry: null,
         name: r'mainUi_selectedChatItemProviderProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -97,7 +97,7 @@ final class MainUi_selectedChatItemProviderProvider
 }
 
 String _$mainUi_selectedChatItemProviderHash() =>
-    r'f0d17937d1b494db07e7d84d9bb6d72bc95be712';
+    r'969c14c2046935b11c6962153d9fe3f5a2125983';
 
 abstract class _$MainUi_selectedChatItemProvider
     extends $Notifier<ChatListItemModel?> {

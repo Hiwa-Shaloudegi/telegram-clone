@@ -13,7 +13,7 @@ class MainUi_isFabVisible extends _$MainUi_isFabVisible {
   }
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 class MainUi_selectedChatItemProvider
     extends _$MainUi_selectedChatItemProvider {
   @override
