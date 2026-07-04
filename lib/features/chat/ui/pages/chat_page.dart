@@ -94,11 +94,15 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
     final chatId = GoRouterState.of(context).pathParameters['chatId']!;
 
-    // Try to get chat info from the selected provider first, then from the
-    // chat list stream, and finally fall back to a minimal object.
+    // Try to get chat info from the selected provider first (only if it
+    // actually matches the chat we navigated to), then from the chat list
+    // stream, and finally fall back to a minimal object.
     final selectedChat = ref.watch(mainUi_selectedChatItemProviderProvider);
     final chatsAsync = ref.watch(watchUserChatsQueryProvider);
-    final ChatListItemModel chatInfo = selectedChat ??
+    final ChatListItemModel chatInfo =
+        (selectedChat != null && selectedChat.chatId == chatId
+            ? selectedChat
+            : null) ??
         chatsAsync.whenData((chats) {
           for (final c in chats) {
             if (c.chatId == chatId) return c;

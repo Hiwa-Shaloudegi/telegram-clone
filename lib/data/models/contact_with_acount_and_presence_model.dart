@@ -25,21 +25,25 @@ class ContactWithAcountAndPresenceModel {
   String get displayName => '$firstName ${lastName ?? ''} ';
   String get contactDisplayName => '$contactFirstName ${contactLastName ?? ''}';
   String get shortDisplayName {
-    String res = '${firstName?.substring(0, 1).toUpperCase()}';
+    String res = (firstName != null && firstName!.isNotEmpty)
+        ? firstName![0].toUpperCase()
+        : '';
 
-    if (lastName != null) {
-      res += '${lastName?.substring(0, 1).toUpperCase()}';
+    if (lastName != null && lastName!.isNotEmpty) {
+      res += lastName![0].toUpperCase();
     }
-    return res;
+    return res.isEmpty ? '?' : res;
   }
 
   String get shortContactDisplayName {
-    String res = '${contactFirstName?.substring(0, 1).toUpperCase()}';
+    String res = (contactFirstName != null && contactFirstName!.isNotEmpty)
+        ? contactFirstName![0].toUpperCase()
+        : '';
 
-    if (contactLastName != null) {
-      res += '${contactLastName?.substring(0, 1).toUpperCase()}';
+    if (contactLastName != null && contactLastName!.isNotEmpty) {
+      res += contactLastName![0].toUpperCase();
     }
-    return res;
+    return res.isEmpty ? '?' : res;
   }
 
   ContactWithAcountAndPresenceModel({

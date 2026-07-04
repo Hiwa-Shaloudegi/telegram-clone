@@ -34,7 +34,7 @@ final class CreatePrivateChatCommandProvider
 }
 
 String _$createPrivateChatCommandHash() =>
-    r'219482cbd2fdcfa68bc7532d093a8a85db4afffc';
+    r'ec385c3a537e8bc60246b6583c18ea29590cfe43';
 
 abstract class _$CreatePrivateChatCommand extends $AsyncNotifier<void> {
   FutureOr<void> build();

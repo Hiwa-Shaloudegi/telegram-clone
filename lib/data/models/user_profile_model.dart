@@ -14,15 +14,46 @@ class UserProfileModel {
   final bool isActive;
   final DateTime? birthday;
 
-  String get displayName => '$firstName $lastName'.trim();
+  // String get displayName => '$firstName $lastName'.trim();
+  String get displayName {
+    return [
+      firstName,
+      lastName,
+    ].where((e) => e != null && e.trim().isNotEmpty).join(' ');
+  }
+
+  // String get shortDisplayName {
+  //   final nameList = displayName.split(' ');
+  //   final f = nameList[0][0].toUpperCase();
+  //   if (nameList.length > 1) {
+  //     final l = nameList[1][0].toUpperCase();
+  //     return '$f$l';
+  //   }
+  //   return f;
+  // }
   String get shortDisplayName {
-    final nameList = displayName.split(' ');
-    final f = nameList[0][0].toUpperCase();
-    if (nameList.length > 1) {
-      final l = nameList[1][0].toUpperCase();
-      return '$f$l';
+    final name = displayName.trim();
+
+    if (name.isNotEmpty) {
+      final parts = name.split(RegExp(r'\s+'));
+      final first = parts.first[0].toUpperCase();
+
+      if (parts.length > 1 && parts[1].isNotEmpty) {
+        return '$first${parts[1][0].toUpperCase()}';
+      }
+
+      return first;
     }
-    return f;
+
+    if (email?.isNotEmpty ?? false) {
+      return email![0].toUpperCase();
+    }
+
+    if (username?.isNotEmpty ?? false) {
+      return username![0].toUpperCase();
+    }
+
+    return 'U';
   }
 
   UserProfileModel({

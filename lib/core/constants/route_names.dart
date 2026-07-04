@@ -9,6 +9,5 @@ abstract class RouteNames {
   static const String settings = 'settings';
   static const String contacts = 'contacts';
   static const String chat = 'chat';
-  static const String pendingDm = 'pending-dm';
   static const String error = 'error';
 }

@@ -76,8 +76,6 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
 
   void removeMessage(String messageId) {
     final current = state.asData?.value ?? [];
-    state = AsyncValue.data(
-      current.where((m) => m.id != messageId).toList(),
-    );
+    state = AsyncValue.data(current.where((m) => m.id != messageId).toList());
   }
 }

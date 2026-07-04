@@ -25,9 +25,7 @@ class ChatTile extends ConsumerWidget {
       onTap: () {
         // TODO: is it necessary to mark as read here? maybe just do it in chat page when messages are loaded?
         // Mark as read then navigate
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ref.read(mainUi_selectedChatItemProviderProvider.notifier).set(item);
-        });
+        ref.read(mainUi_selectedChatItemProviderProvider.notifier).set(item);
         // TODO: if it's mobile view, then navigate and select chat, else just update selected chat
         context.pushNamed(
           RouteNames.chat,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/core/utils/date_helper.dart';
 import 'package:telegram_clone/data/models/contact_with_acount_and_presence_model.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/command/create_private_chat_command.dart';
 import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.dart';
 
 class ContactTile extends ConsumerWidget {
@@ -37,65 +38,86 @@ class ContactTile extends ConsumerWidget {
                   .toggle(contact.contactId),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
+          child: Column(
             children: [
-              if (isSelectionMode) ...[
-                Checkbox(value: isSelected, onChanged: (_) {}),
-                const SizedBox(width: 8),
-              ],
-
-              CircleAvatar(
-                radius: 24,
-                foregroundImage: contact.profileImageUrl != null
-                    ? NetworkImage(contact.profileImageUrl!)
-                    : null,
-                child: contact.profileImageUrl == null
-                    ? Text(contact.shortContactDisplayName)
-                    : null,
-              ),
-
-              const SizedBox(width: 12),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      contact.contactDisplayName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
-
-                    const SizedBox(height: 2),
-
-                    Text(
-                      contact.isOnline
-                          ? 'online'
-                          : formatLastSeen(contact.lastSeenAt),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: contact.isOnline
-                            ? Colors.green
-                            : Theme.of(context).textTheme.bodySmall?.color,
-                      ),
-                    ),
+              Row(
+                children: [
+                  if (isSelectionMode) ...[
+                    Checkbox(value: isSelected, onChanged: (_) {}),
+                    const SizedBox(width: 8),
                   ],
-                ),
+
+                  CircleAvatar(
+                    radius: 24,
+                    foregroundImage: contact.profileImageUrl != null
+                        ? NetworkImage(contact.profileImageUrl!)
+                        : null,
+                    child: contact.profileImageUrl == null
+                        ? Text(
+                            contact.hasAccount
+                                ? contact.shortDisplayName
+                                : contact.shortContactDisplayName,
+                          )
+                        : null,
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          contact.hasAccount
+                              ? contact.displayName.trim()
+                              : contact.contactDisplayName.trim(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+
+                        const SizedBox(height: 2),
+
+                        Text(
+                          contact.isOnline
+                              ? 'online'
+                              : formatLastSeen(contact.lastSeenAt),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: contact.isOnline
+                                ? Colors.green
+                                : Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  if (!contact.hasAccount)
+                    TextButton(
+                      onPressed: () {
+                        // TODO: invite friend
+                      },
+                      child: const Text('Invite'),
+                    ),
+                ],
               ),
 
-              if (!contact.hasAccount)
-                TextButton(
-                  onPressed: () {
-                    // TODO: invite friend
-                  },
-                  child: const Text('Invite'),
-                ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final createPrivateChatAsync = ref.watch(
+                    createPrivateChatCommandProvider,
+                  );
+                  return createPrivateChatAsync.isLoading
+                      ? const LinearProgressIndicator()
+                      : const SizedBox.shrink();
+                },
+              ),
             ],
           ),
         ),
