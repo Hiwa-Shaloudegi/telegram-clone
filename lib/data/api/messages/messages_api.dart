@@ -28,6 +28,9 @@ class MessagesApi {
   User? get currentUser => supabase.auth.currentUser;
 
   Stream<List<MessageModel>> watchMessages(String chatId) {
+    if (chatId.startsWith('pending_')) {
+      return Stream.value([]);
+    }
     try {
       late StreamController<List<MessageModel>> controller;
 

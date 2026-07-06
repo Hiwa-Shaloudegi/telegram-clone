@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:record/record.dart';
 import 'package:telegram_clone/app/enums/chat_type.dart';
+import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/data/api/messages/messages_api.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
@@ -94,15 +95,19 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
     final chatId = GoRouterState.of(context).pathParameters['chatId']!;
 
-    // Try to get chat info from the selected provider first (only if it
-    // actually matches the chat we navigated to), then from the chat list
-    // stream, and finally fall back to a minimal object.
+    // 1. Prefer the extras passed via GoRouter (guaranteed to carry contact info).
+    // 2. Fall back to the selectedChat provider (e.g. after re-navigation).
+    // 3. Fall back to the chat-list stream (existing chats).
+    // 4. Last resort: a minimal object (will show "Unknown").
+    final routeExtra = GoRouterState.of(context).extra;
+    final ChatListItemModel? extraChatInfo =
+        routeExtra is ChatListItemModel ? routeExtra : null;
+
     final selectedChat = ref.watch(mainUi_selectedChatItemProviderProvider);
     final chatsAsync = ref.watch(watchUserChatsQueryProvider);
-    final ChatListItemModel chatInfo =
-        (selectedChat != null && selectedChat.chatId == chatId
-            ? selectedChat
-            : null) ??
+
+    final ChatListItemModel chatInfo = extraChatInfo ??
+        selectedChat ??
         chatsAsync.whenData((chats) {
           for (final c in chats) {
             if (c.chatId == chatId) return c;
@@ -121,15 +126,13 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           unreadCount: 0,
         );
 
+    // Use the resolved chatId (from chatInfo) for the messages query so
+    // that we always watch the real chat's stream, even when the URL still
+    // carries a pending ID.
+    final effectiveChatId = chatInfo.chatId;
     final messagesState = ref.watch(
-      watchMessagesQueryProvider(chatInfo.chatId),
+      watchMessagesQueryProvider(effectiveChatId),
     );
-
-    // Sync the selected chat provider so child widgets can access it.
-    ref.listen(mainUi_selectedChatItemProviderProvider, (prev, next) {});
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(mainUi_selectedChatItemProviderProvider.notifier).set(chatInfo);
-    });
 
     return Scaffold(
       appBar: ChatAppBar(chatInfo: chatInfo),
@@ -138,13 +141,13 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           Expanded(
             child: messagesState.when(
               data: (messages) => ChatMessagesList(
-                chatId: chatInfo.chatId,
+                chatId: effectiveChatId,
                 messages: messages,
                 scrollController: _scrollController,
                 isLoadingMore: _isLoadingMore,
                 onReply: (msg) =>
                     ref.read(chatUi_replyingToProvider.notifier).set(msg),
-                onDelete: (msg) => _deleteMessage(chatInfo.chatId, msg),
+                onDelete: (msg) => _deleteMessage(effectiveChatId, msg),
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text(e.toString())),
@@ -187,11 +190,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
       await ref
           .read(editMessageCommandProvider(editing.id).notifier)
-          .editText(
-            chatId: chatId,
-            messageId: editing.id,
-            newContent: text,
-          );
+          .editText(chatId: chatId, messageId: editing.id, newContent: text);
 
       return;
     }
@@ -205,11 +204,21 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
     await ref
         .read(sendMessageCommandProvider(messageTempId).notifier)
-        .sendText(
-          chatId: chatId,
-          content: text,
-          replyingToMessage: replyingTo,
+        .sendText(chatId: chatId, content: text, replyingToMessage: replyingTo);
+
+    // If this was a pending (no prior chat) conversation the command has now
+    // created the real chat row and updated the selected-chat provider with the
+    // real chatId.  Re-navigate so the URL and all watchers use the real ID.
+    if (chatId.startsWith('pending_') && mounted) {
+      final selectedChat = ref.read(mainUi_selectedChatItemProviderProvider);
+      if (selectedChat != null && selectedChat.chatId != chatId) {
+        context.pushReplacementNamed(
+          RouteNames.chat,
+          pathParameters: {'chatId': selectedChat.chatId},
         );
+        return;
+      }
+    }
 
     // Scroll to bottom (newest)
     if (_scrollController.hasClients) {

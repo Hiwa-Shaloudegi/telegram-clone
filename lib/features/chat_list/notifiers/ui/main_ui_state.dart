@@ -5,6 +5,8 @@ part 'main_ui_state.g.dart';
 
 @riverpod
 class MainUi_isFabVisible extends _$MainUi_isFabVisible {
+  get next => null;
+
   @override
   bool build() => true;
 

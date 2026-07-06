@@ -38,6 +38,7 @@ class ContactsList extends ConsumerWidget {
               // 1. Logic for the first list
               if (index < withAccount.length) {
                 final contact = withAccount[index];
+
                 return ContactTile(
                   contact: contact,
                   onTap: () {
@@ -47,7 +48,8 @@ class ContactsList extends ConsumerWidget {
                         .read(createPrivateChatCommandProvider.notifier)
                         .run(
                           otherUserId: contactUserId,
-                          displayName: contact.contactDisplayName.trim(),
+                          displayName: contact
+                              .contactDisplayName, //contact.contactDisplayName.trim(),
                           profileImageUrl: contact.profileImageUrl,
                           isOnline: contact.isOnline,
                           lastSeenAt: contact.lastSeenAt,

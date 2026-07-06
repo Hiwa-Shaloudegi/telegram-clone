@@ -40,6 +40,7 @@ class CreatePrivateChatCommand extends _$CreatePrivateChatCommand {
       router.pushNamed(
         RouteNames.chat,
         pathParameters: {'chatId': existing.chatId},
+        extra: existing,
       );
       return;
     }
@@ -64,6 +65,7 @@ class CreatePrivateChatCommand extends _$CreatePrivateChatCommand {
     router.pushNamed(
       RouteNames.chat,
       pathParameters: {'chatId': pendingChatId},
+      extra: chatInfo,
     );
   }
 }

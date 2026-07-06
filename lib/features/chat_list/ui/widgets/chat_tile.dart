@@ -30,6 +30,7 @@ class ChatTile extends ConsumerWidget {
         context.pushNamed(
           RouteNames.chat,
           pathParameters: {'chatId': item.chatId},
+          extra: item,
         );
       },
       onLongPress: () => _showContextMenu(context, ref),

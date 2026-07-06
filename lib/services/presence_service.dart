@@ -36,31 +36,34 @@ class PresenceService extends _$PresenceService {
   }
 
   void _initializePresence(String userId) {
-    logger.d('Initializing presence for userId: $userId');
+    // logger.d('Initializing presence for userId: $userId');
     // Avoid re-initializing if already tracking the same user
     if (_channel != null &&
         ref.read(supabaseProvider).auth.currentUser?.id == userId) {
-      logger.d('Channel already exists for this user, skipping init.');
+      // logger.d('Channel already exists for this user, skipping init.');
       return;
     }
 
     _cleanup();
 
     final supabase = ref.read(supabaseProvider);
-    
+
     // Create a channel for presence tracking
     _channel = supabase.channel('presence:online_users');
 
-    _channel?.onPresenceSync((payload) {
-          logger.d('Presence synced: ${_channel?.presenceState()}');
-    }).onPresenceJoin((payload) {
-          logger.d('User joined: ${payload.newPresences}');
-    }).onPresenceLeave((payload) {
-          logger.d('User left: ${payload.leftPresences}');
-    });
+    _channel
+        ?.onPresenceSync((payload) {
+          // logger.d('Presence synced: ${_channel?.presenceState()}');
+        })
+        .onPresenceJoin((payload) {
+          // logger.d('User joined: ${payload.newPresences}');
+        })
+        .onPresenceLeave((payload) {
+          // logger.d('User left: ${payload.leftPresences}');
+        });
 
     _channel?.subscribe((status, [error]) async {
-      logger.d('Presence Channel Status: $status, Error: $error');
+      // logger.d('Presence Channel Status: $status, Error: $error');
       if (status == RealtimeSubscribeStatus.subscribed) {
         await goOnline();
       }
@@ -79,9 +82,9 @@ class PresenceService extends _$PresenceService {
       return;
     }
 
-    // 1. Track the user in Realtime. 
-    // This is the source of truth for "is online". 
-    // If the app crashes or loses internet, the Realtime server will 
+    // 1. Track the user in Realtime.
+    // This is the source of truth for "is online".
+    // If the app crashes or loses internet, the Realtime server will
     // automatically remove the user from presence after a timeout (~10s).
     await _channel?.track({
       'user_id': user.id,
@@ -105,7 +108,7 @@ class PresenceService extends _$PresenceService {
 
     // 2. Final "Last Seen" update in DB
     await _updateLastSeen(user.id, isOnline: false);
-    
+
     // Only cleanup if we are still supposed to be offline
     if (!_shouldBeOnline) {
       _cleanup();
@@ -122,13 +125,13 @@ class PresenceService extends _$PresenceService {
   Future<void> _updateLastSeen(String userId, {bool isOnline = true}) async {
     // Prevent overwriting online status if we just resumed
     if (isOnline == false && _shouldBeOnline) {
-      logger.d('Skipping offline update because user resumed.');
+      // logger.d('Skipping offline update because user resumed.');
       return;
     }
 
     try {
       final supabase = ref.read(supabaseProvider);
-      
+
       // Basic upsert without .select() to reduce overhead and potential 403 triggers
       await supabase.from('user_presence').upsert({
         'user_id': userId,
@@ -136,15 +139,15 @@ class PresenceService extends _$PresenceService {
         'is_online': isOnline,
       });
 
-      logger.d(
-        'Successfully updated presence for $userId. isOnline: $isOnline',
-      );
+      // logger.d(
+      //   'Successfully updated presence for $userId. isOnline: $isOnline',
+      // );
     } catch (e, stack) {
-      logger.e(
-        'Error updating last seen. isOnline: $isOnline',
-        error: e,
-        stackTrace: stack,
-      );
+      // logger.e(
+      //   'Error updating last seen. isOnline: $isOnline',
+      //   error: e,
+      //   stackTrace: stack,
+      // );
     }
   }
 

@@ -42,7 +42,7 @@ final class MainUi_isFabVisibleProvider
 }
 
 String _$mainUi_isFabVisibleHash() =>
-    r'1ef8e427af29a06a5592d483550ffcb09a283ed6';
+    r'b06d0b75d4ca4f8a6c363deb28739ab45b34fb29';
 
 abstract class _$MainUi_isFabVisible extends $Notifier<bool> {
   bool build();
@@ -97,7 +97,7 @@ final class MainUi_selectedChatItemProviderProvider
 }
 
 String _$mainUi_selectedChatItemProviderHash() =>
-    r'969c14c2046935b11c6962153d9fe3f5a2125983';
+    r'c86fd1dca884caa82371e33cfb99f58d073e4634';
 
 abstract class _$MainUi_selectedChatItemProvider
     extends $Notifier<ChatListItemModel?> {
