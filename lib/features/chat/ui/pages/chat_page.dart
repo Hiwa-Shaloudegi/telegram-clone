@@ -142,6 +142,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             child: messagesState.when(
               data: (messages) => ChatMessagesList(
                 chatId: effectiveChatId,
+                chatType: chatInfo.chatType,
                 messages: messages,
                 scrollController: _scrollController,
                 isLoadingMore: _isLoadingMore,

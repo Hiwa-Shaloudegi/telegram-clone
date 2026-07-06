@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:telegram_clone/app/enums/chat_type.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/date_divider.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/message_bubble.dart';
 
-class ChatMessagesList extends StatelessWidget {
+class ChatMessagesList extends ConsumerWidget {
   final String chatId;
+  final ChatType chatType;
   final List<MessageModel> messages;
   final ScrollController scrollController;
   final bool isLoadingMore;
@@ -16,6 +18,7 @@ class ChatMessagesList extends StatelessWidget {
   const ChatMessagesList({
     super.key,
     required this.chatId,
+    required this.chatType,
     required this.messages,
     required this.scrollController,
     required this.isLoadingMore,
@@ -24,7 +27,7 @@ class ChatMessagesList extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (messages.isEmpty) {
       return const Center(child: Text('No messages yet. Say hi! 👋'));
     }
@@ -58,7 +61,10 @@ class ChatMessagesList extends StatelessWidget {
 
         // Should the avatar/sender name be shown?
         final bool showSenderInfo;
-        if (index == 0) {
+        final isDMChat = chatType == ChatType.private;
+        if (isDMChat) {
+          showSenderInfo = false;
+        } else if (index == 0) {
           showSenderInfo = true;
         } else {
           final prev = messages[index - 1]; // newer message

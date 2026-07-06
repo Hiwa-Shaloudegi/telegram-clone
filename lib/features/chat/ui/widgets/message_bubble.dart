@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:telegram_clone/app/enums/message_status.dart';
+import 'package:telegram_clone/core/utils/get_color_from_name.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/send_message_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
@@ -157,19 +158,7 @@ class MessageBubble extends ConsumerWidget {
     );
   }
 
-  Color _senderColor(String senderId) {
-    const colors = [
-      Color(0xFFE53935),
-      Color(0xFF8E24AA),
-      Color(0xFF1E88E5),
-      Color(0xFF00897B),
-      Color(0xFF43A047),
-      Color(0xFFEF6C00),
-      Color(0xFF6D4C41),
-    ];
-    final hash = senderId.codeUnits.fold(0, (a, b) => a + b);
-    return colors[hash % colors.length];
-  }
+  Color _senderColor(String senderId) => getColorFromName(senderId);
 
   void _showContextMenu(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(

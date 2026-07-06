@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/core/utils/date_helper.dart';
+import 'package:telegram_clone/core/utils/get_color_from_name.dart';
 import 'package:telegram_clone/data/models/contact_with_acount_and_presence_model.dart';
 import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.dart';
 
@@ -46,6 +47,11 @@ class ContactTile extends ConsumerWidget {
 
               CircleAvatar(
                 radius: 24,
+                backgroundColor: getColorFromName(
+                  contact.hasAccount
+                      ? contact.displayName
+                      : contact.contactDisplayName,
+                ),
                 foregroundImage: contact.profileImageUrl != null
                     ? NetworkImage(contact.profileImageUrl!)
                     : null,
@@ -54,6 +60,10 @@ class ContactTile extends ConsumerWidget {
                         contact.hasAccount
                             ? contact.shortDisplayName
                             : contact.shortContactDisplayName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       )
                     : null,
               ),
