@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/phone_field.dart';
 import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
+import 'package:telegram_clone/core/utils/invite_helper.dart';
 import 'package:telegram_clone/features/contacts/notifiers/command/add_contact_command.dart';
 
 Future<dynamic> showAddContactBottomSheet(BuildContext context) {
@@ -52,10 +53,8 @@ class _AddContactBottomSheetState extends ConsumerState<AddContactBottomSheet> {
           if (hasAccount) {
             // TODO: navigate to PV chats page
           } else {
-            // TODO: invite contact feature via SMS
-            AppSnackbar.show(
-              context,
-              message: "Contact added. Invite them to Telegram!",
+            InviteHelper.inviteContact(
+              contactName: _fitstNameController.text.trim(),
             );
           }
 

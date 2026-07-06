@@ -106,11 +106,14 @@ class ContactTile extends ConsumerWidget {
               ),
 
               if (!contact.hasAccount)
-                TextButton(
-                  onPressed: () {
-                    // TODO: invite friend
-                  },
-                  child: const Text('Invite'),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Text(
+                    'Invite',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
                 ),
             ],
           ),

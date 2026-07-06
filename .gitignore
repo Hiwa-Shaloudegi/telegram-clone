@@ -1,4 +1,5 @@
 .env
+opencode.json
 # Miscellaneous
 *.class
 *.log

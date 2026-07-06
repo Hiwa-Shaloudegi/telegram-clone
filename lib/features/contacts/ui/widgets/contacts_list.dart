@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/ui/widgets/section_divider.dart';
+import 'package:telegram_clone/core/utils/invite_helper.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/command/create_private_chat_command.dart';
 import 'package:telegram_clone/features/contacts/notifiers/query/get_contacts_query.dart';
 import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.dart';
@@ -95,7 +96,17 @@ class ContactsList extends ConsumerWidget {
               final secondListIndex = showDivider
                   ? index - withAccount.length - 1
                   : index - withAccount.length;
-              return ContactTile(contact: withoutAccount[secondListIndex]);
+              return ContactTile(
+                contact: withoutAccount[secondListIndex],
+                onTap: () {
+                  final contact = withoutAccount[secondListIndex];
+                  if (!contact.hasAccount) {
+                    InviteHelper.inviteContact(
+                      contactName: contact.contactFirstName,
+                    );
+                  }
+                },
+              );
             },
           ),
         );
