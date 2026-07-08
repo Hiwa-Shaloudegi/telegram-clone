@@ -78,4 +78,35 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
     final current = state.asData?.value ?? [];
     state = AsyncValue.data(current.where((m) => m.id != messageId).toList());
   }
+
+  void addOptimisticForwardMessage({
+    required String chatId,
+    required String messageTempId,
+    required String content,
+    required String messageType,
+    required String? mediaUrl,
+    required String originalMessageId,
+    required String forwardedFromChatId,
+    required String? forwardedFromTitle,
+  }) async {
+    final userProfile = await ref.read(userProfileQueryProvider.future);
+    if (userProfile == null) return;
+
+    final msg = MessageModel(
+      id: messageTempId,
+      chatId: chatId,
+      senderId: userProfile.id,
+      senderName: userProfile.displayName,
+      content: content,
+      messageType: messageType,
+      mediaUrl: mediaUrl,
+      isForwarded: forwardedFromTitle != null,
+      forwardedFromChatId: forwardedFromChatId,
+      forwardedFromTitle: forwardedFromTitle,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      isOwnMessage: true,
+    );
+    state = AsyncValue.data([msg, ...?state.asData?.value]);
+  }
 }

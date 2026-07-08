@@ -408,3 +408,151 @@ abstract class _$ChatUi_editingMessage extends $Notifier<MessageModel?> {
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(ChatUi_forwardMessages)
+final chatUi_forwardMessagesProvider = ChatUi_forwardMessagesProvider._();
+
+final class ChatUi_forwardMessagesProvider
+    extends $NotifierProvider<ChatUi_forwardMessages, List<MessageModel>> {
+  ChatUi_forwardMessagesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chatUi_forwardMessagesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chatUi_forwardMessagesHash();
+
+  @$internal
+  @override
+  ChatUi_forwardMessages create() => ChatUi_forwardMessages();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<MessageModel> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<MessageModel>>(value),
+    );
+  }
+}
+
+String _$chatUi_forwardMessagesHash() =>
+    r'046378fddeac62c824f5070c2b43af692204f5f2';
+
+abstract class _$ChatUi_forwardMessages extends $Notifier<List<MessageModel>> {
+  List<MessageModel> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<List<MessageModel>, List<MessageModel>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<MessageModel>, List<MessageModel>>,
+              List<MessageModel>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(ChatUi_forwardChatInfo)
+final chatUi_forwardChatInfoProvider = ChatUi_forwardChatInfoProvider._();
+
+final class ChatUi_forwardChatInfoProvider
+    extends $NotifierProvider<ChatUi_forwardChatInfo, ChatListItemModel?> {
+  ChatUi_forwardChatInfoProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chatUi_forwardChatInfoProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chatUi_forwardChatInfoHash();
+
+  @$internal
+  @override
+  ChatUi_forwardChatInfo create() => ChatUi_forwardChatInfo();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ChatListItemModel? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ChatListItemModel?>(value),
+    );
+  }
+}
+
+String _$chatUi_forwardChatInfoHash() =>
+    r'338e8223c0b53da0327b2db363b1178782cd4249';
+
+abstract class _$ChatUi_forwardChatInfo extends $Notifier<ChatListItemModel?> {
+  ChatListItemModel? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<ChatListItemModel?, ChatListItemModel?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<ChatListItemModel?, ChatListItemModel?>,
+              ChatListItemModel?,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(ChatUi_isForwarding)
+final chatUi_isForwardingProvider = ChatUi_isForwardingProvider._();
+
+final class ChatUi_isForwardingProvider
+    extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  ChatUi_isForwardingProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chatUi_isForwardingProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chatUi_isForwardingHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return ChatUi_isForwarding(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$chatUi_isForwardingHash() =>
+    r'5a3fd8871b8bd06b1b31fc1577bfcf6e8acd905a';

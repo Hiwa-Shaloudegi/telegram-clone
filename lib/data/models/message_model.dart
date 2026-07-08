@@ -15,6 +15,7 @@ class MessageModel {
   final bool isForwarded;
   final String? forwardedFromChatId;
   final String? forwardedFromTitle;
+  final String? forwardedFromSenderId;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isOwnMessage;
@@ -34,6 +35,7 @@ class MessageModel {
     required this.isForwarded,
     this.forwardedFromChatId,
     this.forwardedFromTitle,
+    this.forwardedFromSenderId,
     required this.createdAt,
     required this.updatedAt,
     required this.isOwnMessage,
@@ -55,6 +57,7 @@ class MessageModel {
       isForwarded: json['is_forwarded'] as bool? ?? false,
       forwardedFromChatId: json['forwarded_from_chat_id'] as String?,
       forwardedFromTitle: json['forwarded_from_title'] as String?,
+      forwardedFromSenderId: json['forwarded_from_sender_id'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       isOwnMessage: json['is_own_message'] as bool? ?? false,
@@ -77,6 +80,7 @@ class MessageModel {
       replyToSenderName: null,
       isForwarded: json['is_forwarded'] as bool? ?? false,
       forwardedFromChatId: json['forwarded_from_chat_id'] as String?,
+      forwardedFromSenderId: json['forwarded_from_sender_id'] as String?,
       forwardedFromTitle: null,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
@@ -90,6 +94,10 @@ class MessageModel {
     bool? isOwnMessage,
     String? replyToContent,
     String? replyToSenderName,
+    bool? isForwarded,
+    String? forwardedFromChatId,
+    String? forwardedFromTitle,
+    String? forwardedFromSenderId,
   }) {
     return MessageModel(
       id: id,
@@ -103,9 +111,11 @@ class MessageModel {
       replyToMessageId: replyToMessageId,
       replyToContent: replyToContent ?? this.replyToContent,
       replyToSenderName: replyToSenderName ?? this.replyToSenderName,
-      isForwarded: isForwarded,
-      forwardedFromChatId: forwardedFromChatId,
-      forwardedFromTitle: forwardedFromTitle,
+      isForwarded: isForwarded ?? this.isForwarded,
+      forwardedFromChatId: forwardedFromChatId ?? this.forwardedFromChatId,
+      forwardedFromTitle: forwardedFromTitle ?? this.forwardedFromTitle,
+      forwardedFromSenderId:
+          forwardedFromSenderId ?? this.forwardedFromSenderId,
       createdAt: createdAt,
       updatedAt: updatedAt,
       isOwnMessage: isOwnMessage ?? this.isOwnMessage,

@@ -15,6 +15,7 @@ import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_quer
 import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_app_bar.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_message_list.dart';
+import 'package:telegram_clone/features/chat/ui/widgets/forward_preview.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/input_text.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/message_bubble.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/reply_preview.dart';
@@ -84,6 +85,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   Widget build(BuildContext context) {
     MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
     MessageModel? editingMessage = ref.watch(chatUi_editingMessageProvider);
+    List<MessageModel> forwardMessages = ref.watch(chatUi_forwardMessagesProvider);
     // when editing is started elsewhere (app bar), populate input
     ref.listen<MessageModel?>(chatUi_editingMessageProvider, (prev, next) {
       if (next != null) {
@@ -100,13 +102,15 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     // 3. Fall back to the chat-list stream (existing chats).
     // 4. Last resort: a minimal object (will show "Unknown").
     final routeExtra = GoRouterState.of(context).extra;
-    final ChatListItemModel? extraChatInfo =
-        routeExtra is ChatListItemModel ? routeExtra : null;
+    final ChatListItemModel? extraChatInfo = routeExtra is ChatListItemModel
+        ? routeExtra
+        : null;
 
     final selectedChat = ref.watch(mainUi_selectedChatItemProviderProvider);
     final chatsAsync = ref.watch(watchUserChatsQueryProvider);
 
-    final ChatListItemModel chatInfo = extraChatInfo ??
+    final ChatListItemModel chatInfo =
+        extraChatInfo ??
         selectedChat ??
         chatsAsync.whenData((chats) {
           for (final c in chats) {
@@ -162,6 +166,13 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                   ref.read(chatUi_replyingToProvider.notifier).set(null),
             ),
 
+          if (forwardMessages.isNotEmpty)
+            ForwardPreview(
+              messages: forwardMessages,
+              onCancel: () =>
+                  ref.read(chatUi_forwardMessagesProvider.notifier).clear(),
+            ),
+
           InputBar(
             controller: _textController,
             focusNode: _inputFocus,
@@ -179,7 +190,11 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   // TODO: Organize functions
   Future<void> _sendText() async {
     final text = _textController.text.trim();
-    if (text.isEmpty) return;
+    final forwardMessages = ref.read(chatUi_forwardMessagesProvider);
+    final hasText = text.isNotEmpty;
+    final hasForward = forwardMessages.isNotEmpty;
+
+    if (!hasText && !hasForward) return;
 
     final chatId = GoRouterState.of(context).pathParameters['chatId']!;
 
@@ -198,26 +213,55 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
     _textController.clear();
 
-    MessageModel? replyingTo = ref.read(chatUi_replyingToProvider);
-    ref.read(chatUi_replyingToProvider.notifier).set(null);
+    // Handle forward messages first
+    if (hasForward) {
+      ref.read(chatUi_forwardMessagesProvider.notifier).clear();
 
-    final messageTempId = 'temp_${Uuid().v4()}';
+      final forwardTempId = 'temp_${Uuid().v4()}';
+      await ref
+          .read(sendMessageCommandProvider(forwardTempId).notifier)
+          .sendForward(chatId: chatId, originalMessages: forwardMessages);
 
-    await ref
-        .read(sendMessageCommandProvider(messageTempId).notifier)
-        .sendText(chatId: chatId, content: text, replyingToMessage: replyingTo);
+      // If this was a pending conversation, re-navigate
+      if (chatId.startsWith('pending_') && mounted) {
+        final selectedChat = ref.read(mainUi_selectedChatItemProviderProvider);
+        if (selectedChat != null && selectedChat.chatId != chatId) {
+          context.pushReplacementNamed(
+            RouteNames.chat,
+            pathParameters: {'chatId': selectedChat.chatId},
+          );
+          return;
+        }
+      }
+    }
 
-    // If this was a pending (no prior chat) conversation the command has now
-    // created the real chat row and updated the selected-chat provider with the
-    // real chatId.  Re-navigate so the URL and all watchers use the real ID.
-    if (chatId.startsWith('pending_') && mounted) {
-      final selectedChat = ref.read(mainUi_selectedChatItemProviderProvider);
-      if (selectedChat != null && selectedChat.chatId != chatId) {
-        context.pushReplacementNamed(
-          RouteNames.chat,
-          pathParameters: {'chatId': selectedChat.chatId},
-        );
-        return;
+    // Handle text message
+    if (hasText) {
+      MessageModel? replyingTo = ref.read(chatUi_replyingToProvider);
+      ref.read(chatUi_replyingToProvider.notifier).set(null);
+
+      final messageTempId = 'temp_${Uuid().v4()}';
+
+      await ref
+          .read(sendMessageCommandProvider(messageTempId).notifier)
+          .sendText(
+            chatId: chatId,
+            content: text,
+            replyingToMessage: replyingTo,
+          );
+
+      // If this was a pending (no prior chat) conversation the command has now
+      // created the real chat row and updated the selected-chat provider with the
+      // real chatId.  Re-navigate so the URL and all watchers use the real ID.
+      if (chatId.startsWith('pending_') && mounted) {
+        final selectedChat = ref.read(mainUi_selectedChatItemProviderProvider);
+        if (selectedChat != null && selectedChat.chatId != chatId) {
+          context.pushReplacementNamed(
+            RouteNames.chat,
+            pathParameters: {'chatId': selectedChat.chatId},
+          );
+          return;
+        }
       }
     }
 

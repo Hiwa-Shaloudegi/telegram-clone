@@ -105,9 +105,13 @@ class _InputBarState extends ConsumerState<InputBar> {
                     child: Consumer(
                       builder: (_, ref, __) {
                         final hasText = ref.watch(chatUi_hasTextProvider);
+                        final isForwarding = ref.watch(
+                          chatUi_isForwardingProvider,
+                        );
+
                         return AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
-                          child: hasText
+                          child: hasText || isForwarding
                               ? SendButton(onTap: widget.onSendText)
                               : widget.isRecording
                               ? RecordingButton(

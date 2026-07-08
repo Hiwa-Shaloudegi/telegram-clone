@@ -10,6 +10,7 @@ import 'package:telegram_clone/features/auth/ui/pages/login_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/profile_info_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/signup_page.dart';
 import 'package:telegram_clone/features/chat/ui/pages/chat_page.dart';
+import 'package:telegram_clone/features/chat/ui/pages/forward_chat_picker_page.dart';
 import 'package:telegram_clone/features/chat_list/ui/pages/main_page.dart';
 import 'package:telegram_clone/features/contacts/ui/pages/contacts_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/edit_profile_page.dart';
@@ -85,6 +86,11 @@ GoRouter router(Ref ref) {
         name: RouteNames.chat,
         path: '/chat/:chatId',
         builder: (context, state) => ChatPage(),
+      ),
+      GoRoute(
+        name: RouteNames.forwardChatPicker,
+        path: '/forward-chat-picker',
+        builder: (context, state) => const ForwardChatPickerPage(),
       ),
     ],
     redirect: (context, state) {

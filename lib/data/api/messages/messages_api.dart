@@ -105,6 +105,10 @@ class MessagesApi {
     required String chatId,
     required String content,
     String? replyToMessageId,
+    bool isForwarded = false,
+    String? forwardedFromChatId,
+    String? forwardedFromTitle,
+    String? forwardedFromSenderId,
   }) async {
     try {
       final result = await supabase.rpc(
@@ -114,6 +118,10 @@ class MessagesApi {
           'p_content': content,
           'p_message_type': 'text',
           'p_reply_to_message_id': ?replyToMessageId,
+          'p_is_forwarded': isForwarded,
+          'p_forwarded_from_chat_id': ?forwardedFromChatId,
+          'p_forwarded_from_title': ?forwardedFromTitle,
+          'p_forwarded_from_sender_id': ?forwardedFromSenderId,
         },
       );
       return result as String?;

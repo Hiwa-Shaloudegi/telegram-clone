@@ -53,7 +53,7 @@ class ChatsApi {
     final channel = supabase
         .channel('chats_list_$currentUserId')
         .onPostgresChanges(
-          event: PostgresChangeEvent.insert,
+          event: PostgresChangeEvent.all,
           schema: 'public',
           table: 'messages',
           callback: (_) => fetch(),

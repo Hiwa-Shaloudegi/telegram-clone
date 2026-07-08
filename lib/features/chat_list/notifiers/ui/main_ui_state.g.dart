@@ -97,7 +97,7 @@ final class MainUi_selectedChatItemProviderProvider
 }
 
 String _$mainUi_selectedChatItemProviderHash() =>
-    r'c86fd1dca884caa82371e33cfb99f58d073e4634';
+    r'969c14c2046935b11c6962153d9fe3f5a2125983';
 
 abstract class _$MainUi_selectedChatItemProvider
     extends $Notifier<ChatListItemModel?> {

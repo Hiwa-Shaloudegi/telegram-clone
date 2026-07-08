@@ -7,6 +7,7 @@ import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
+import 'package:uuid/uuid.dart';
 
 part 'send_message_command.g.dart';
 
@@ -121,5 +122,51 @@ class SendMessageCommand extends _$SendMessageCommand {
             replyToMessageId: replyToMessageId,
           ),
     );
+  }
+
+  Future<void> sendForward({
+    required String chatId,
+    required List<MessageModel> originalMessages,
+  }) async {
+    final link = ref.keepAlive();
+    state = const AsyncValue.loading();
+
+    final resolvedChatId = await _resolveChatId(chatId);
+    final currentUserId = ref.read(messagesApiProvider).currentUser?.id;
+
+    for (final originalMessage in originalMessages) {
+      final tempId = 'temp_${const Uuid().v4()}';
+      final isOwnOriginal = originalMessage.senderId == currentUserId;
+
+      ref
+          .read(watchMessagesQueryProvider(resolvedChatId).notifier)
+          .addOptimisticForwardMessage(
+            chatId: resolvedChatId,
+            messageTempId: tempId,
+            content: originalMessage.content,
+            messageType: originalMessage.messageType,
+            mediaUrl: originalMessage.mediaUrl,
+            originalMessageId: originalMessage.id,
+            forwardedFromChatId: originalMessage.chatId,
+            forwardedFromTitle: isOwnOriginal
+                ? null
+                : originalMessage.senderName,
+          );
+
+      state = await AsyncValue.guard(
+        () => ref.read(messagesApiProvider).sendTextMessage(
+              chatId: resolvedChatId,
+              content: originalMessage.content,
+              isForwarded: !isOwnOriginal,
+              forwardedFromChatId: originalMessage.chatId,
+              forwardedFromTitle: isOwnOriginal
+                  ? null
+                  : originalMessage.senderName,
+              forwardedFromSenderId: originalMessage.senderId,
+            ),
+      );
+    }
+
+    link.close();
   }
 }

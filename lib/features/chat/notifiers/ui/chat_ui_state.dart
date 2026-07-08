@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
@@ -107,4 +108,33 @@ class ChatUi_editingMessage extends _$ChatUi_editingMessage {
   void set(MessageModel? value) {
     state = value;
   }
+}
+
+@riverpod
+class ChatUi_forwardMessages extends _$ChatUi_forwardMessages {
+  @override
+  List<MessageModel> build() => [];
+
+  void set(List<MessageModel> value) {
+    state = value;
+  }
+
+  void clear() {
+    state = [];
+  }
+}
+
+@riverpod
+class ChatUi_forwardChatInfo extends _$ChatUi_forwardChatInfo {
+  @override
+  ChatListItemModel? build() => null;
+
+  void set(ChatListItemModel? value) {
+    state = value;
+  }
+}
+
+@riverpod
+bool ChatUi_isForwarding(Ref ref) {
+  return ref.watch(chatUi_forwardMessagesProvider).isNotEmpty;
 }

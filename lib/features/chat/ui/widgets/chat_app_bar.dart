@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/app/enums/chat_type.dart';
+import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
+import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/delete_messages_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
 import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_avatar.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_profile_subtitle.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/show_date_search.dart';
-import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 
 class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const ChatAppBar({super.key, required this.chatInfo});
@@ -110,7 +112,35 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
           ),
 
         IconButton(onPressed: () {}, icon: Icon(Icons.copy_outlined)),
-        IconButton(onPressed: () {}, icon: Icon(Icons.turn_right_outlined)),
+        IconButton(
+          onPressed: () {
+            final selectedMessageIds = ref.read(
+              chatUi_selectedMessagesProvider,
+            );
+            if (selectedMessageIds.isEmpty) return;
+
+            final messagesAsync = ref.read(
+              watchMessagesQueryProvider(chatId),
+            );
+            final selectedMessages = messagesAsync.whenData((messages) {
+              final result = <MessageModel>[];
+              for (final msg in messages) {
+                if (selectedMessageIds.contains(msg.id)) result.add(msg);
+              }
+              return result;
+            }).value;
+
+            if (selectedMessages == null || selectedMessages.isEmpty) return;
+
+            ref
+                .read(chatUi_forwardMessagesProvider.notifier)
+                .set(selectedMessages);
+            ref.read(chatUi_selectedMessagesProvider.notifier).clear();
+
+            context.pushNamed(RouteNames.forwardChatPicker);
+          },
+          icon: Icon(Icons.turn_right_outlined),
+        ),
         IconButton(
           onPressed: () {
             // ref.read(deleteMessagesCommandProvider.notifier).run();

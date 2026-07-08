@@ -51,7 +51,7 @@ final class SendMessageCommandProvider
 }
 
 String _$sendMessageCommandHash() =>
-    r'748a431fb6e090ca1098e4c6a8ca785ca656cfa6';
+    r'01ba6b92841eb996cbc572b4a6f066138cc78a50';
 
 final class SendMessageCommandFamily extends $Family
     with

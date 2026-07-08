@@ -2,7 +2,6 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:telegram_clone/app/enums/message_status.dart';
@@ -47,9 +46,7 @@ class MessageBubble extends ConsumerWidget {
       color: tileBackgroundColor ?? Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        onLongPress: isSelectionMode
-            ? onLongPress
-            : () => _showContextMenu(context, ref),
+        onLongPress: onLongPress,
         child: Align(
           alignment: isOwn ? Alignment.centerRight : Alignment.centerLeft,
           child: ConstrainedBox(
@@ -159,74 +156,6 @@ class MessageBubble extends ConsumerWidget {
   }
 
   Color _senderColor(String senderId) => getColorFromName(senderId);
-
-  void _showContextMenu(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.reply),
-              title: const Text('Reply'),
-              onTap: () {
-                Navigator.pop(context);
-                onReply();
-              },
-            ),
-            if (message.messageType == 'text')
-              ListTile(
-                leading: const Icon(Icons.copy),
-                title: const Text('Copy'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Clipboard.setData(ClipboardData(text: message.content));
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('Copied')));
-                },
-              ),
-            ListTile(
-              leading: const Icon(Icons.check_circle_outline),
-              title: const Text('Select'),
-              onTap: () {
-                Navigator.pop(context);
-                ref
-                    .read(chatUi_selectedMessagesProvider.notifier)
-                    .toggle(message.id);
-              },
-            ),
-            if (message.isOwnMessage)
-              ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text(
-                  'Delete',
-                  style: TextStyle(color: Colors.red),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  onDelete?.call();
-                },
-              ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -621,7 +550,7 @@ class _Timestamp extends ConsumerWidget {
                 : messageStatus == MessageStatus.read
                 ? Icon(Icons.done_all, size: 14, color: subtleColor)
                 : messageStatus == MessageStatus.error
-                ? Icon(Icons.error, size: 14, color: Colors.red)
+                ? Icon(Icons.error_outline, size: 14, color: Colors.white)
                 : messageStatus == MessageStatus.sending
                 ? Icon(Icons.access_time, size: 14, color: subtleColor)
                 : const SizedBox.shrink(),
