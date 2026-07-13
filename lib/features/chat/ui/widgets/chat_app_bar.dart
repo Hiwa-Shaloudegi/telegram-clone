@@ -22,7 +22,11 @@ class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final isSelectionMode = ref.watch(chatUi_isSelectionModeProvider);
 
     return isSelectionMode
-        ? SelectionAppBar(chatId: chatInfo.chatId, chatType: chatInfo.chatType)
+        ? SelectionAppBar(
+            chatId: chatInfo.chatId,
+            chatType: chatInfo.chatType,
+            otherUserName: chatInfo.otherUserName,
+          )
         : AppBar(
             titleSpacing: 0,
             leadingWidth: 40,
@@ -64,10 +68,16 @@ class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
 }
 
 class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
-  const SelectionAppBar({super.key, required this.chatId, required this.chatType});
+  const SelectionAppBar({
+    super.key,
+    required this.chatId,
+    required this.chatType,
+    this.otherUserName,
+  });
 
   final String chatId;
   final ChatType chatType;
+  final String? otherUserName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -170,44 +180,14 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
         ),
         IconButton(
           onPressed: () {
-            // ref.read(deleteMessagesCommandProvider.notifier).run();
-            // show confirmation dialog before deleting
             showDialog(
               context: context,
               builder: (context) {
-                return AlertDialog(
-                  title: selectedCounts == 1
-                      ? Text('Delete Message')
-                      : Text('Delete $selectedCounts Messages'),
-                  content: selectedCounts == 1
-                      ? Text('Are you sure you want to delete this message?')
-                      : Text('Are you sure you want to delete these messages?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        ref
-                            .read(chatUi_selectedMessagesProvider.notifier)
-                            .clear();
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        ref
-                            .read(deleteMessagesCommandProvider.notifier)
-                            .run(
-                              chatId: chatId,
-                              chatType: chatType,
-                            );
-                        ref
-                            .read(chatUi_selectedMessagesProvider.notifier)
-                            .clear();
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('Delete'),
-                    ),
-                  ],
+                return _DeleteConfirmDialog(
+                  chatId: chatId,
+                  chatType: chatType,
+                  selectedCounts: selectedCounts,
+                  otherUserName: otherUserName,
                 );
               },
             );
@@ -220,4 +200,110 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => Size.fromHeight(56);
+}
+
+class _DeleteConfirmDialog extends ConsumerStatefulWidget {
+  const _DeleteConfirmDialog({
+    required this.chatId,
+    required this.chatType,
+    required this.selectedCounts,
+    this.otherUserName,
+  });
+
+  final String chatId;
+  final ChatType chatType;
+  final int selectedCounts;
+  final String? otherUserName;
+
+  @override
+  ConsumerState<_DeleteConfirmDialog> createState() =>
+      _DeleteConfirmDialogState();
+}
+
+class _DeleteConfirmDialogState extends ConsumerState<_DeleteConfirmDialog> {
+  bool _deleteForEveryone = false;
+
+  bool get _isPrivateChat => widget.chatType == ChatType.private;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = widget.selectedCounts == 1
+        ? 'Delete Message'
+        : 'Delete ${widget.selectedCounts} Messages';
+
+    final contentText = widget.selectedCounts == 1
+        ? 'Are you sure you want to delete this message?'
+        : 'Are you sure you want to delete these messages?';
+
+    final otherName = widget.otherUserName ?? 'the other person';
+
+    return AlertDialog(
+      title: Text(title),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(contentText),
+          if (_isPrivateChat) ...[
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: () {
+                setState(() => _deleteForEveryone = !_deleteForEveryone);
+              },
+              borderRadius: BorderRadius.circular(4),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: _deleteForEveryone,
+                      onChanged: (value) {
+                        setState(() => _deleteForEveryone = value ?? false);
+                      },
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Also delete for $otherName',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 16),
+            Text(
+              'This message will be deleted for everyone.',
+              style: TextStyle(
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            ref.read(chatUi_selectedMessagesProvider.notifier).clear();
+            Navigator.of(context).pop();
+          },
+          child: Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            ref.read(deleteMessagesCommandProvider.notifier).run(
+              chatId: widget.chatId,
+              chatType: widget.chatType,
+              deleteForEveryone: _deleteForEveryone,
+            );
+            ref.read(chatUi_selectedMessagesProvider.notifier).clear();
+            Navigator.of(context).pop();
+          },
+          child: Text('Delete'),
+        ),
+      ],
+    );
+  }
 }

@@ -14,7 +14,11 @@ class DeleteMessagesCommand extends _$DeleteMessagesCommand {
   @override
   FutureOr<void> build() {}
 
-  Future<void> run({required String chatId, required ChatType chatType}) async {
+  Future<void> run({
+    required String chatId,
+    required ChatType chatType,
+    bool deleteForEveryone = false,
+  }) async {
     final link = ref.keepAlive();
     state = const AsyncValue.loading();
 
@@ -37,7 +41,11 @@ class DeleteMessagesCommand extends _$DeleteMessagesCommand {
     final result = await AsyncValue.guard(
       () => ref
           .watch(messagesApiProvider)
-          .bulkDeleteMessages(messageIds: messageIds, chatType: chatType),
+          .bulkDeleteMessages(
+            messageIds: messageIds,
+            chatType: chatType,
+            deleteForEveryone: deleteForEveryone,
+          ),
     );
     state = result;
 
