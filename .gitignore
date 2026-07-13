@@ -1,5 +1,6 @@
 .env
 opencode.json
+.mimocode
 # Miscellaneous
 *.class
 *.log
