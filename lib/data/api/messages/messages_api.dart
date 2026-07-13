@@ -252,7 +252,7 @@ class MessagesApi {
     try {
       await supabase
           .from('messages')
-          .update({'content': newContent, 'updated_at': DateTime.now().toIso8601String()})
+          .update({'content': newContent, 'updated_at': DateTime.now().toIso8601String(), 'is_edited': true})
           .eq('id', messageId)
           .eq('sender_id', supabase.auth.currentUser!.id);
     } catch (e) {

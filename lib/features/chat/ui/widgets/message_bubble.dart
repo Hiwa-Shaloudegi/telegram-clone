@@ -525,8 +525,7 @@ class _Timestamp extends ConsumerWidget {
         }
       }
     } else {
-      // TODO: add "is_read" in db ==> messageStatus = message.isRead ? MessageStatus.read : MessageStatus.sent;
-      messageStatus = MessageStatus.read;
+      messageStatus = message.isRead ? MessageStatus.read : MessageStatus.sent;
     }
 
     final timeStr = DateFormat('HH:mm').format(message.createdAt.toLocal());
@@ -539,7 +538,7 @@ class _Timestamp extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(timeStr, style: TextStyle(fontSize: 11, color: subtleColor)),
-          if (message.updatedAt.isAfter(message.createdAt)) ...[
+          if (message.isEdited) ...[
             const SizedBox(width: 6),
             Text('edited', style: TextStyle(fontSize: 10, color: subtleColor)),
           ],

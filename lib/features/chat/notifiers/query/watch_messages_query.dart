@@ -36,6 +36,7 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
       replyToSenderName: replyingToMessage?.senderName,
       updatedAt: DateTime.now(),
       isOwnMessage: true,
+      isEdited: false,
     );
     state = AsyncValue.data([msg, ...?state.asData?.value]);
   }
@@ -66,6 +67,7 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
           createdAt: m.createdAt,
           updatedAt: now,
           isOwnMessage: m.isOwnMessage,
+          isEdited: true,
         );
       }
       return m;
@@ -106,7 +108,22 @@ class WatchMessagesQuery extends _$WatchMessagesQuery {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       isOwnMessage: true,
+      isEdited: false,
     );
     state = AsyncValue.data([msg, ...?state.asData?.value]);
+  }
+
+  /// Immediately mark messages as read in local state (optimistic update).
+  /// This shows double checkmarks before the server confirms.
+  void optimisticallyMarkMessagesAsRead(List<String> messageIds) {
+    final current = state.asData?.value ?? [];
+    final updated = current.map((msg) {
+      if (messageIds.contains(msg.id) && !msg.isOwnMessage) {
+        return msg.copyWith(isRead: true);
+      }
+      return msg;
+    }).toList();
+
+    state = AsyncData(updated);
   }
 }

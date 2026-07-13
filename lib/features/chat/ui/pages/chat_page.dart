@@ -9,6 +9,7 @@ import 'package:telegram_clone/data/api/messages/messages_api.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/edit_message_command.dart';
+import 'package:telegram_clone/features/chat/notifiers/command/mark_messages_read_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/send_message_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/messages_by_date_query.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
@@ -38,6 +39,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   final AudioRecorder _recorder = AudioRecorder();
   // TODO: Refactor
   bool _isLoadingMore = false;
+
 
   @override
   void initState() {
@@ -134,9 +136,29 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     // that we always watch the real chat's stream, even when the URL still
     // carries a pending ID.
     final effectiveChatId = chatInfo.chatId;
+
     final messagesState = ref.watch(
       watchMessagesQueryProvider(effectiveChatId),
     );
+
+    // Listen for message changes to mark as read
+    ref.listen(watchMessagesQueryProvider(effectiveChatId), (prev, next) {
+      next.whenData((messages) {
+        if (messages.isNotEmpty && mounted) {
+          ref
+              .read(markMessagesReadCommandProvider(effectiveChatId).notifier)
+              .markMessagesAsRead(messages);
+        }
+      });
+    });
+    // Mark current messages as read immediately
+    messagesState.whenData((messages) {
+      if (messages.isNotEmpty && mounted) {
+        ref
+            .read(markMessagesReadCommandProvider(effectiveChatId).notifier)
+            .markMessagesAsRead(messages);
+      }
+    });
 
     return Scaffold(
       appBar: ChatAppBar(chatInfo: chatInfo),

@@ -9,19 +9,12 @@ part of 'watch_user_chats_query.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(watchUserChatsQuery)
+@ProviderFor(WatchUserChatsQuery)
 final watchUserChatsQueryProvider = WatchUserChatsQueryProvider._();
 
 final class WatchUserChatsQueryProvider
     extends
-        $FunctionalProvider<
-          AsyncValue<List<ChatListItemModel>>,
-          List<ChatListItemModel>,
-          Stream<List<ChatListItemModel>>
-        >
-    with
-        $FutureModifier<List<ChatListItemModel>>,
-        $StreamProvider<List<ChatListItemModel>> {
+        $StreamNotifierProvider<WatchUserChatsQuery, List<ChatListItemModel>> {
   WatchUserChatsQueryProvider._()
     : super(
         from: null,
@@ -38,15 +31,35 @@ final class WatchUserChatsQueryProvider
 
   @$internal
   @override
-  $StreamProviderElement<List<ChatListItemModel>> $createElement(
-    $ProviderPointer pointer,
-  ) => $StreamProviderElement(pointer);
-
-  @override
-  Stream<List<ChatListItemModel>> create(Ref ref) {
-    return watchUserChatsQuery(ref);
-  }
+  WatchUserChatsQuery create() => WatchUserChatsQuery();
 }
 
 String _$watchUserChatsQueryHash() =>
-    r'153148feab27d9385c2ccf57e841059e431eee47';
+    r'dc7f2775f84ab1007afe72272ad803f0bb2f8fda';
+
+abstract class _$WatchUserChatsQuery
+    extends $StreamNotifier<List<ChatListItemModel>> {
+  Stream<List<ChatListItemModel>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<ChatListItemModel>>,
+              List<ChatListItemModel>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<ChatListItemModel>>,
+                List<ChatListItemModel>
+              >,
+              AsyncValue<List<ChatListItemModel>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

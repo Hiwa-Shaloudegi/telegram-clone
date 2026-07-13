@@ -19,6 +19,8 @@ class MessageModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isOwnMessage;
+  final bool isRead;
+  final bool isEdited;
 
   const MessageModel({
     required this.id,
@@ -39,6 +41,8 @@ class MessageModel {
     required this.createdAt,
     required this.updatedAt,
     required this.isOwnMessage,
+    this.isRead = false,
+    this.isEdited = false,
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
@@ -61,6 +65,8 @@ class MessageModel {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       isOwnMessage: json['is_own_message'] as bool? ?? false,
+      isRead: json['is_read'] as bool? ?? false,
+      isEdited: json['is_edited'] as bool? ?? false,
     );
   }
 
@@ -85,6 +91,8 @@ class MessageModel {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       isOwnMessage: false, // will be resolved after enrich
+      isRead: json['is_read'] as bool? ?? false,
+      isEdited: json['is_edited'] as bool? ?? false,
     );
   }
 
@@ -98,6 +106,8 @@ class MessageModel {
     String? forwardedFromChatId,
     String? forwardedFromTitle,
     String? forwardedFromSenderId,
+    bool? isRead,
+    bool? isEdited,
   }) {
     return MessageModel(
       id: id,
@@ -119,6 +129,8 @@ class MessageModel {
       createdAt: createdAt,
       updatedAt: updatedAt,
       isOwnMessage: isOwnMessage ?? this.isOwnMessage,
+      isRead: isRead ?? this.isRead,
+      isEdited: isEdited ?? this.isEdited,
     );
   }
 }

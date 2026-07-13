@@ -111,6 +111,33 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
             icon: Icon(Icons.mode_edit_outlined),
           ),
 
+        IconButton(
+          onPressed: () {
+            final selectedMessageIds = ref.read(
+              chatUi_selectedMessagesProvider,
+            );
+            if (selectedMessageIds.isEmpty) return;
+
+            final selectedMessageId = selectedMessageIds.first;
+            final messagesAsync = ref.read(
+              watchMessagesQueryProvider(chatId),
+            );
+            final selectedMessage = messagesAsync.whenData((messages) {
+              for (final msg in messages) {
+                if (msg.id == selectedMessageId) return msg;
+              }
+              return null;
+            }).value;
+
+            if (selectedMessage == null) return;
+
+            ref
+                .read(chatUi_replyingToProvider.notifier)
+                .set(selectedMessage);
+            ref.read(chatUi_selectedMessagesProvider.notifier).clear();
+          },
+          icon: Icon(Icons.reply),
+        ),
         IconButton(onPressed: () {}, icon: Icon(Icons.copy_outlined)),
         IconButton(
           onPressed: () {

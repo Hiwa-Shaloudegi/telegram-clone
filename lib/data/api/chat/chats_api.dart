@@ -97,6 +97,28 @@ class ChatsApi {
     }
   }
 
+  /// Mark specific messages as read and update chat read position.
+  Future<void> markMessagesRead(List<String> messageIds, String chatId) async {
+    if (messageIds.isEmpty) return;
+    try {
+      final userId = supabase.auth.currentUser!.id;
+
+      // Mark received messages as read
+      await supabase
+          .from('messages')
+          .update({'is_read': true})
+          .inFilter('id', messageIds)
+          .eq('chat_id', chatId)
+          .neq('sender_id', userId)
+          .eq('is_read', false);
+
+      // Update last_read_message_id to latest message in chat
+      await supabase.rpc('mark_chat_read', params: {'p_chat_id': chatId});
+    } catch (e) {
+      exceptionHandler.handle(e);
+    }
+  }
+
   /// Find an existing DM chat with [otherUserId], or create a new one.
   /// Returns the chat ID.
   Future<String> getOrCreatePrivateChat(String otherUserId) async {

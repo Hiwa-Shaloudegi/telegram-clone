@@ -101,25 +101,12 @@ class ChatMessagesList extends ConsumerWidget {
                             .read(chatUi_selectedMessagesProvider.notifier)
                             .toggle(msg.id)
                       : () {},
-
                   onLongPress: isSelectionMode
                       ? null
                       : () => ref
                             .read(chatUi_selectedMessagesProvider.notifier)
                             .toggle(msg.id),
                   onDelete: () => onDelete(msg),
-                  // messageStatus: MessageStatus.sent, // TODO: msg.isRead ? MessageStatus.read : MessageStatus.sent,
-                  // onTap: isSelectionMode
-                  //     ? () => ref
-                  //           .read(chatUi_selectedMessagesProvider.notifier)
-                  //           .toggle(msg.id)
-                  //     : () {},
-
-                  // onLongPress: isSelectionMode
-                  //     ? null
-                  //     : () => ref
-                  //           .read(chatUi_selectedMessagesProvider.notifier)
-                  //           .toggle(msg.id),
                   onReply: () => onReply(msg),
                 );
               },
