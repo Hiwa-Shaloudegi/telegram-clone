@@ -174,4 +174,40 @@ class ChatsApi {
       exceptionHandler.handle(e);
     }
   }
+
+  /// Set pin status for many chats at once.
+  Future<void> setPinnedForChats(
+    List<String> chatIds, {
+    required bool pin,
+  }) async {
+    if (chatIds.isEmpty) return;
+    try {
+      final userId = supabase.auth.currentUser!.id;
+      await supabase
+          .from('chat_members')
+          .update({'is_pinned': pin})
+          .inFilter('chat_id', chatIds)
+          .eq('user_id', userId);
+    } catch (e) {
+      exceptionHandler.handle(e);
+    }
+  }
+
+  /// Set archive status for many chats at once.
+  Future<void> setArchivedForChats(
+    List<String> chatIds, {
+    required bool archive,
+  }) async {
+    if (chatIds.isEmpty) return;
+    try {
+      final userId = supabase.auth.currentUser!.id;
+      await supabase
+          .from('chat_members')
+          .update({'is_archived': archive})
+          .inFilter('chat_id', chatIds)
+          .eq('user_id', userId);
+    } catch (e) {
+      exceptionHandler.handle(e);
+    }
+  }
 }

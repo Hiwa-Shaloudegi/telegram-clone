@@ -8,8 +8,10 @@ import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/eager_initialization.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/ui/chat_selection_state.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/app_drawer.dart';
+import 'package:telegram_clone/features/chat_list/ui/widgets/chat_selection_app_bar.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/chat_tile.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/chats_app_bar_title.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/chats_empty_state.dart';
@@ -59,25 +61,36 @@ class _MainPageState extends ConsumerState<MainPage> {
       );
     });
 
+    final selectionActive = ref.watch(chatSelectionActiveProvider);
+
     return EagerInitialization(
       providers: [
         userProfileQueryProvider,
         getContactsQueryProvider,
         contactsUi_sortByProvider,
       ],
-      child: Scaffold(
+      child: PopScope(
+        canPop: !selectionActive,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) {
+            ref.read(chatSelectionProvider.notifier).clear();
+          }
+        },
+        child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        appBar: AppBar(
-          title: const ChatsAppBarTitle(),
-          scrolledUnderElevation: 0,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {},
-              tooltip: 'Search',
-            ),
-          ],
-        ),
+        appBar: selectionActive
+            ? const ChatSelectionAppBar()
+            : AppBar(
+                title: const ChatsAppBarTitle(),
+                scrolledUnderElevation: 0,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {},
+                    tooltip: 'Search',
+                  ),
+                ],
+              ),
         drawer: AppDrawer(),
         body: watchUserChatsState.when(
           data: (chats) => chats.isEmpty
@@ -129,6 +142,7 @@ class _MainPageState extends ConsumerState<MainPage> {
               ),
             );
           },
+        ),
         ),
       ),
     );

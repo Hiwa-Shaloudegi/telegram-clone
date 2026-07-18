@@ -34,7 +34,7 @@ final class UpdateProfileCommandProvider
 }
 
 String _$updateProfileCommandHash() =>
-    r'150bd1c58b12e1897175f935048f87f171adbc53';
+    r'1e2f93bca6239edf4a6dab86c671d474cc0b52b3';
 
 abstract class _$UpdateProfileCommand extends $AsyncNotifier<void> {
   FutureOr<void> build();
