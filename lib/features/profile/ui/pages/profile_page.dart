@@ -87,6 +87,8 @@ class ProfilePage extends ConsumerWidget {
                   _handleSetPhoto(context, ref);
                 case ProfileMenuAction.changeUsername:
                   context.pushNamed(RouteNames.changeUsername);
+                case ProfileMenuAction.logout:
+                  break;
               }
             },
             itemBuilder: (_) => const [

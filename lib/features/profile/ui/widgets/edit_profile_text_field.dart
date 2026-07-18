@@ -63,12 +63,12 @@ class EditProfileTextField extends StatelessWidget {
           floatingLabelBehavior: FloatingLabelBehavior.always,
           labelStyle: TextStyle(
             color: labelColor,
-            fontSize: 15,
+            fontSize: 17,
             fontWeight: FontWeight.w500,
           ),
           floatingLabelStyle: TextStyle(
             color: labelColor,
-            fontSize: 15,
+            fontSize: 17,
             fontWeight: FontWeight.w500,
           ),
           hintStyle: TextStyle(

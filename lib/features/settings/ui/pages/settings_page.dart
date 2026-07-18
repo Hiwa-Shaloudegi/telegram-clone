@@ -67,10 +67,49 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
+  Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        return AlertDialog(
+          title: const Text('Log out'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(
+                'Log out',
+                style: TextStyle(
+                  color: theme.colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      ref.read(logoutCommandProvider.notifier).run();
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(userProfileQueryProvider);
     final logoutState = ref.watch(logoutCommandProvider);
+
+    ref.listen<AsyncValue<void>>(logoutCommandProvider, (_, next) {
+      next.whenOrNull(
+        error: (error, _) => AppSnackbar.showError(context, error.toString()),
+      );
+    });
 
     return AppScaffold(
       appBar: AppBar(
@@ -89,25 +128,36 @@ class SettingsPage extends ConsumerWidget {
                   _handleSetPhoto(context, ref);
                 case ProfileMenuAction.changeUsername:
                   context.pushNamed(RouteNames.changeUsername);
+                case ProfileMenuAction.logout:
+                  _confirmLogout(context, ref);
               }
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(
+            itemBuilder: (_) => [
+              const PopupMenuItem(
                 value: ProfileMenuAction.editInfo,
                 child: MenuItem(icon: Icons.edit, text: 'Edit info'),
               ),
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: ProfileMenuAction.setPhoto,
                 child: MenuItem(
                   icon: Icons.photo_camera_outlined,
                   text: 'Set profile photo',
                 ),
               ),
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: ProfileMenuAction.changeUsername,
                 child: MenuItem(
                   icon: Icons.alternate_email,
                   text: 'Change username',
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                value: ProfileMenuAction.logout,
+                child: MenuItem(
+                  icon: Icons.logout,
+                  text: 'Log out',
+                  color: Theme.of(context).colorScheme.error,
                 ),
               ),
             ],
