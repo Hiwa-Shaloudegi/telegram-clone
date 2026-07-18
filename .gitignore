@@ -1,6 +1,13 @@
 .env
 opencode.json
-.mimocode
+.mimocode/
+.vscode/
+.fvm/
+mimocode.json
+.metadata
+.flutter-plugins-dependencies
+.hermes/
+.fvmrc
 # Miscellaneous
 *.class
 *.log
