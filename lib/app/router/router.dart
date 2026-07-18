@@ -13,6 +13,7 @@ import 'package:telegram_clone/features/chat/ui/pages/chat_page.dart';
 import 'package:telegram_clone/features/chat/ui/pages/forward_chat_picker_page.dart';
 import 'package:telegram_clone/features/chat_list/ui/pages/main_page.dart';
 import 'package:telegram_clone/features/contacts/ui/pages/contacts_page.dart';
+import 'package:telegram_clone/features/profile/ui/pages/change_username_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/edit_profile_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/profile_page.dart';
 import 'package:telegram_clone/features/settings/ui/pages/settings_page.dart';
@@ -68,6 +69,11 @@ GoRouter router(Ref ref) {
         path: '/profile/edit',
         name: RouteNames.editProfile,
         builder: (context, state) => const EditProfilePage(),
+      ),
+      GoRoute(
+        path: '/profile/username',
+        name: RouteNames.changeUsername,
+        builder: (context, state) => const ChangeUsernamePage(),
       ),
       GoRoute(
         path: '/settings',

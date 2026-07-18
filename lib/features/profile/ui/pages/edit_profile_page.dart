@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
-import 'package:telegram_clone/core/ui/widgets/input_text_field.dart';
-import 'package:telegram_clone/core/ui/widgets/primary_button.dart';
-import 'package:telegram_clone/data/api/user/user_api.dart';
+import 'package:telegram_clone/core/ui/widgets/section_divider.dart';
+import 'package:telegram_clone/data/models/user_profile_model.dart';
+import 'package:telegram_clone/features/profile/notifiers/command/update_profile_command.dart';
 import 'package:telegram_clone/features/profile/notifiers/query/user_profile_query.dart';
+import 'package:telegram_clone/features/profile/ui/widgets/edit_profile_avatar.dart';
+import 'package:telegram_clone/features/profile/ui/widgets/edit_profile_nav_row.dart';
+import 'package:telegram_clone/features/profile/ui/widgets/edit_profile_text_field.dart';
+import 'package:telegram_clone/features/profile/ui/widgets/profile_photo_bottom_sheet.dart';
 
+/// Telegram-style Edit Profile screen.
+///
+/// Layout mirrors Telegram Android/iOS:
+/// - App bar with back + check (done)
+/// - Avatar with camera badge + "Set/Change Photo"
+/// - Underlined First Name / Last Name / Bio fields
+/// - Username row → dedicated username page
+/// - Unsaved-changes dialog on back
 class EditProfilePage extends ConsumerStatefulWidget {
   const EditProfilePage({super.key});
 
@@ -16,175 +30,392 @@ class EditProfilePage extends ConsumerStatefulWidget {
 }
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
-  late final TextEditingController _firstNameController;
-  late final TextEditingController _lastNameController;
-  late final TextEditingController _usernameController;
-  late final TextEditingController _bioController;
   final _formKey = GlobalKey<FormState>();
-  // bool _isLoading = false;
-  // bool _controllersInitialized = false;
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _bioController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _firstNameController = TextEditingController();
-    _lastNameController = TextEditingController();
-    _usernameController = TextEditingController();
-    _bioController = TextEditingController();
+  XFile? _localImage;
+  bool _photoRemoved = false;
+  bool _initialized = false;
+
+  String _originalFirstName = '';
+  String _originalLastName = '';
+  String _originalBio = '';
+  String? _currentUsername;
+
+  bool get _hasChanges {
+    return _firstNameController.text.trim() != _originalFirstName ||
+        _lastNameController.text.trim() != _originalLastName ||
+        _bioController.text.trim() != _originalBio ||
+        _localImage != null ||
+        _photoRemoved;
+  }
+
+  void _initializeFromProfile(UserProfileModel profile) {
+    if (_initialized) return;
+    _initialized = true;
+
+    _originalFirstName = profile.firstName;
+    _originalLastName = profile.lastName ?? '';
+    _originalBio = profile.bio ?? '';
+    _currentUsername = profile.usernameWithoutAt;
+
+    _firstNameController
+      ..text = _originalFirstName
+      ..addListener(_onFieldChanged);
+    _lastNameController
+      ..text = _originalLastName
+      ..addListener(_onFieldChanged);
+    _bioController
+      ..text = _originalBio
+      ..addListener(_onFieldChanged);
+  }
+
+  void _onFieldChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    _firstNameController.removeListener(_onFieldChanged);
+    _lastNameController.removeListener(_onFieldChanged);
+    _bioController.removeListener(_onFieldChanged);
     _firstNameController.dispose();
     _lastNameController.dispose();
-    _usernameController.dispose();
     _bioController.dispose();
     super.dispose();
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: source,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 85,
+    );
+    if (picked != null && mounted) {
+      setState(() {
+        _localImage = picked;
+        _photoRemoved = false;
+      });
+    }
+  }
+
+  void _removePhoto() {
+    setState(() {
+      _localImage = null;
+      _photoRemoved = true;
+    });
+  }
+
+  void _showPhotoSheet(UserProfileModel? profile) {
+    final hasPhoto =
+        _localImage != null ||
+        (!_photoRemoved && profile?.hasProfileImage == true);
+
+    ProfilePhotoBottomSheet.show(
+      context: context,
+      hasPhoto: hasPhoto,
+      onPickImage: _pickImage,
+      onRemovePhoto: hasPhoto ? _removePhoto : null,
+    );
+  }
+
   Future<void> _onSave() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      // setState(() => _isLoading = true);
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!_hasChanges) {
+      context.pop();
+      return;
+    }
 
-      try {
-        final currentProfile = await ref.read(userProfileQueryProvider.future);
-        final newUsername = _usernameController.text.trim();
-        final currentUsername = currentProfile?.usernameWithoutAt ?? '';
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final bio = _bioController.text.trim();
 
-        // Only update username if it has changed
-        final usernameToUpdate =
-            newUsername.isNotEmpty && newUsername != currentUsername
-            ? newUsername
-            : null;
+    try {
+      await ref.read(updateProfileCommandProvider.notifier).run(
+            firstName: firstName != _originalFirstName ? firstName : null,
+            lastName: lastName != _originalLastName ? lastName : null,
+            bio: bio != _originalBio ? bio : null,
+            localImage: _localImage,
+            removePhoto: _photoRemoved && _localImage == null,
+          );
 
-        await ref
-            .read(userApiProvider)
-            .updateProfile(
-              firstName: _firstNameController.text.trim(),
-              lastName: _lastNameController.text.trim(),
-              username: usernameToUpdate,
-              bio: _bioController.text.trim(),
-            );
-
-        // Invalidate to refresh profile
-        ref.invalidate(userProfileQueryProvider);
-
-        if (mounted) {
-          AppSnackbar.showSuccess(context, 'Profile updated successfully');
-          context.pop();
-        }
-      } catch (e) {
-        if (mounted) {
-          AppSnackbar.showError(context, e.toString());
-        }
-      } finally {
-        // if (mounted) {
-        // setState(() => _isLoading = false);
-        // }
+      if (mounted) {
+        AppSnackbar.showSuccess(context, 'Profile updated');
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        AppSnackbar.showError(context, e.toString());
       }
     }
+  }
+
+  Future<bool> _confirmDiscard() async {
+    if (!_hasChanges) return true;
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        return AlertDialog(
+          title: const Text('Unsaved Changes'),
+          content: const Text(
+            'You have unsaved changes. Do you want to apply them?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, 'discard'),
+              child: Text(
+                'Discard',
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, 'cancel'),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, 'apply'),
+              child: Text(
+                'Apply',
+                style: TextStyle(
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == 'apply') {
+      await _onSave();
+      return false; // save handles pop
+    }
+    if (result == 'discard') return true;
+    return false;
+  }
+
+  Future<void> _onBack() async {
+    final canLeave = await _confirmDiscard();
+    if (canLeave && mounted) context.pop();
   }
 
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(userProfileQueryProvider);
+    final updateState = ref.watch(updateProfileCommandProvider);
+    final isSaving = updateState.isLoading;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    return AppScaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
-      body: profileAsync.when(
-        data: (profile) {
-          // Initialize controllers with profile data only once
-          // if (!_controllersInitialized) {
-          //   _displayNameController.text = profile.displayName;
-          //   _usernameController.text = profile.usernameWithoutAt ?? '';
-          //   _bioController.text = profile.bio ?? '';
-          //   _controllersInitialized = true;
-          // }
+    // Keep username label in sync when returning from Change Username page
+    ref.listen(userProfileQueryProvider, (prev, next) {
+      next.whenData((profile) {
+        if (profile != null && mounted) {
+          setState(() {
+            _currentUsername = profile.usernameWithoutAt;
+          });
+        }
+      });
+    });
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
+    return PopScope(
+      canPop: !_hasChanges,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        await _onBack();
+      },
+      child: AppScaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: isSaving ? null : _onBack,
+          ),
+          title: const Text('Edit Profile'),
+          actions: [
+            if (isSaving)
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            else
+              IconButton(
+                icon: Icon(
+                  Icons.check,
+                  color: _hasChanges ? Colors.white : Colors.white54,
+                ),
+                tooltip: 'Done',
+                onPressed: _hasChanges ? _onSave : null,
+              ),
+          ],
+        ),
+        body: profileAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => _ErrorBody(
+            message: error.toString(),
+            onRetry: () => ref.invalidate(userProfileQueryProvider),
+          ),
+          data: (profile) {
+            if (profile == null) {
+              return const Center(child: Text('Profile not found'));
+            }
+
+            if (!_initialized) {
+              // Schedule after this frame to avoid mutating controllers mid-build
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && !_initialized) {
+                  setState(() => _initializeFromProfile(profile));
+                }
+              });
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return Form(
               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: ListView(
                 children: [
-                  const SizedBox(height: 16),
-                  InputTextField(
+                  const SizedBox(height: 28),
+
+                  // Avatar
+                  EditProfileAvatar(
+                    profile: profile,
+                    localImage: _localImage,
+                    photoRemoved: _photoRemoved,
+                    onTap: isSaving ? null : () => _showPhotoSheet(profile),
+                  ),
+
+                  const SizedBox(height: 28),
+                  const SectionDivider(height: 12),
+                  const SizedBox(height: 8),
+
+                  // First name
+                  EditProfileTextField(
                     controller: _firstNameController,
-                    label: 'First Name',
+                    label: 'First name',
+                    textCapitalization: TextCapitalization.words,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'First name is required';
+                        return 'Please enter your first name';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
-                  InputTextField(
+                  const SizedBox(height: 4),
+
+                  // Last name
+                  EditProfileTextField(
                     controller: _lastNameController,
-                    label: 'Last Name',
+                    label: 'Last name',
+                    textCapitalization: TextCapitalization.words,
                   ),
-                  const SizedBox(height: 16),
-                  InputTextField(
-                    controller: _usernameController,
-                    label: 'Username (optional)',
-                    prefixIcon: const Icon(Icons.alternate_email),
+                  const SizedBox(height: 4),
+
+                  // Bio
+                  EditProfileTextField(
+                    controller: _bioController,
+                    label: 'Bio',
+                    hint: 'Add a few words about yourself',
+                    maxLines: 3,
+                    maxLength: 70,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
                     validator: (value) {
-                      if (value != null && value.trim().isNotEmpty) {
-                        final username = value.trim();
-                        if (username.length < 3) {
-                          return 'Username must be at least 3 characters';
-                        }
-                        if (username.length > 30) {
-                          return 'Username must be less than 30 characters';
-                        }
-                        if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(username)) {
-                          return 'Username can only contain letters, numbers, and underscores';
-                        }
+                      if (value != null && value.length > 70) {
+                        return 'Bio must be 70 characters or less';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _bioController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 4,
-                    decoration: const InputDecoration(
-                      labelText: 'Bio (optional)',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
+
+                  const SizedBox(height: 12),
+                  const SectionDivider(height: 12),
+
+                  // Username → dedicated page
+                  EditProfileNavRow(
+                    label: 'Username',
+                    value: (_currentUsername ?? '').isNotEmpty
+                        ? '@$_currentUsername'
+                        : null,
+                    emptyLabel: 'None',
+                    onTap: isSaving
+                        ? null
+                        : () => context.pushNamed(RouteNames.changeUsername),
+                  ),
+
+                  Divider(
+                    height: 1,
+                    indent: 20,
+                    color: isDark ? Colors.white12 : Colors.black12,
+                  ),
+
+                  // Phone (read-only, like Telegram)
+                  if ((profile.phone ?? '').isNotEmpty)
+                    EditProfileNavRow(
+                      label: 'Phone',
+                      value: profile.phone,
+                      showChevron: false,
+                    ),
+
+                  const SizedBox(height: 24),
+
+                  // Helper text (Telegram-style)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Any details you enter here will be visible to people '
+                      'you message, contacts, and groups.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isDark ? Colors.white54 : Colors.black54,
+                        fontSize: 14,
+                        height: 1.4,
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 32),
-                  PrimaryButton(
-                    text: 'Save',
-                    isLoading: false,
-                    onPressed: _onSave,
-                  ),
                 ],
               ),
-            ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              Text('Error loading profile: ${error.toString()}'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {}, // ref.invalidate(userProfileQueryProvider),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorBody extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _ErrorBody({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
+            Text('Error loading profile: $message', textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
         ),
       ),
     );

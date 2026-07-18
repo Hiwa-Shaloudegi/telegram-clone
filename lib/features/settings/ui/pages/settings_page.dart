@@ -1,18 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_scaffold.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/profile_info_section.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
+import 'package:telegram_clone/features/profile/notifiers/command/update_profile_command.dart';
 import 'package:telegram_clone/features/profile/notifiers/query/user_profile_query.dart';
+import 'package:telegram_clone/features/profile/ui/widgets/profile_photo_bottom_sheet.dart';
 import 'package:telegram_clone/features/settings/ui/widgets/menu_item.dart';
 import 'package:telegram_clone/features/settings/ui/widgets/profile_header.dart';
 import 'package:telegram_clone/features/settings/ui/widgets/settings_tile.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
+
+  Future<void> _handleSetPhoto(BuildContext context, WidgetRef ref) async {
+    final profile = await ref.read(userProfileQueryProvider.future);
+
+    if (!context.mounted) return;
+
+    ProfilePhotoBottomSheet.show(
+      context: context,
+      hasPhoto: profile?.hasProfileImage == true,
+      onPickImage: (source) async {
+        final picker = ImagePicker();
+        final picked = await picker.pickImage(
+          source: source,
+          maxWidth: 1024,
+          maxHeight: 1024,
+          imageQuality: 85,
+        );
+        if (picked == null || !context.mounted) return;
+
+        try {
+          await ref
+              .read(updateProfileCommandProvider.notifier)
+              .run(localImage: picked);
+          if (context.mounted) {
+            AppSnackbar.showSuccess(context, 'Profile photo updated');
+          }
+        } catch (e) {
+          if (context.mounted) {
+            AppSnackbar.showError(context, e.toString());
+          }
+        }
+      },
+      onRemovePhoto: profile?.hasProfileImage == true
+          ? () async {
+              try {
+                await ref
+                    .read(updateProfileCommandProvider.notifier)
+                    .run(removePhoto: true);
+                if (context.mounted) {
+                  AppSnackbar.showSuccess(context, 'Profile photo removed');
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  AppSnackbar.showError(context, e.toString());
+                }
+              }
+            }
+          : null,
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,25 +75,20 @@ class SettingsPage extends ConsumerWidget {
     return AppScaffold(
       appBar: AppBar(
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
+          IconButton(
+            onPressed: () => context.pushNamed(RouteNames.editProfile),
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit profile',
+          ),
           PopupMenuButton<ProfileMenuAction>(
             onSelected: (action) {
               switch (action) {
                 case ProfileMenuAction.editInfo:
                   context.pushNamed(RouteNames.editProfile);
-                  break;
                 case ProfileMenuAction.setPhoto:
-                  AppSnackbar.showSuccess(
-                    context,
-                    'Set profile photo (Coming Soon)',
-                  );
-                  break;
+                  _handleSetPhoto(context, ref);
                 case ProfileMenuAction.changeUsername:
-                  AppSnackbar.showSuccess(
-                    context,
-                    'Change username (Coming Soon)',
-                  );
-                  break;
+                  context.pushNamed(RouteNames.changeUsername);
               }
             },
             itemBuilder: (_) => const [
@@ -74,12 +122,13 @@ class SettingsPage extends ConsumerWidget {
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
             /// PROFILE HEADER (tappable → Profile page)
-            SliverToBoxAdapter(
-              child: GestureDetector(
-                onTap: () => context.pushNamed(RouteNames.profile),
-                child: ProfileHeader(profile: profile!),
+            if (profile != null)
+              SliverToBoxAdapter(
+                child: GestureDetector(
+                  onTap: () => context.pushNamed(RouteNames.profile),
+                  child: ProfileHeader(profile: profile),
+                ),
               ),
-            ),
 
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
@@ -87,7 +136,8 @@ class SettingsPage extends ConsumerWidget {
             const SliverToBoxAdapter(child: Divider(thickness: 8)),
 
             /// PROFILE INFO (shared with Profile page)
-            SliverToBoxAdapter(child: ProfileInfoSection(profile: profile)),
+            if (profile != null)
+              SliverToBoxAdapter(child: ProfileInfoSection(profile: profile)),
 
             /// SETTINGS DIVIDER
             const SliverToBoxAdapter(child: Divider(thickness: 8)),
@@ -96,7 +146,7 @@ class SettingsPage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               sliver: SliverToBoxAdapter(
                 child: Text(
-                  "Settings",
+                  'Settings',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.blueAccent,
                     fontWeight: FontWeight.bold,

@@ -6,6 +6,7 @@ abstract class RouteNames {
   static const String profileInfo = 'profile-info';
   static const String profile = 'profile';
   static const String editProfile = 'edit-profile';
+  static const String changeUsername = 'change-username';
   static const String settings = 'settings';
   static const String contacts = 'contacts';
   static const String chat = 'chat';

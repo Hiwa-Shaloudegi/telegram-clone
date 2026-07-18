@@ -117,12 +117,12 @@ class UserApi {
           : '@$username';
 
       // Validate format
-      final usernameRegex = RegExp(r'^@[a-zA-Z0-9_]{3,30}$');
+      final usernameRegex = RegExp(r'^@[a-zA-Z0-9_]{5,32}$');
       if (!usernameRegex.hasMatch(formattedUsername)) {
         throw AppException(
           message: 'Invalid username format',
           userMessage:
-              'Username must be 3-30 characters and contain only letters, numbers, and underscores',
+              'Username must be 5-32 characters and contain only letters, numbers, and underscores',
         );
       }
 
@@ -132,7 +132,9 @@ class UserApi {
           .eq('username', formattedUsername)
           .maybeSingle();
 
-      return response == null;
+      // Available if no one has it, or it belongs to the current user
+      if (response == null) return true;
+      return response['id'] == _currentUserId;
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
@@ -144,6 +146,7 @@ class UserApi {
     String? phone,
     String? bio,
     String? username,
+    bool clearUsername = false,
   }) async {
     try {
       final userId = _currentUserId;
@@ -160,8 +163,10 @@ class UserApi {
       if (firstName != null && firstName.trim().isNotEmpty) {
         updates['first_name'] = firstName.trim();
       }
-      if (lastName != null && lastName.trim().isNotEmpty) {
-        updates['last_name'] = lastName.trim();
+      // Allow clearing last name with empty string
+      if (lastName != null) {
+        updates['last_name'] =
+            lastName.trim().isEmpty ? null : lastName.trim();
       }
       if (phone != null && phone.trim().isNotEmpty) {
         updates['phone'] = phone.trim();
@@ -169,25 +174,27 @@ class UserApi {
 
       if (bio != null) {
         // Allow empty string to clear bio
-        updates['bio'] = bio.trim();
+        updates['bio'] = bio.trim().isEmpty ? null : bio.trim();
       }
 
-      if (username != null && username.trim().isNotEmpty) {
-        // Format and validate username
+      if (clearUsername) {
+        updates['username'] = null;
+      } else if (username != null && username.trim().isNotEmpty) {
+        // Format and validate username (Telegram: 5–32 chars)
         final formattedUsername = username.startsWith('@')
             ? username
             : '@$username';
-        final usernameRegex = RegExp(r'^@[a-zA-Z0-9_]{3,30}$');
+        final usernameRegex = RegExp(r'^@[a-zA-Z0-9_]{5,32}$');
 
         if (!usernameRegex.hasMatch(formattedUsername)) {
           throw AppException(
             message: 'Invalid username format',
             userMessage:
-                'Username must be 3-30 characters and contain only letters, numbers, and underscores',
+                'Username must be 5-32 characters and contain only letters, numbers, and underscores',
           );
         }
 
-        // Check if username is available
+        // Check if username is available (excludes current user)
         final isAvailable = await isUsernameAvailable(formattedUsername);
         if (!isAvailable) {
           throw AppException(

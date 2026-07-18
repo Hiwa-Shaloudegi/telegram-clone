@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'delete_messages_command.dart';
+part of 'update_profile_command.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,34 +9,34 @@ part of 'delete_messages_command.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(DeleteMessagesCommand)
-final deleteMessagesCommandProvider = DeleteMessagesCommandProvider._();
+@ProviderFor(UpdateProfileCommand)
+final updateProfileCommandProvider = UpdateProfileCommandProvider._();
 
-final class DeleteMessagesCommandProvider
-    extends $AsyncNotifierProvider<DeleteMessagesCommand, void> {
-  DeleteMessagesCommandProvider._()
+final class UpdateProfileCommandProvider
+    extends $AsyncNotifierProvider<UpdateProfileCommand, void> {
+  UpdateProfileCommandProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'deleteMessagesCommandProvider',
+        name: r'updateProfileCommandProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$deleteMessagesCommandHash();
+  String debugGetCreateSourceHash() => _$updateProfileCommandHash();
 
   @$internal
   @override
-  DeleteMessagesCommand create() => DeleteMessagesCommand();
+  UpdateProfileCommand create() => UpdateProfileCommand();
 }
 
-String _$deleteMessagesCommandHash() =>
-    r'3cba4f614aaec74b0997ea2133bfe5787dc42e22';
+String _$updateProfileCommandHash() =>
+    r'150bd1c58b12e1897175f935048f87f171adbc53';
 
-abstract class _$DeleteMessagesCommand extends $AsyncNotifier<void> {
+abstract class _$UpdateProfileCommand extends $AsyncNotifier<void> {
   FutureOr<void> build();
   @$mustCallSuper
   @override
