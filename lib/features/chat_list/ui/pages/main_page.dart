@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:telegram_clone/app/enums/chat_type.dart';
 import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
@@ -9,6 +10,7 @@ import 'package:telegram_clone/core/ui/widgets/eager_initialization.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/query/contact_name_map_provider.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/chat_selection_state.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/app_drawer.dart';
@@ -55,6 +57,7 @@ class _MainPageState extends ConsumerState<MainPage> {
   @override
   Widget build(BuildContext context) {
     final watchUserChatsState = ref.watch(watchUserChatsQueryProvider);
+    final contactNameMap = ref.watch(contactNameMapProvider);
 
     ref.listen<AsyncValue<void>>(logoutCommandProvider, (_, next) {
       next.whenOrNull(
@@ -96,7 +99,18 @@ class _MainPageState extends ConsumerState<MainPage> {
         body: watchUserChatsState.when(
           data: (chats) {
             if (chats.isEmpty) return ChatsEmptyState();
-            final sorted = List<ChatListItemModel>.from(chats)
+            final withContactNames = chats.map((chat) {
+              if (chat.chatType == ChatType.private &&
+                  chat.otherUserId != null &&
+                  chat.contactName == null) {
+                final name = contactNameMap[chat.otherUserId];
+                if (name != null) {
+                  return chat.copyWith(contactName: name);
+                }
+              }
+              return chat;
+            }).toList();
+            final sorted = List<ChatListItemModel>.from(withContactNames)
               ..sort((a, b) {
                 if (a.isPinned && !b.isPinned) return -1;
                 if (!a.isPinned && b.isPinned) return 1;

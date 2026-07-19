@@ -48,18 +48,14 @@ class ContactTile extends ConsumerWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: getColorFromName(
-                  contact.hasAccount
-                      ? contact.displayName
-                      : contact.contactDisplayName,
+                  contact.contactDisplayName,
                 ),
                 foregroundImage: contact.profileImageUrl != null
                     ? NetworkImage(contact.profileImageUrl!)
                     : null,
                 child: contact.profileImageUrl == null
                     ? Text(
-                        contact.hasAccount
-                            ? contact.shortDisplayName
-                            : contact.shortContactDisplayName,
+                        contact.shortContactDisplayName,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -75,9 +71,7 @@ class ContactTile extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      contact.hasAccount
-                          ? contact.displayName.trim()
-                          : contact.contactDisplayName.trim(),
+                      contact.contactDisplayName.trim(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

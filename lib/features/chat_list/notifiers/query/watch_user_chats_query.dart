@@ -42,6 +42,7 @@ class WatchUserChatsQuery extends _$WatchUserChatsQuery {
           otherUserId: chat.otherUserId,
           otherUserName: chat.otherUserName,
           otherUserImage: chat.otherUserImage,
+          contactName: chat.contactName,
         );
       }
       return chat;
@@ -81,6 +82,7 @@ class WatchUserChatsQuery extends _$WatchUserChatsQuery {
           otherUserId: chat.otherUserId,
           otherUserName: chat.otherUserName,
           otherUserImage: chat.otherUserImage,
+          contactName: chat.contactName,
         );
       }
       return chat;

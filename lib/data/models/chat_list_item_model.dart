@@ -34,6 +34,9 @@ class ChatListItemModel {
   final String? otherUserName;
   final String? otherUserImage;
 
+  // Contact name override (set client-side from contacts list)
+  final String? contactName;
+
   const ChatListItemModel({
     required this.chatId,
     required this.chatType,
@@ -57,6 +60,7 @@ class ChatListItemModel {
     this.otherUserId,
     this.otherUserName,
     this.otherUserImage,
+    this.contactName,
   });
 
   factory ChatListItemModel.fromJson(Map<String, dynamic> json) {
@@ -88,12 +92,15 @@ class ChatListItemModel {
       otherUserId: json['other_user_id'] as String?,
       otherUserName: json['other_user_name'] as String?,
       otherUserImage: json['other_user_image'] as String?,
+      contactName: json['contact_name'] as String?,
     );
   }
 
-  /// Display name — for DMs uses other user's name; for groups/channels uses title
+  /// Display name — for DMs uses contact name if available, else other user's name; for groups/channels uses title
   String get displayTitle {
-    if (chatType == ChatType.private) return otherUserName ?? 'Unknown';
+    if (chatType == ChatType.private) {
+      return contactName ?? otherUserName ?? 'Unknown';
+    }
     if (chatType == ChatType.saved) return 'Saved Messages';
     return title ?? '';
   }
@@ -113,6 +120,58 @@ class ChatListItemModel {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
     return name[0].toUpperCase();
+  }
+
+  ChatListItemModel copyWith({
+    String? chatId,
+    ChatType? chatType,
+    String? title,
+    String? description,
+    String? imageUrl,
+    bool? isPublic,
+    String? inviteLink,
+    DateTime? updatedAt,
+    String? memberRole,
+    bool? isPinned,
+    bool? isArchived,
+    bool? isMuted,
+    String? lastMessageId,
+    String? lastMessageContent,
+    String? lastMessageType,
+    DateTime? lastMessageAt,
+    String? lastMessageSenderId,
+    String? lastMessageSenderName,
+    int? unreadCount,
+    String? otherUserId,
+    String? otherUserName,
+    String? otherUserImage,
+    String? contactName,
+  }) {
+    return ChatListItemModel(
+      chatId: chatId ?? this.chatId,
+      chatType: chatType ?? this.chatType,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      imageUrl: imageUrl ?? this.imageUrl,
+      isPublic: isPublic ?? this.isPublic,
+      inviteLink: inviteLink ?? this.inviteLink,
+      updatedAt: updatedAt ?? this.updatedAt,
+      memberRole: memberRole ?? this.memberRole,
+      isPinned: isPinned ?? this.isPinned,
+      isArchived: isArchived ?? this.isArchived,
+      isMuted: isMuted ?? this.isMuted,
+      lastMessageId: lastMessageId ?? this.lastMessageId,
+      lastMessageContent: lastMessageContent ?? this.lastMessageContent,
+      lastMessageType: lastMessageType ?? this.lastMessageType,
+      lastMessageAt: lastMessageAt ?? this.lastMessageAt,
+      lastMessageSenderId: lastMessageSenderId ?? this.lastMessageSenderId,
+      lastMessageSenderName: lastMessageSenderName ?? this.lastMessageSenderName,
+      unreadCount: unreadCount ?? this.unreadCount,
+      otherUserId: otherUserId ?? this.otherUserId,
+      otherUserName: otherUserName ?? this.otherUserName,
+      otherUserImage: otherUserImage ?? this.otherUserImage,
+      contactName: contactName ?? this.contactName,
+    );
   }
 
   /// Human-readable last message preview
