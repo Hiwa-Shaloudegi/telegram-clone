@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/data/api/chat/chats_api.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/chat_selection_state.dart';
 
 enum _SelectionMenuAction { pin, unpin, addToFolder, markUnread, blockUser }
@@ -115,9 +116,15 @@ class ChatSelectionAppBar extends ConsumerWidget
 
     switch (action) {
       case _SelectionMenuAction.pin:
+        ref
+            .read(watchUserChatsQueryProvider.notifier)
+            .optimisticallyTogglePin(ids, pin: true);
         ref.read(chatsApiProvider).setPinnedForChats(ids, pin: true);
         notifier.clear();
       case _SelectionMenuAction.unpin:
+        ref
+            .read(watchUserChatsQueryProvider.notifier)
+            .optimisticallyTogglePin(ids, pin: false);
         ref.read(chatsApiProvider).setPinnedForChats(ids, pin: false);
         notifier.clear();
       case _SelectionMenuAction.addToFolder:

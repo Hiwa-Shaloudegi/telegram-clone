@@ -50,30 +50,16 @@ class ChatTile extends ConsumerWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Selection checkbox ──
+            if (selectionActive) ...[
+              Checkbox(value: isSelected, onChanged: (_) {}),
+              const SizedBox(width: 8),
+            ],
+
             // ── Avatar ──
             Stack(
               children: [
                 ChatAvatar(chatInfo: item, size: 50),
-                if (isSelected)
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.55),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.check,
-                        size: 26,
-                        color: colorScheme.onPrimary,
-                      ),
-                    ),
-                  ),
-                // ChatAvatar(
-                //   displayTitle: item.displayTitle,
-                //   imageUrl: item.avatarUrl,
-                //   chatType: item.chatType,
-                //   size: 52,
-                // ),
                 if (item.isMuted)
                   Positioned(
                     bottom: 0,
@@ -105,31 +91,24 @@ class ChatTile extends ConsumerWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Row(
-                          children: [
-                            if (item.isPinned)
-                              Padding(
-                                padding: const EdgeInsets.only(right: 4),
-                                child: Icon(
-                                  Icons.push_pin,
-                                  size: 14,
-                                  color: colorScheme.primary,
-                                ),
-                              ),
-                            Flexible(
-                              child: Text(
-                                item.displayTitle,
-                                style: textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          item.displayTitle,
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
                       const SizedBox(width: 8),
+                      if (item.isPinned)
+                        Icon(
+                          Icons.push_pin,
+                          size: 14,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      if (item.isPinned && item.lastMessageAt != null)
+                        const SizedBox(width: 4),
                       if (item.lastMessageAt != null)
                         Text(
                           _formatTime(item.lastMessageAt!),

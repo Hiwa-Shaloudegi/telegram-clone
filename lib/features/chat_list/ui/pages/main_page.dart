@@ -6,6 +6,7 @@ import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/eager_initialization.dart';
+import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/chat_selection_state.dart';
@@ -93,16 +94,23 @@ class _MainPageState extends ConsumerState<MainPage> {
               ),
         drawer: AppDrawer(),
         body: watchUserChatsState.when(
-          data: (chats) => chats.isEmpty
-              ? ChatsEmptyState()
-              : ListView.builder(
-                  controller: _scrollController,
-                  itemCount: chats.length,
-                  itemBuilder: (context, index) {
-                    final item = chats[index];
-                    return ChatTile(item: item);
-                  },
-                ),
+          data: (chats) {
+            if (chats.isEmpty) return ChatsEmptyState();
+            final sorted = List<ChatListItemModel>.from(chats)
+              ..sort((a, b) {
+                if (a.isPinned && !b.isPinned) return -1;
+                if (!a.isPinned && b.isPinned) return 1;
+                return 0;
+              });
+            return ListView.builder(
+              controller: _scrollController,
+              itemCount: sorted.length,
+              itemBuilder: (context, index) {
+                final item = sorted[index];
+                return ChatTile(item: item);
+              },
+            );
+          },
           error: (error, _) => Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
