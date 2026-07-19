@@ -49,4 +49,49 @@ class WatchUserChatsQuery extends _$WatchUserChatsQuery {
 
     state = AsyncData(updated);
   }
+
+  /// Immediately toggle pin state for the given chat IDs (optimistic update).
+  /// Pinned chats are moved to the top of the list instantly.
+  void optimisticallyTogglePin(List<String> chatIds, {required bool pin}) {
+    final current = state.asData?.value;
+    if (current == null) return;
+
+    final updated = current.map((chat) {
+      if (chatIds.contains(chat.chatId)) {
+        return ChatListItemModel(
+          chatId: chat.chatId,
+          chatType: chat.chatType,
+          title: chat.title,
+          description: chat.description,
+          imageUrl: chat.imageUrl,
+          isPublic: chat.isPublic,
+          inviteLink: chat.inviteLink,
+          updatedAt: chat.updatedAt,
+          memberRole: chat.memberRole,
+          isPinned: pin,
+          isArchived: chat.isArchived,
+          isMuted: chat.isMuted,
+          lastMessageId: chat.lastMessageId,
+          lastMessageContent: chat.lastMessageContent,
+          lastMessageType: chat.lastMessageType,
+          lastMessageAt: chat.lastMessageAt,
+          lastMessageSenderId: chat.lastMessageSenderId,
+          lastMessageSenderName: chat.lastMessageSenderName,
+          unreadCount: chat.unreadCount,
+          otherUserId: chat.otherUserId,
+          otherUserName: chat.otherUserName,
+          otherUserImage: chat.otherUserImage,
+        );
+      }
+      return chat;
+    }).toList();
+
+    updated.sort((a, b) {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return 0;
+    });
+
+    state = AsyncData(updated);
+  }
 }

@@ -3,11 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
-import 'package:telegram_clone/data/api/chat/chats_api.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/features/chat/ui/widgets/chat_avatar.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/ui/chat_selection_state.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
-// import 'package:telegram_clone/features/chat_list/ui/widgets/chat_avatar.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/last_message_row.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/unread_badge.dart';
 
@@ -21,8 +20,17 @@ class ChatTile extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
+    final selectionActive = ref.watch(chatSelectionActiveProvider);
+    final isSelected = ref.watch(
+      chatSelectionProvider.select((s) => s.containsKey(item.chatId)),
+    );
+
     return InkWell(
       onTap: () {
+        if (selectionActive) {
+          ref.read(chatSelectionProvider.notifier).toggle(item);
+          return;
+        }
         // TODO: is it necessary to mark as read here? maybe just do it in chat page when messages are loaded?
         // Mark as read then navigate
         ref.read(mainUi_selectedChatItemProviderProvider.notifier).set(item);
@@ -33,22 +41,25 @@ class ChatTile extends ConsumerWidget {
           extra: item,
         );
       },
-      onLongPress: () => _showContextMenu(context, ref),
-      child: Padding(
+      onLongPress: () => ref.read(chatSelectionProvider.notifier).toggle(item),
+      child: Container(
+        color: isSelected
+            ? colorScheme.primary.withValues(alpha: 0.12)
+            : Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Selection checkbox ──
+            if (selectionActive) ...[
+              Checkbox(value: isSelected, onChanged: (_) {}),
+              const SizedBox(width: 8),
+            ],
+
             // ── Avatar ──
             Stack(
               children: [
                 ChatAvatar(chatInfo: item, size: 50),
-                // ChatAvatar(
-                //   displayTitle: item.displayTitle,
-                //   imageUrl: item.avatarUrl,
-                //   chatType: item.chatType,
-                //   size: 52,
-                // ),
                 if (item.isMuted)
                   Positioned(
                     bottom: 0,
@@ -80,31 +91,24 @@ class ChatTile extends ConsumerWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Row(
-                          children: [
-                            if (item.isPinned)
-                              Padding(
-                                padding: const EdgeInsets.only(right: 4),
-                                child: Icon(
-                                  Icons.push_pin,
-                                  size: 14,
-                                  color: colorScheme.primary,
-                                ),
-                              ),
-                            Flexible(
-                              child: Text(
-                                item.displayTitle,
-                                style: textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          item.displayTitle,
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
                       const SizedBox(width: 8),
+                      if (item.isPinned)
+                        Icon(
+                          Icons.push_pin,
+                          size: 14,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      if (item.isPinned && item.lastMessageAt != null)
+                        const SizedBox(width: 4),
                       if (item.lastMessageAt != null)
                         Text(
                           _formatTime(item.lastMessageAt!),
@@ -155,67 +159,5 @@ class ChatTile extends ConsumerWidget {
       return DateFormat('EEE').format(dt.toLocal());
     }
     return DateFormat('dd/MM/yy').format(dt.toLocal());
-  }
-
-  void _showContextMenu(BuildContext context, WidgetRef ref) {
-    final api = ref.read(chatsApiProvider);
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // handle
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            ListTile(
-              leading: Icon(
-                item.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-              ),
-              title: Text(item.isPinned ? 'Unpin' : 'Pin'),
-              onTap: () {
-                Navigator.pop(context);
-                api.togglePin(item.chatId, pin: !item.isPinned);
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                item.isMuted
-                    ? Icons.volume_up_outlined
-                    : Icons.volume_off_outlined,
-              ),
-              title: Text(item.isMuted ? 'Unmute' : 'Mute'),
-              onTap: () {
-                Navigator.pop(context);
-                api.toggleMute(item.chatId, mute: !item.isMuted);
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                item.isArchived
-                    ? Icons.unarchive_outlined
-                    : Icons.archive_outlined,
-              ),
-              title: Text(item.isArchived ? 'Unarchive' : 'Archive'),
-              onTap: () {
-                Navigator.pop(context);
-                api.toggleArchive(item.chatId, archive: !item.isArchived);
-              },
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
   }
 }
