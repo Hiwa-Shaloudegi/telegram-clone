@@ -116,6 +116,19 @@ class ChatSelectionAppBar extends ConsumerWidget
 
     switch (action) {
       case _SelectionMenuAction.pin:
+        final chats = ref.read(watchUserChatsQueryProvider).asData?.value ?? [];
+        final alreadyPinned = chats.where((c) => c.isPinned).length;
+        final newPins = ids.where((id) {
+          final item = selection[id];
+          return item != null && !item.isPinned;
+        }).length;
+        if (alreadyPinned + newPins > 5) {
+          AppSnackbar.show(
+            context,
+            message: 'You can pin a maximum of 5 chats',
+          );
+          return;
+        }
         ref
             .read(watchUserChatsQueryProvider.notifier)
             .optimisticallyTogglePin(ids, pin: true);
