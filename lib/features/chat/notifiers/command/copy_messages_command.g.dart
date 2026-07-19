@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'update_profile_command.dart';
+part of 'copy_messages_command.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,34 +9,34 @@ part of 'update_profile_command.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(UpdateProfileCommand)
-final updateProfileCommandProvider = UpdateProfileCommandProvider._();
+@ProviderFor(CopyMessagesCommand)
+final copyMessagesCommandProvider = CopyMessagesCommandProvider._();
 
-final class UpdateProfileCommandProvider
-    extends $AsyncNotifierProvider<UpdateProfileCommand, void> {
-  UpdateProfileCommandProvider._()
+final class CopyMessagesCommandProvider
+    extends $AsyncNotifierProvider<CopyMessagesCommand, void> {
+  CopyMessagesCommandProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'updateProfileCommandProvider',
+        name: r'copyMessagesCommandProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$updateProfileCommandHash();
+  String debugGetCreateSourceHash() => _$copyMessagesCommandHash();
 
   @$internal
   @override
-  UpdateProfileCommand create() => UpdateProfileCommand();
+  CopyMessagesCommand create() => CopyMessagesCommand();
 }
 
-String _$updateProfileCommandHash() =>
-    r'1e2f93bca6239edf4a6dab86c671d474cc0b52b3';
+String _$copyMessagesCommandHash() =>
+    r'e5ca22531bcf4aba3c36bc714fb77b09ba05c99e';
 
-abstract class _$UpdateProfileCommand extends $AsyncNotifier<void> {
+abstract class _$CopyMessagesCommand extends $AsyncNotifier<void> {
   FutureOr<void> build();
   @$mustCallSuper
   @override

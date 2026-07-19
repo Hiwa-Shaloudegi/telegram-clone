@@ -5,6 +5,7 @@ import 'package:telegram_clone/app/enums/chat_type.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
+import 'package:telegram_clone/features/chat/notifiers/command/copy_messages_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/command/delete_messages_command.dart';
 import 'package:telegram_clone/features/chat/notifiers/query/watch_messages_query.dart';
 import 'package:telegram_clone/features/chat/notifiers/ui/chat_ui_state.dart';
@@ -148,7 +149,19 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
           },
           icon: Icon(Icons.reply),
         ),
-        IconButton(onPressed: () {}, icon: Icon(Icons.copy_outlined)),
+        IconButton(
+          onPressed: () {
+            final selectedMessageIds = ref.read(
+              chatUi_selectedMessagesProvider,
+            );
+            if (selectedMessageIds.isEmpty) return;
+
+            ref
+                .read(copyMessagesCommandProvider.notifier)
+                .run(chatId: chatId);
+          },
+          icon: Icon(Icons.copy_outlined),
+        ),
         IconButton(
           onPressed: () {
             final selectedMessageIds = ref.read(
