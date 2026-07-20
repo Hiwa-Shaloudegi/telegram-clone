@@ -39,9 +39,19 @@ class ChatSelectionAppBar extends ConsumerWidget
           tooltip: allArchived ? 'Unarchive' : 'Archive',
           onPressed: () {
             final ids = selection.keys.toList();
+            final archive = !allArchived;
+            ref
+                .read(watchUserChatsQueryProvider.notifier)
+                .optimisticallyToggleArchive(ids, archive: archive);
+            // Persist pin clear on archive so server matches optimistic UI.
+            if (archive) {
+              ref
+                  .read(chatsApiProvider)
+                  .setPinnedForChats(ids, pin: false);
+            }
             ref
                 .read(chatsApiProvider)
-                .setArchivedForChats(ids, archive: !allArchived);
+                .setArchivedForChats(ids, archive: archive);
             clearSelection();
           },
         ),
@@ -117,10 +127,12 @@ class ChatSelectionAppBar extends ConsumerWidget
     switch (action) {
       case _SelectionMenuAction.pin:
         final chats = ref.read(watchUserChatsQueryProvider).asData?.value ?? [];
-        final alreadyPinned = chats.where((c) => c.isPinned).length;
+        // Only count pins on the main (non-archived) list — same as Telegram.
+        final alreadyPinned =
+            chats.where((c) => c.isPinned && !c.isArchived).length;
         final newPins = ids.where((id) {
           final item = selection[id];
-          return item != null && !item.isPinned;
+          return item != null && !item.isPinned && !item.isArchived;
         }).length;
         if (alreadyPinned + newPins > 5) {
           AppSnackbar.show(

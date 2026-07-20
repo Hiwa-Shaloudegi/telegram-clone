@@ -7,13 +7,13 @@ import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/eager_initialization.dart';
-import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/contact_name_map_provider.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/chat_selection_state.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/app_drawer.dart';
+import 'package:telegram_clone/features/chat_list/ui/widgets/archived_chats_tile.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/chat_selection_app_bar.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/chat_tile.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/chats_app_bar_title.dart';
@@ -99,6 +99,7 @@ class _MainPageState extends ConsumerState<MainPage> {
         body: watchUserChatsState.when(
           data: (chats) {
             if (chats.isEmpty) return ChatsEmptyState();
+
             final withContactNames = chats.map((chat) {
               if (chat.chatType == ChatType.private &&
                   chat.otherUserId != null &&
@@ -110,17 +111,39 @@ class _MainPageState extends ConsumerState<MainPage> {
               }
               return chat;
             }).toList();
-            final sorted = List<ChatListItemModel>.from(withContactNames)
+
+            final archived = withContactNames
+                .where((c) => c.isArchived)
+                .toList();
+            final active = withContactNames
+                .where((c) => !c.isArchived)
+                .toList()
               ..sort((a, b) {
                 if (a.isPinned && !b.isPinned) return -1;
                 if (!a.isPinned && b.isPinned) return 1;
                 return 0;
               });
+
+            // Only archived chats remain — still show the archive entry.
+            if (active.isEmpty && archived.isEmpty) {
+              return ChatsEmptyState();
+            }
+            if (active.isEmpty && archived.isNotEmpty) {
+              return ListView(
+                controller: _scrollController,
+                children: [ArchivedChatsTile(archivedChats: archived)],
+              );
+            }
+
+            final showArchiveTile = archived.isNotEmpty;
             return ListView.builder(
               controller: _scrollController,
-              itemCount: sorted.length,
+              itemCount: active.length + (showArchiveTile ? 1 : 0),
               itemBuilder: (context, index) {
-                final item = sorted[index];
+                if (showArchiveTile && index == 0) {
+                  return ArchivedChatsTile(archivedChats: archived);
+                }
+                final item = active[index - (showArchiveTile ? 1 : 0)];
                 return ChatTile(item: item);
               },
             );

@@ -19,31 +19,7 @@ class WatchUserChatsQuery extends _$WatchUserChatsQuery {
 
     final updated = current.map((chat) {
       if (chat.chatId == chatId && chat.unreadCount > 0) {
-        return ChatListItemModel(
-          chatId: chat.chatId,
-          chatType: chat.chatType,
-          title: chat.title,
-          description: chat.description,
-          imageUrl: chat.imageUrl,
-          isPublic: chat.isPublic,
-          inviteLink: chat.inviteLink,
-          updatedAt: chat.updatedAt,
-          memberRole: chat.memberRole,
-          isPinned: chat.isPinned,
-          isArchived: chat.isArchived,
-          isMuted: chat.isMuted,
-          lastMessageId: chat.lastMessageId,
-          lastMessageContent: chat.lastMessageContent,
-          lastMessageType: chat.lastMessageType,
-          lastMessageAt: chat.lastMessageAt,
-          lastMessageSenderId: chat.lastMessageSenderId,
-          lastMessageSenderName: chat.lastMessageSenderName,
-          unreadCount: 0, // immediate reset
-          otherUserId: chat.otherUserId,
-          otherUserName: chat.otherUserName,
-          otherUserImage: chat.otherUserImage,
-          contactName: chat.contactName,
-        );
+        return chat.copyWith(unreadCount: 0);
       }
       return chat;
     }).toList();
@@ -59,31 +35,7 @@ class WatchUserChatsQuery extends _$WatchUserChatsQuery {
 
     final updated = current.map((chat) {
       if (chatIds.contains(chat.chatId)) {
-        return ChatListItemModel(
-          chatId: chat.chatId,
-          chatType: chat.chatType,
-          title: chat.title,
-          description: chat.description,
-          imageUrl: chat.imageUrl,
-          isPublic: chat.isPublic,
-          inviteLink: chat.inviteLink,
-          updatedAt: chat.updatedAt,
-          memberRole: chat.memberRole,
-          isPinned: pin,
-          isArchived: chat.isArchived,
-          isMuted: chat.isMuted,
-          lastMessageId: chat.lastMessageId,
-          lastMessageContent: chat.lastMessageContent,
-          lastMessageType: chat.lastMessageType,
-          lastMessageAt: chat.lastMessageAt,
-          lastMessageSenderId: chat.lastMessageSenderId,
-          lastMessageSenderName: chat.lastMessageSenderName,
-          unreadCount: chat.unreadCount,
-          otherUserId: chat.otherUserId,
-          otherUserName: chat.otherUserName,
-          otherUserImage: chat.otherUserImage,
-          contactName: chat.contactName,
-        );
+        return chat.copyWith(isPinned: pin);
       }
       return chat;
     }).toList();
@@ -93,6 +45,30 @@ class WatchUserChatsQuery extends _$WatchUserChatsQuery {
       if (!a.isPinned && b.isPinned) return 1;
       return 0;
     });
+
+    state = AsyncData(updated);
+  }
+
+  /// Immediately toggle archive state for the given chat IDs (optimistic update).
+  /// Archived chats leave the main list (and return on unarchive) instantly.
+  void optimisticallyToggleArchive(
+    List<String> chatIds, {
+    required bool archive,
+  }) {
+    final current = state.asData?.value;
+    if (current == null) return;
+
+    final idSet = chatIds.toSet();
+    final updated = current.map((chat) {
+      if (idSet.contains(chat.chatId)) {
+        // Archiving removes the chat from the main pin section immediately.
+        return chat.copyWith(
+          isArchived: archive,
+          isPinned: archive ? false : chat.isPinned,
+        );
+      }
+      return chat;
+    }).toList();
 
     state = AsyncData(updated);
   }

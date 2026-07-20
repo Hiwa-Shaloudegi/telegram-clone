@@ -11,6 +11,7 @@ import 'package:telegram_clone/features/auth/ui/pages/profile_info_page.dart';
 import 'package:telegram_clone/features/auth/ui/pages/signup_page.dart';
 import 'package:telegram_clone/features/chat/ui/pages/chat_page.dart';
 import 'package:telegram_clone/features/chat/ui/pages/forward_chat_picker_page.dart';
+import 'package:telegram_clone/features/chat_list/ui/pages/archived_chats_page.dart';
 import 'package:telegram_clone/features/chat_list/ui/pages/main_page.dart';
 import 'package:telegram_clone/features/contacts/ui/pages/contacts_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/change_username_page.dart';
@@ -92,6 +93,11 @@ GoRouter router(Ref ref) {
         name: RouteNames.chat,
         path: '/chat/:chatId',
         builder: (context, state) => ChatPage(),
+      ),
+      GoRoute(
+        name: RouteNames.archivedChats,
+        path: '/archived-chats',
+        builder: (context, state) => const ArchivedChatsPage(),
       ),
       GoRoute(
         name: RouteNames.forwardChatPicker,

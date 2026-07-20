@@ -10,6 +10,7 @@ abstract class RouteNames {
   static const String settings = 'settings';
   static const String contacts = 'contacts';
   static const String chat = 'chat';
+  static const String archivedChats = 'archived-chats';
   static const String forwardChatPicker = 'forward-chat-picker';
   static const String error = 'error';
 }
