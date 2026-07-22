@@ -6,11 +6,17 @@ import 'package:telegram_clone/app/router/extra/edit_folder_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/data/api/chat_folders/chat_folders_api.dart';
+import 'package:telegram_clone/data/models/chat_folder_model.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/contact_name_map_provider.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
-import 'package:telegram_clone/features/folders/notifiers/command/folder_commands.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/create_folder_command.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/rename_folder_command.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/delete_folder_command.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/set_folder_chats_command.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/remove_chat_from_folder_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
+import 'package:telegram_clone/features/folders/notifiers/ui/folders_ui_state.dart';
 import 'package:telegram_clone/features/folders/ui/widgets/folder_chat_tile.dart';
 import 'package:telegram_clone/app/enums/chat_type.dart';
 
@@ -29,18 +35,19 @@ class EditFolderPage extends ConsumerStatefulWidget {
 class _EditFolderPageState extends ConsumerState<EditFolderPage> {
   final _nameController = TextEditingController();
   final _nameFocus = FocusNode();
-  late Set<String> _chatIds;
   bool _initialized = false;
-  bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    _chatIds = {};
     if (widget.isCreating) {
       _initialized = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _nameFocus.requestFocus();
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _tryInitialize();
       });
     }
   }
@@ -52,22 +59,33 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
     super.dispose();
   }
 
-  void _ensureInitialized() {
+  void _tryInitialize() {
     if (_initialized || widget.folderId == null) return;
     final folders = ref.read(watchFoldersQueryProvider).asData?.value;
     final folder = folders?.where((f) => f.id == widget.folderId).firstOrNull;
-    if (folder != null) {
-      _nameController.text = folder.name;
-      _chatIds = folder.chatIds.toSet();
-      _initialized = true;
+    if (folder == null) return;
+    _nameController.text = folder.name;
+    ref.read(editFolder_nameProvider.notifier).set(folder.name);
+    ref.read(editFolder_chatIdsProvider.notifier).set(folder.chatIds.toSet());
+    _initialized = true;
+  }
+
+  Set<String> _currentChatIds() {
+    if (!widget.isCreating && widget.folderId != null) {
+      final folders = ref.read(watchFoldersQueryProvider).asData?.value;
+      final folder =
+          folders?.where((f) => f.id == widget.folderId).firstOrNull;
+      if (folder != null) return folder.chatIds.toSet();
     }
+    return ref.read(editFolder_chatIdsProvider);
   }
 
   List<ChatListItemModel> _resolveChats(List<ChatListItemModel> allChats) {
     final contactNames = ref.read(contactNameMapProvider);
+    final chatIds = _currentChatIds();
     final byId = {for (final c in allChats) c.chatId: c};
     final result = <ChatListItemModel>[];
-    for (final id in _chatIds) {
+    for (final id in chatIds) {
       final chat = byId[id];
       if (chat == null) continue;
       if (chat.chatType == ChatType.private &&
@@ -83,26 +101,18 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
   }
 
   Future<void> _onAddChats() async {
+    final chatIds = _currentChatIds();
     final result = await context.pushNamed<List<String>>(
       RouteNames.addChatsToFolder,
       extra: AddChatsToFolderExtra(
-        selectedChatIds: _chatIds.toList(),
-        // Creating: return selection only. Editing existing: also persist.
+        selectedChatIds: chatIds.toList(),
         folderId: widget.isCreating ? null : widget.folderId,
       ),
     );
 
     if (!mounted) return;
     if (result != null) {
-      setState(() => _chatIds = result.toSet());
-    } else if (!widget.isCreating && widget.folderId != null) {
-      // If persisted on the add-chats page, refresh local set from query.
-      final folders = ref.read(watchFoldersQueryProvider).asData?.value;
-      final folder =
-          folders?.where((f) => f.id == widget.folderId).firstOrNull;
-      if (folder != null) {
-        setState(() => _chatIds = folder.chatIds.toSet());
-      }
+      ref.read(editFolder_chatIdsProvider.notifier).set(result.toSet());
     }
   }
 
@@ -137,20 +147,22 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
 
     if (confirmed != true || !mounted) return;
 
-    setState(() => _chatIds.remove(chat.chatId));
-
     if (!widget.isCreating && widget.folderId != null) {
       try {
-        await ref.read(folderCommandsProvider.notifier).removeChatFromFolder(
+        await ref.read(removeChatFromFolderCommandProvider.notifier).run(
               folderId: widget.folderId!,
               chatId: chat.chatId,
             );
       } catch (e) {
         if (mounted) {
-          setState(() => _chatIds.add(chat.chatId));
           AppSnackbar.showError(context, e.toString());
         }
       }
+    } else {
+      final chatIds = ref.read(editFolder_chatIdsProvider);
+      ref.read(editFolder_chatIdsProvider.notifier).set(
+        {...chatIds}..remove(chat.chatId),
+      );
     }
   }
 
@@ -168,12 +180,13 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
       return;
     }
 
-    setState(() => _saving = true);
+    ref.read(editFolder_savingProvider.notifier).set(true);
     try {
+      final chatIds = _currentChatIds();
       if (widget.isCreating) {
-        await ref.read(folderCommandsProvider.notifier).createFolder(
+        await ref.read(createFolderCommandProvider.notifier).run(
               name: name,
-              chatIds: _chatIds.toList(),
+              chatIds: chatIds.toList(),
             );
         if (mounted) {
           AppSnackbar.showSuccess(context, 'Folder created');
@@ -189,17 +202,17 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
             .firstOrNull;
 
         if (existing == null || existing.name != name) {
-          await ref.read(folderCommandsProvider.notifier).renameFolder(
+          await ref.read(renameFolderCommandProvider.notifier).run(
                 folderId: folderId,
                 name: name,
               );
         }
 
         final currentIds = existing?.chatIds.toSet() ?? {};
-        if (!_setEquals(currentIds, _chatIds)) {
-          await ref.read(folderCommandsProvider.notifier).setFolderChats(
+        if (!_setEquals(currentIds, chatIds)) {
+          await ref.read(setFolderChatsCommandProvider.notifier).run(
                 folderId: folderId,
-                chatIds: _chatIds.toList(),
+                chatIds: chatIds.toList(),
               );
         }
 
@@ -211,7 +224,7 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
     } catch (e) {
       if (mounted) AppSnackbar.showError(context, e.toString());
     } finally {
-      if (mounted) setState(() => _saving = false);
+      if (mounted) ref.read(editFolder_savingProvider.notifier).set(false);
     }
   }
 
@@ -247,11 +260,11 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
 
     if (confirmed != true || !mounted) return;
 
-    setState(() => _saving = true);
+    ref.read(editFolder_savingProvider.notifier).set(true);
     try {
       await ref
-          .read(folderCommandsProvider.notifier)
-          .deleteFolder(widget.folderId!);
+          .read(deleteFolderCommandProvider.notifier)
+          .run(widget.folderId!);
       if (mounted) {
         AppSnackbar.showSuccess(context, 'Folder deleted');
         context.pop();
@@ -259,7 +272,7 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
     } catch (e) {
       if (mounted) AppSnackbar.showError(context, e.toString());
     } finally {
-      if (mounted) setState(() => _saving = false);
+      if (mounted) ref.read(editFolder_savingProvider.notifier).set(false);
     }
   }
 
@@ -270,18 +283,19 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Keep folder data in sync for edit mode.
-    ref.watch(watchFoldersQueryProvider);
-    _ensureInitialized();
+    ref.listen<AsyncValue<List<ChatFolderModel>>>(watchFoldersQueryProvider, (prev, next) {
+      _tryInitialize();
+    });
 
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final saving = ref.watch(editFolder_savingProvider);
+    final nameLen = ref.watch(editFolder_nameProvider).length;
+    ref.watch(editFolder_chatIdsProvider);
     final chatsAsync = ref.watch(watchUserChatsQueryProvider);
     final folderChats = chatsAsync.asData != null
         ? _resolveChats(chatsAsync.asData!.value)
         : <ChatListItemModel>[];
-
-    final nameLen = _nameController.text.characters.length;
 
     return Scaffold(
       appBar: AppBar(
@@ -291,11 +305,11 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
             IconButton(
               tooltip: 'Delete folder',
               icon: const Icon(Icons.delete_outline),
-              onPressed: _saving ? null : _delete,
+              onPressed: saving ? null : _delete,
             ),
           TextButton(
-            onPressed: _saving ? null : _save,
-            child: _saving
+            onPressed: saving ? null : _save,
+            child: saving
                 ? const SizedBox(
                     width: 18,
                     height: 18,
@@ -339,7 +353,8 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
                   borderSide: BorderSide(color: colorScheme.primary, width: 2),
                 ),
               ),
-              onChanged: (_) => setState(() {}),
+              onChanged: (v) =>
+                  ref.read(editFolder_nameProvider.notifier).set(v),
             ),
           ),
           const Divider(thickness: 8, height: 32),

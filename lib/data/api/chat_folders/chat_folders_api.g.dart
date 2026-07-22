@@ -48,4 +48,4 @@ final class ChatFoldersApiProvider
   }
 }
 
-String _$chatFoldersApiHash() => r'folder_api_gen_hash_001';
+String _$chatFoldersApiHash() => r'9601c52f3b45a29f81b8db38a52998bb575cfd8d';

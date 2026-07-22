@@ -13,8 +13,12 @@ part of 'contact_name_map_provider.dart';
 final contactNameMapProvider = ContactNameMapProvider._();
 
 final class ContactNameMapProvider
-    extends $FunctionalProvider<Map<String, String>, Map<String, String>,
-        Map<String, String>>
+    extends
+        $FunctionalProvider<
+          Map<String, String>,
+          Map<String, String>,
+          Map<String, String>
+        >
     with $Provider<Map<String, String>> {
   ContactNameMapProvider._()
     : super(
@@ -50,4 +54,4 @@ final class ContactNameMapProvider
   }
 }
 
-String _$contactNameMapHash() => r'generated_hash_contact_name_map';
+String _$contactNameMapHash() => r'2780a836157238ed6d35a73247da8ca8bfa9ebe7';

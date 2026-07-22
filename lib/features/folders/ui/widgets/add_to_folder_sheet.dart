@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
-import 'package:telegram_clone/features/folders/notifiers/command/folder_commands.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/add_chats_to_folder_command.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/remove_chat_from_folder_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
 
 /// Bottom sheet to pick one or more folders when adding selected chats.
@@ -119,34 +120,51 @@ class _AddToFolderSheetBody extends ConsumerWidget {
                         trailing: alreadyAll
                             ? Icon(Icons.check, color: colorScheme.primary)
                             : null,
-                        onTap: alreadyAll
-                            ? null
-                            : () async {
-                                Navigator.pop(context);
-                                try {
-                                  await ref
-                                      .read(folderCommandsProvider.notifier)
-                                      .addChatsToFolder(
-                                        folderId: folder.id,
-                                        chatIds: chatIds,
-                                      );
-                                  if (context.mounted) {
-                                    AppSnackbar.showSuccess(
-                                      context,
-                                      chatIds.length == 1
-                                          ? 'Chat added to ${folder.name}'
-                                          : 'Chats added to ${folder.name}',
+                        onTap: () async {
+                          Navigator.pop(context);
+                          try {
+                            if (alreadyAll) {
+                              for (final chatId in chatIds) {
+                                await ref
+                                    .read(removeChatFromFolderCommandProvider.notifier)
+                                    .run(
+                                      folderId: folder.id,
+                                      chatId: chatId,
                                     );
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    AppSnackbar.showError(
-                                      context,
-                                      e.toString(),
-                                    );
-                                  }
-                                }
-                              },
+                              }
+                              if (context.mounted) {
+                                AppSnackbar.showSuccess(
+                                  context,
+                                  chatIds.length == 1
+                                      ? 'Chat removed from ${folder.name}'
+                                      : 'Chats removed from ${folder.name}',
+                                );
+                              }
+                            } else {
+                              await ref
+                                  .read(addChatsToFolderCommandProvider.notifier)
+                                  .run(
+                                    folderId: folder.id,
+                                    chatIds: chatIds,
+                                  );
+                              if (context.mounted) {
+                                AppSnackbar.showSuccess(
+                                  context,
+                                  chatIds.length == 1
+                                      ? 'Chat added to ${folder.name}'
+                                      : 'Chats added to ${folder.name}',
+                                );
+                              }
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              AppSnackbar.showError(
+                                context,
+                                e.toString(),
+                              );
+                            }
+                          }
+                        },
                       );
                     },
                   ),

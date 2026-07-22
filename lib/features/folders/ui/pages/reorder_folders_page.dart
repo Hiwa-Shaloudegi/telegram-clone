@@ -3,38 +3,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/data/models/chat_folder_model.dart';
-import 'package:telegram_clone/features/folders/notifiers/command/folder_commands.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/reorder_folders_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
+import 'package:telegram_clone/features/folders/notifiers/ui/folders_ui_state.dart';
 
 /// Drag-to-reorder folders page (opened from long-press → Reorder).
-class ReorderFoldersPage extends ConsumerStatefulWidget {
+class ReorderFoldersPage extends ConsumerWidget {
   const ReorderFoldersPage({super.key});
 
   @override
-  ConsumerState<ReorderFoldersPage> createState() => _ReorderFoldersPageState();
-}
-
-class _ReorderFoldersPageState extends ConsumerState<ReorderFoldersPage> {
-  List<ChatFolderModel>? _local;
-  bool _saving = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final foldersAsync = ref.watch(watchFoldersQueryProvider);
+    final local = ref.watch(reorderFolders_localProvider);
+    final saving = ref.watch(reorderFolders_savingProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final folders = _local ?? foldersAsync.asData?.value ?? [];
+    final folders = local ?? foldersAsync.asData?.value ?? [];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reorder Folders'),
         actions: [
           TextButton(
-            onPressed: _saving || folders.isEmpty
+            onPressed: saving || folders.isEmpty
                 ? null
-                : () => _save(folders),
-            child: _saving
+                : () => _save(context, ref, folders),
+            child: saving
                 ? const SizedBox(
                     width: 18,
                     height: 18,
@@ -62,13 +57,11 @@ class _ReorderFoldersPageState extends ConsumerState<ReorderFoldersPage> {
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: folders.length,
             onReorder: (oldIndex, newIndex) {
-              setState(() {
-                final list = List<ChatFolderModel>.from(folders);
-                if (newIndex > oldIndex) newIndex -= 1;
-                final item = list.removeAt(oldIndex);
-                list.insert(newIndex, item);
-                _local = list;
-              });
+              final list = List<ChatFolderModel>.from(folders);
+              if (newIndex > oldIndex) newIndex -= 1;
+              final item = list.removeAt(oldIndex);
+              list.insert(newIndex, item);
+              ref.read(reorderFolders_localProvider.notifier).set(list);
             },
             itemBuilder: (context, index) {
               final folder = folders[index];
@@ -94,20 +87,26 @@ class _ReorderFoldersPageState extends ConsumerState<ReorderFoldersPage> {
     );
   }
 
-  Future<void> _save(List<ChatFolderModel> folders) async {
-    setState(() => _saving = true);
+  Future<void> _save(
+    BuildContext context,
+    WidgetRef ref,
+    List<ChatFolderModel> folders,
+  ) async {
+    ref.read(reorderFolders_savingProvider.notifier).set(true);
     try {
-      await ref.read(folderCommandsProvider.notifier).reorderFolders(
+      await ref.read(reorderFoldersCommandProvider.notifier).run(
             folders.map((f) => f.id).toList(),
           );
-      if (mounted) {
+      if (context.mounted) {
         AppSnackbar.showSuccess(context, 'Folders reordered');
         context.pop();
       }
     } catch (e) {
-      if (mounted) AppSnackbar.showError(context, e.toString());
+      if (context.mounted) AppSnackbar.showError(context, e.toString());
     } finally {
-      if (mounted) setState(() => _saving = false);
+      if (context.mounted) {
+        ref.read(reorderFolders_savingProvider.notifier).set(false);
+      }
     }
   }
 }

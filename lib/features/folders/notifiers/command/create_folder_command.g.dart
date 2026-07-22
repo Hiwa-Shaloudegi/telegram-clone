@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'folder_commands.dart';
+part of 'create_folder_command.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,33 +9,34 @@ part of 'folder_commands.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(FolderCommands)
-final folderCommandsProvider = FolderCommandsProvider._();
+@ProviderFor(CreateFolderCommand)
+final createFolderCommandProvider = CreateFolderCommandProvider._();
 
-final class FolderCommandsProvider
-    extends $AsyncNotifierProvider<FolderCommands, void> {
-  FolderCommandsProvider._()
+final class CreateFolderCommandProvider
+    extends $AsyncNotifierProvider<CreateFolderCommand, void> {
+  CreateFolderCommandProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'folderCommandsProvider',
+        name: r'createFolderCommandProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$folderCommandsHash();
+  String debugGetCreateSourceHash() => _$createFolderCommandHash();
 
   @$internal
   @override
-  FolderCommands create() => FolderCommands();
+  CreateFolderCommand create() => CreateFolderCommand();
 }
 
-String _$folderCommandsHash() => r'folder_cmd_gen_hash_001';
+String _$createFolderCommandHash() =>
+    r'2584738a3699ca18b0f46638b8096896f3108429';
 
-abstract class _$FolderCommands extends $AsyncNotifier<void> {
+abstract class _$CreateFolderCommand extends $AsyncNotifier<void> {
   FutureOr<void> build();
   @$mustCallSuper
   @override

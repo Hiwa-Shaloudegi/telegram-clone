@@ -35,7 +35,7 @@ final class WatchUserChatsQueryProvider
 }
 
 String _$watchUserChatsQueryHash() =>
-    r'dc7f2775f84ab1007afe72272ad803f0bb2f8fda';
+    r'a42734efb566f6c2c16203ef193f821477fa554b';
 
 abstract class _$WatchUserChatsQuery
     extends $StreamNotifier<List<ChatListItemModel>> {
