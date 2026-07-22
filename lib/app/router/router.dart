@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
+import 'package:telegram_clone/app/router/extra/edit_folder_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/pages/not_found_page.dart';
 import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
@@ -14,6 +15,10 @@ import 'package:telegram_clone/features/chat/ui/pages/forward_chat_picker_page.d
 import 'package:telegram_clone/features/chat_list/ui/pages/archived_chats_page.dart';
 import 'package:telegram_clone/features/chat_list/ui/pages/main_page.dart';
 import 'package:telegram_clone/features/contacts/ui/pages/contacts_page.dart';
+import 'package:telegram_clone/features/folders/ui/pages/add_chats_to_folder_page.dart';
+import 'package:telegram_clone/features/folders/ui/pages/edit_folder_page.dart';
+import 'package:telegram_clone/features/folders/ui/pages/folders_settings_page.dart';
+import 'package:telegram_clone/features/folders/ui/pages/reorder_folders_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/change_username_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/edit_profile_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/profile_page.dart';
@@ -103,6 +108,40 @@ GoRouter router(Ref ref) {
         name: RouteNames.forwardChatPicker,
         path: '/forward-chat-picker',
         builder: (context, state) => const ForwardChatPickerPage(),
+      ),
+      GoRoute(
+        name: RouteNames.folders,
+        path: '/settings/folders',
+        builder: (context, state) => const FoldersSettingsPage(),
+      ),
+      GoRoute(
+        name: RouteNames.createFolder,
+        path: '/settings/folders/create',
+        builder: (context, state) => const EditFolderPage(),
+      ),
+      GoRoute(
+        name: RouteNames.addChatsToFolder,
+        path: '/settings/folders/add-chats',
+        builder: (context, state) {
+          final extra = state.extra is AddChatsToFolderExtra
+              ? state.extra as AddChatsToFolderExtra
+              : const AddChatsToFolderExtra();
+          return AddChatsToFolderPage(extra: extra);
+        },
+      ),
+      GoRoute(
+        name: RouteNames.reorderFolders,
+        path: '/settings/folders/reorder',
+        builder: (context, state) => const ReorderFoldersPage(),
+      ),
+      // Parameterized route last so it doesn't swallow static paths above.
+      GoRoute(
+        name: RouteNames.editFolder,
+        path: '/settings/folders/:folderId',
+        builder: (context, state) {
+          final folderId = state.pathParameters['folderId']!;
+          return EditFolderPage(folderId: folderId);
+        },
       ),
     ],
     redirect: (context, state) {

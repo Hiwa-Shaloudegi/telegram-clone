@@ -20,6 +20,9 @@ import 'package:telegram_clone/features/chat_list/ui/widgets/chats_app_bar_title
 import 'package:telegram_clone/features/chat_list/ui/widgets/chats_empty_state.dart';
 import 'package:telegram_clone/features/contacts/notifiers/query/get_contacts_query.dart';
 import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.dart';
+import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
+import 'package:telegram_clone/features/folders/notifiers/ui/folders_ui_state.dart';
+import 'package:telegram_clone/features/folders/ui/widgets/folder_tabs.dart';
 import 'package:telegram_clone/features/profile/notifiers/query/user_profile_query.dart';
 
 class MainPage extends ConsumerStatefulWidget {
@@ -67,11 +70,15 @@ class _MainPageState extends ConsumerState<MainPage> {
 
     final selectionActive = ref.watch(chatSelectionActiveProvider);
 
+    final selectedFolderId = ref.watch(selectedFolderIdProvider);
+    final folders = ref.watch(watchFoldersQueryProvider).asData?.value ?? [];
+
     return EagerInitialization(
       providers: [
         userProfileQueryProvider,
         getContactsQueryProvider,
         contactsUi_sortByProvider,
+        watchFoldersQueryProvider,
       ],
       child: PopScope(
         canPop: !selectionActive,
@@ -81,113 +88,183 @@ class _MainPageState extends ConsumerState<MainPage> {
           }
         },
         child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        appBar: selectionActive
-            ? const ChatSelectionAppBar()
-            : AppBar(
-                title: const ChatsAppBarTitle(),
-                scrolledUnderElevation: 0,
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {},
-                    tooltip: 'Search',
-                  ),
-                ],
-              ),
-        drawer: AppDrawer(),
-        body: watchUserChatsState.when(
-          data: (chats) {
-            if (chats.isEmpty) return ChatsEmptyState();
-
-            final withContactNames = chats.map((chat) {
-              if (chat.chatType == ChatType.private &&
-                  chat.otherUserId != null &&
-                  chat.contactName == null) {
-                final name = contactNameMap[chat.otherUserId];
-                if (name != null) {
-                  return chat.copyWith(contactName: name);
-                }
-              }
-              return chat;
-            }).toList();
-
-            final archived = withContactNames
-                .where((c) => c.isArchived)
-                .toList();
-            final active = withContactNames
-                .where((c) => !c.isArchived)
-                .toList()
-              ..sort((a, b) {
-                if (a.isPinned && !b.isPinned) return -1;
-                if (!a.isPinned && b.isPinned) return 1;
-                return 0;
-              });
-
-            // Only archived chats remain — still show the archive entry.
-            if (active.isEmpty && archived.isEmpty) {
-              return ChatsEmptyState();
-            }
-            if (active.isEmpty && archived.isNotEmpty) {
-              return ListView(
-                controller: _scrollController,
-                children: [ArchivedChatsTile(archivedChats: archived)],
-              );
-            }
-
-            final showArchiveTile = archived.isNotEmpty;
-            return ListView.builder(
-              controller: _scrollController,
-              itemCount: active.length + (showArchiveTile ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (showArchiveTile && index == 0) {
-                  return ArchivedChatsTile(archivedChats: archived);
-                }
-                final item = active[index - (showArchiveTile ? 1 : 0)];
-                return ChatTile(item: item);
-              },
-            );
-          },
-          error: (error, _) => Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                const SizedBox(height: 12),
-                Text(
-                  error.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.red),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          appBar: selectionActive
+              ? const ChatSelectionAppBar()
+              : AppBar(
+                  title: const ChatsAppBarTitle(),
+                  scrolledUnderElevation: 0,
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {},
+                      tooltip: 'Search',
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          // TODO: Replace with shimmer effect
-          loading: () => _ChatListSkeleton(),
-        ),
-        floatingActionButton: Consumer(
-          builder: (_, ref, _) {
-            final isFabVisible = ref.watch(mainUi_isFabVisibleProvider);
-            return AnimatedSlide(
-              duration: const Duration(milliseconds: 200),
-              offset: isFabVisible ? Offset.zero : const Offset(0, 2),
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 200),
-                opacity: isFabVisible ? 1 : 0,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    context.pushNamed(
-                      RouteNames.contacts,
-                      extra: ContactsPageExtra(isOnlyAddContacts: false),
+          drawer: AppDrawer(),
+          body: Column(
+            children: [
+              if (!selectionActive) const FolderTabs(),
+              Expanded(
+                child: watchUserChatsState.when(
+                  data: (chats) {
+                    if (chats.isEmpty) return ChatsEmptyState();
+
+                    final withContactNames = chats.map((chat) {
+                      if (chat.chatType == ChatType.private &&
+                          chat.otherUserId != null &&
+                          chat.contactName == null) {
+                        final name = contactNameMap[chat.otherUserId];
+                        if (name != null) {
+                          return chat.copyWith(contactName: name);
+                        }
+                      }
+                      return chat;
+                    }).toList();
+
+                    // Filter by selected folder when not on "All".
+                    final folderFiltered = selectedFolderId == null
+                        ? withContactNames
+                        : withContactNames.where((c) {
+                            final folder = folders
+                                .where((f) => f.id == selectedFolderId)
+                                .firstOrNull;
+                            if (folder == null) return false;
+                            return folder.chatIds.contains(c.chatId);
+                          }).toList();
+
+                    final archived = folderFiltered
+                        .where((c) => c.isArchived)
+                        .toList();
+                    final active = folderFiltered
+                        .where((c) => !c.isArchived)
+                        .toList()
+                      ..sort((a, b) {
+                        if (a.isPinned && !b.isPinned) return -1;
+                        if (!a.isPinned && b.isPinned) return 1;
+                        return 0;
+                      });
+
+                    // On a custom folder, don't surface the archive row —
+                    // Telegram only shows archived under All.
+                    final showArchive =
+                        selectedFolderId == null && archived.isNotEmpty;
+
+                    if (active.isEmpty && !showArchive) {
+                      if (selectedFolderId != null) {
+                        return const _FolderEmptyState();
+                      }
+                      return ChatsEmptyState();
+                    }
+                    if (active.isEmpty && showArchive) {
+                      return ListView(
+                        controller: _scrollController,
+                        children: [
+                          ArchivedChatsTile(archivedChats: archived),
+                        ],
+                      );
+                    }
+
+                    return ListView.builder(
+                      controller: _scrollController,
+                      itemCount: active.length + (showArchive ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (showArchive && index == 0) {
+                          return ArchivedChatsTile(archivedChats: archived);
+                        }
+                        final item =
+                            active[index - (showArchive ? 1 : 0)];
+                        return ChatTile(item: item);
+                      },
                     );
                   },
-                  tooltip: 'New Message',
-                  child: const Icon(Icons.edit_outlined),
+                  error: (error, _) => Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          error.toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // TODO: Replace with shimmer effect
+                  loading: () => _ChatListSkeleton(),
                 ),
               ),
-            );
-          },
+            ],
+          ),
+          floatingActionButton: Consumer(
+            builder: (_, ref, _) {
+              final isFabVisible = ref.watch(mainUi_isFabVisibleProvider);
+              return AnimatedSlide(
+                duration: const Duration(milliseconds: 200),
+                offset: isFabVisible ? Offset.zero : const Offset(0, 2),
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 200),
+                  opacity: isFabVisible ? 1 : 0,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      context.pushNamed(
+                        RouteNames.contacts,
+                        extra: ContactsPageExtra(isOnlyAddContacts: false),
+                      );
+                    },
+                    tooltip: 'New Message',
+                    child: const Icon(Icons.edit_outlined),
+                  ),
+                ),
+              );
+            },
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _FolderEmptyState extends StatelessWidget {
+  const _FolderEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.folder_open_outlined,
+              size: 64,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No chats in this folder',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Long press a folder tab and choose Edit Folder\nto add chats.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/data/api/chat/chats_api.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/chat_selection_state.dart';
+import 'package:telegram_clone/features/folders/ui/widgets/add_to_folder_sheet.dart';
 
 enum _SelectionMenuAction { pin, unpin, addToFolder, markUnread, blockUser }
 
@@ -153,7 +154,9 @@ class ChatSelectionAppBar extends ConsumerWidget
         ref.read(chatsApiProvider).setPinnedForChats(ids, pin: false);
         notifier.clear();
       case _SelectionMenuAction.addToFolder:
-        AppSnackbar.show(context, message: 'Folders are coming soon');
+        showAddToFolderSheet(context, ref, chatIds: ids).then((_) {
+          ref.read(chatSelectionProvider.notifier).clear();
+        });
       case _SelectionMenuAction.markUnread:
         AppSnackbar.show(context, message: 'Mark as unread is coming soon');
       case _SelectionMenuAction.blockUser:

@@ -221,6 +221,11 @@ class SettingsPage extends ConsumerWidget {
                   icon: Icons.chat_bubble_outline,
                   title: 'Chat Settings',
                 ),
+                SettingsTile(
+                  icon: Icons.folder_outlined,
+                  title: 'Folders',
+                  onTap: () => context.pushNamed(RouteNames.folders),
+                ),
                 SettingsTile(icon: Icons.devices, title: 'Devices'),
                 SettingsTile(icon: Icons.language, title: 'Language'),
               ]),

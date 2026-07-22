@@ -12,5 +12,10 @@ abstract class RouteNames {
   static const String chat = 'chat';
   static const String archivedChats = 'archived-chats';
   static const String forwardChatPicker = 'forward-chat-picker';
+  static const String folders = 'folders';
+  static const String createFolder = 'create-folder';
+  static const String editFolder = 'edit-folder';
+  static const String addChatsToFolder = 'add-chats-to-folder';
+  static const String reorderFolders = 'reorder-folders';
   static const String error = 'error';
 }
