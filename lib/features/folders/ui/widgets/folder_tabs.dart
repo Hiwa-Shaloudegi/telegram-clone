@@ -186,21 +186,36 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
                 },
                 itemBuilder: (context, index) {
                   final folder = folders[index];
-                  return ReorderableDragStartListener(
+                  return Row(
                     key: ValueKey(folder.id),
-                    index: index,
-                    child: _FolderTab(
-                      label: folder.name,
-                      isSelected: selectedId == folder.id,
-                      backgroundColor: null,
-                      selectedColor: selectedColor,
-                      unselectedColor: unselectedColor,
-                      indicatorColor: indicatorColor,
-                      onTap: () {},
-                      onLongPress: null,
-                      onRemove: () =>
-                          _confirmDeleteFolder(context, ref, folder),
-                    ),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ReorderableDragStartListener(
+                        index: index,
+                        child: _FolderTab(
+                          label: folder.name,
+                          isSelected: selectedId == folder.id,
+                          backgroundColor: null,
+                          selectedColor: selectedColor,
+                          unselectedColor: unselectedColor,
+                          indicatorColor: indicatorColor,
+                          onTap: () {},
+                          onLongPress: null,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () =>
+                            _confirmDeleteFolder(context, ref, folder),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 2),
+                          child: Icon(
+                            Icons.cancel,
+                            size: 18,
+                            color: unselectedColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
