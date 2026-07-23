@@ -379,6 +379,59 @@ abstract class _$AddChats_saving extends $Notifier<bool> {
   }
 }
 
+@ProviderFor(ReorderFolders_isActive)
+final reorderFolders_isActiveProvider = ReorderFolders_isActiveProvider._();
+
+final class ReorderFolders_isActiveProvider
+    extends $NotifierProvider<ReorderFolders_isActive, bool> {
+  ReorderFolders_isActiveProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'reorderFolders_isActiveProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$reorderFolders_isActiveHash();
+
+  @$internal
+  @override
+  ReorderFolders_isActive create() => ReorderFolders_isActive();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$reorderFolders_isActiveHash() =>
+    r'4767e1bc071f9f30e009e72677c39ae31b0ddb1b';
+
+abstract class _$ReorderFolders_isActive extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(ReorderFolders_local)
 final reorderFolders_localProvider = ReorderFolders_localProvider._();
 

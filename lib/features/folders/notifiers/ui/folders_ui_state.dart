@@ -87,6 +87,15 @@ class AddChats_saving extends _$AddChats_saving {
 // ---------------------------------------------------------------------------
 
 @riverpod
+class ReorderFolders_isActive extends _$ReorderFolders_isActive {
+  @override
+  bool build() => false;
+
+  void activate() => state = true;
+  void deactivate() => state = false;
+}
+
+@riverpod
 class ReorderFolders_local extends _$ReorderFolders_local {
   @override
   List<ChatFolderModel>? build() => null;

@@ -7,6 +7,7 @@ import 'package:telegram_clone/data/api/chat/chats_api.dart';
 import 'package:telegram_clone/data/models/chat_folder_model.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/folders/notifiers/command/delete_folder_command.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/reorder_folders_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
 import 'package:telegram_clone/features/folders/notifiers/ui/folders_ui_state.dart';
 import 'package:telegram_clone/features/folders/ui/widgets/folder_tab_actions_sheet.dart';
@@ -20,13 +21,14 @@ class FolderTabs extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final foldersAsync = ref.watch(watchFoldersQueryProvider);
+    final isReorderMode = ref.watch(reorderFolders_isActiveProvider);
 
     return foldersAsync.when(
       loading: () => const SizedBox.shrink(),
       error: (_, _) => const SizedBox.shrink(),
       data: (folders) {
         if (folders.isEmpty) return const SizedBox.shrink();
-        return _FolderTabsBar(folders: folders);
+        return _FolderTabsBar(folders: folders, isReorderMode: isReorderMode);
       },
     );
   }
@@ -34,8 +36,9 @@ class FolderTabs extends ConsumerWidget {
 
 class _FolderTabsBar extends ConsumerStatefulWidget {
   final List<ChatFolderModel> folders;
+  final bool isReorderMode;
 
-  const _FolderTabsBar({required this.folders});
+  const _FolderTabsBar({required this.folders, required this.isReorderMode});
 
   @override
   ConsumerState<_FolderTabsBar> createState() => _FolderTabsBarState();
@@ -58,6 +61,7 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final selectedId = ref.watch(selectedFolderIdProvider);
+    final localFolders = ref.watch(reorderFolders_localProvider);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
@@ -72,6 +76,20 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
     // Slight background highlight for long-pressed tab.
     final longPressHighlight = Colors.white.withValues(alpha: 0.12);
 
+    // Use local reordered list if available, otherwise use original
+    final displayFolders = localFolders ?? widget.folders;
+
+    if (widget.isReorderMode) {
+      return _buildReorderMode(
+        displayFolders,
+        selectedId,
+        barColor,
+        selectedColor,
+        unselectedColor,
+        indicatorColor,
+      );
+    }
+
     return Material(
       color: barColor,
       elevation: 0,
@@ -84,8 +102,7 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
             _FolderTab(
               label: 'All',
               isSelected: selectedId == null,
-              backgroundColor:
-                  _longPressedAll ? longPressHighlight : null,
+              backgroundColor: _longPressedAll ? longPressHighlight : null,
               selectedColor: selectedColor,
               unselectedColor: unselectedColor,
               indicatorColor: indicatorColor,
@@ -107,15 +124,87 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
                 onTap: () => ref
                     .read(selectedFolderIdProvider.notifier)
                     .select(folder.id),
-                onLongPress: (renderBox) => _onTabLongPress(
-                  context,
-                  ref,
-                  renderBox,
-                  folder: folder,
-                ),
+                onLongPress: (renderBox) =>
+                    _onTabLongPress(context, ref, renderBox, folder: folder),
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildReorderMode(
+    List<ChatFolderModel> folders,
+    String? selectedId,
+    Color barColor,
+    Color selectedColor,
+    Color unselectedColor,
+    Color indicatorColor,
+  ) {
+    return Material(
+      color: barColor,
+      elevation: 0,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Reorder mode action bar
+          Container(
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: _saveReorder,
+                  child: Text(
+                    'DONE',
+                    style: TextStyle(
+                      color: selectedColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Reorderable folder tabs
+          SizedBox(
+            height: 44,
+            child: SizedBox(
+              height: 44,
+              child: ReorderableListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                buildDefaultDragHandles: false, // <-- removes the "=" icon
+                itemCount: folders.length,
+                onReorder: (oldIndex, newIndex) {
+                  final list = List<ChatFolderModel>.from(folders);
+                  if (newIndex > oldIndex) newIndex -= 1;
+                  final item = list.removeAt(oldIndex);
+                  list.insert(newIndex, item);
+                  ref.read(reorderFolders_localProvider.notifier).set(list);
+                },
+                itemBuilder: (context, index) {
+                  final folder = folders[index];
+                  return ReorderableDragStartListener(
+                    key: ValueKey(folder.id),
+                    index: index,
+                    child: _FolderTab(
+                      label: folder.name,
+                      isSelected: selectedId == folder.id,
+                      backgroundColor: null,
+                      selectedColor: selectedColor,
+                      unselectedColor: unselectedColor,
+                      indicatorColor: indicatorColor,
+                      onTap: () {},
+                      onLongPress: null,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -148,7 +237,8 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
 
     switch (action) {
       case FolderTabAction.reorder:
-        context.pushNamed(RouteNames.reorderFolders);
+        // Activate reorder mode directly on this page
+        ref.read(reorderFolders_isActiveProvider.notifier).activate();
       case FolderTabAction.editFolder:
         if (folder != null) {
           context.pushNamed(
@@ -165,13 +255,31 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
     }
   }
 
+  void _saveReorder() {
+    final localFolders = ref.read(reorderFolders_localProvider);
+    if (localFolders == null || localFolders.isEmpty) {
+      ref.read(reorderFolders_isActiveProvider.notifier).deactivate();
+      ref.read(reorderFolders_localProvider.notifier).set(null);
+      return;
+    }
+
+    // Deactivate immediately for instant feedback
+    ref.read(reorderFolders_isActiveProvider.notifier).deactivate();
+    ref.read(reorderFolders_localProvider.notifier).set(null);
+
+    // Fire-and-forget the API call
+    ref
+        .read(reorderFoldersCommandProvider.notifier)
+        .run(localFolders.map((f) => f.id).toList());
+  }
+
   void _markAllAsRead(WidgetRef ref, ChatFolderModel? folder) {
     final chats = ref.read(watchUserChatsQueryProvider).asData?.value ?? [];
     final chatIds = folder != null
         ? chats
-            .where((c) => folder.chatIds.contains(c.chatId))
-            .map((c) => c.chatId)
-            .toList()
+              .where((c) => folder.chatIds.contains(c.chatId))
+              .map((c) => c.chatId)
+              .toList()
         : chats.map((c) => c.chatId).toList();
 
     final unreadIds = chatIds.where((id) {
@@ -247,6 +355,7 @@ class _FolderTab extends StatelessWidget {
   final void Function(RenderBox renderBox)? onLongPress;
 
   const _FolderTab({
+    super.key,
     required this.label,
     required this.isSelected,
     this.backgroundColor,
@@ -266,8 +375,7 @@ class _FolderTab extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress != null
           ? () {
-              final box =
-                  key.currentContext?.findRenderObject() as RenderBox?;
+              final box = key.currentContext?.findRenderObject() as RenderBox?;
               if (box != null) onLongPress!(box);
             }
           : null,

@@ -193,6 +193,15 @@ class ChatFoldersApi {
   /// Replace the full ordered list of folders (by id).
   Future<void> reorderFolders(List<String> orderedFolderIds) async {
     try {
+      // First, move all to temporary positions to avoid unique constraint conflicts
+      for (var i = 0; i < orderedFolderIds.length; i++) {
+        await supabase
+            .from('chat_folders')
+            .update({'position': i + 1000})
+            .eq('id', orderedFolderIds[i])
+            .eq('user_id', _userId);
+      }
+      // Then, set the final positions
       for (var i = 0; i < orderedFolderIds.length; i++) {
         await supabase
             .from('chat_folders')
