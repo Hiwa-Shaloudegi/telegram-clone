@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
+import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
+import 'package:telegram_clone/data/api/chat/chats_api.dart';
 import 'package:telegram_clone/data/models/chat_folder_model.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/delete_folder_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
 import 'package:telegram_clone/features/folders/notifiers/ui/folders_ui_state.dart';
 import 'package:telegram_clone/features/folders/ui/widgets/folder_tab_actions_sheet.dart';
@@ -28,13 +32,30 @@ class FolderTabs extends ConsumerWidget {
   }
 }
 
-class _FolderTabsBar extends ConsumerWidget {
+class _FolderTabsBar extends ConsumerStatefulWidget {
   final List<ChatFolderModel> folders;
 
   const _FolderTabsBar({required this.folders});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_FolderTabsBar> createState() => _FolderTabsBarState();
+}
+
+class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
+  String? _longPressedFolderId;
+  bool _longPressedAll = false;
+
+  void _clearLongPress() {
+    if (_longPressedFolderId != null || _longPressedAll) {
+      setState(() {
+        _longPressedFolderId = null;
+        _longPressedAll = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final selectedId = ref.watch(selectedFolderIdProvider);
     final colorScheme = theme.colorScheme;
@@ -48,6 +69,9 @@ class _FolderTabsBar extends ConsumerWidget {
     final unselectedColor = Colors.white.withValues(alpha: 0.7);
     final indicatorColor = Colors.white;
 
+    // Slight background highlight for long-pressed tab.
+    final longPressHighlight = Colors.white.withValues(alpha: 0.12);
+
     return Material(
       color: barColor,
       elevation: 0,
@@ -60,23 +84,35 @@ class _FolderTabsBar extends ConsumerWidget {
             _FolderTab(
               label: 'All',
               isSelected: selectedId == null,
+              backgroundColor:
+                  _longPressedAll ? longPressHighlight : null,
               selectedColor: selectedColor,
               unselectedColor: unselectedColor,
               indicatorColor: indicatorColor,
               onTap: () =>
                   ref.read(selectedFolderIdProvider.notifier).selectAll(),
+              onLongPress: (renderBox) =>
+                  _onTabLongPress(context, ref, renderBox, isAllFolder: true),
             ),
-            for (final folder in folders)
+            for (final folder in widget.folders)
               _FolderTab(
                 label: folder.name,
                 isSelected: selectedId == folder.id,
+                backgroundColor: _longPressedFolderId == folder.id
+                    ? longPressHighlight
+                    : null,
                 selectedColor: selectedColor,
                 unselectedColor: unselectedColor,
                 indicatorColor: indicatorColor,
                 onTap: () => ref
                     .read(selectedFolderIdProvider.notifier)
                     .select(folder.id),
-                onLongPress: () => _onFolderLongPress(context, ref, folder),
+                onLongPress: (renderBox) => _onTabLongPress(
+                  context,
+                  ref,
+                  renderBox,
+                  folder: folder,
+                ),
               ),
           ],
         ),
@@ -84,38 +120,136 @@ class _FolderTabsBar extends ConsumerWidget {
     );
   }
 
-  Future<void> _onFolderLongPress(
+  Future<void> _onTabLongPress(
     BuildContext context,
     WidgetRef ref,
-    ChatFolderModel folder,
-  ) async {
-    final action = await showFolderTabActionsSheet(context);
+    RenderBox tabBox, {
+    ChatFolderModel? folder,
+    bool isAllFolder = false,
+  }) async {
+    setState(() {
+      if (isAllFolder) {
+        _longPressedAll = true;
+      } else {
+        _longPressedFolderId = folder?.id;
+      }
+    });
+
+    final action = await showFolderTabActionsPopup(
+      context,
+      tabBox,
+      isAllFolder: isAllFolder,
+    );
+
+    // Clear highlight after menu closes.
+    _clearLongPress();
+
     if (!context.mounted || action == null) return;
 
     switch (action) {
       case FolderTabAction.reorder:
         context.pushNamed(RouteNames.reorderFolders);
       case FolderTabAction.editFolder:
-        context.pushNamed(
-          RouteNames.editFolder,
-          pathParameters: {'folderId': folder.id},
-        );
+        if (folder != null) {
+          context.pushNamed(
+            RouteNames.editFolder,
+            pathParameters: {'folderId': folder.id},
+          );
+        }
+      case FolderTabAction.markAllRead:
+        _markAllAsRead(ref, folder);
+      case FolderTabAction.deleteFolder:
+        if (folder != null) {
+          _confirmDeleteFolder(context, ref, folder);
+        }
     }
+  }
+
+  void _markAllAsRead(WidgetRef ref, ChatFolderModel? folder) {
+    final chats = ref.read(watchUserChatsQueryProvider).asData?.value ?? [];
+    final chatIds = folder != null
+        ? chats
+            .where((c) => folder.chatIds.contains(c.chatId))
+            .map((c) => c.chatId)
+            .toList()
+        : chats.map((c) => c.chatId).toList();
+
+    final unreadIds = chatIds.where((id) {
+      final chat = chats.firstWhere((c) => c.chatId == id);
+      return chat.unreadCount > 0;
+    }).toList();
+
+    if (unreadIds.isEmpty) {
+      AppSnackbar.show(context, message: 'No unread messages');
+      return;
+    }
+
+    final chatsNotifier = ref.read(watchUserChatsQueryProvider.notifier);
+    for (final id in unreadIds) {
+      chatsNotifier.optimisticallyMarkAsRead(id);
+      ref.read(chatsApiProvider).markChatRead(id);
+    }
+    AppSnackbar.show(context, message: 'Marked as read');
+  }
+
+  void _confirmDeleteFolder(
+    BuildContext context,
+    WidgetRef ref,
+    ChatFolderModel folder,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Remove Folder'),
+        content: const Text(
+          'Are you sure you want to remove this folder? Your chats will not be deleted.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              try {
+                await ref
+                    .read(deleteFolderCommandProvider.notifier)
+                    .run(folder.id);
+                if (context.mounted) {
+                  AppSnackbar.show(
+                    context,
+                    message: '"${folder.name}" deleted',
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  AppSnackbar.showError(context, e.toString());
+                }
+              }
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 }
 
 class _FolderTab extends StatelessWidget {
   final String label;
   final bool isSelected;
+  final Color? backgroundColor;
   final Color selectedColor;
   final Color unselectedColor;
   final Color indicatorColor;
   final VoidCallback onTap;
-  final VoidCallback? onLongPress;
+  final void Function(RenderBox renderBox)? onLongPress;
 
   const _FolderTab({
     required this.label,
     required this.isSelected,
+    this.backgroundColor,
     required this.selectedColor,
     required this.unselectedColor,
     required this.indicatorColor,
@@ -125,13 +259,23 @@ class _FolderTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final key = GlobalKey();
+
     return InkWell(
+      key: key,
       onTap: onTap,
-      onLongPress: onLongPress,
+      onLongPress: onLongPress != null
+          ? () {
+              final box =
+                  key.currentContext?.findRenderObject() as RenderBox?;
+              if (box != null) onLongPress!(box);
+            }
+          : null,
       child: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
+          color: backgroundColor,
           border: Border(
             bottom: BorderSide(
               color: isSelected ? indicatorColor : Colors.transparent,
