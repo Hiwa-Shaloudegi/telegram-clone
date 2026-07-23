@@ -33,7 +33,7 @@ final class WatchFoldersQueryProvider
   WatchFoldersQuery create() => WatchFoldersQuery();
 }
 
-String _$watchFoldersQueryHash() => r'3b5bba554122b45c4914450ecd173a033cbc6d89';
+String _$watchFoldersQueryHash() => r'83f9b85dd14abe43cbc0dc58f75529247c8a2c30';
 
 abstract class _$WatchFoldersQuery
     extends $StreamNotifier<List<ChatFolderModel>> {

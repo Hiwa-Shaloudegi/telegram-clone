@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:telegram_clone/app/enums/chat_type.dart';
 import 'package:telegram_clone/app/router/extra/edit_folder_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
@@ -11,21 +12,24 @@ import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/contact_name_map_provider.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/folders/notifiers/command/create_folder_command.dart';
-import 'package:telegram_clone/features/folders/notifiers/command/rename_folder_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/command/delete_folder_command.dart';
-import 'package:telegram_clone/features/folders/notifiers/command/set_folder_chats_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/command/remove_chat_from_folder_command.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/rename_folder_command.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/set_folder_chats_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
 import 'package:telegram_clone/features/folders/notifiers/ui/folders_ui_state.dart';
 import 'package:telegram_clone/features/folders/ui/widgets/folder_chat_tile.dart';
-import 'package:telegram_clone/app/enums/chat_type.dart';
 
 /// Create or edit a single folder (name + included chats).
 class EditFolderPage extends ConsumerStatefulWidget {
   final String? folderId;
   final List<String> initialChatIds;
 
-  const EditFolderPage({super.key, this.folderId, this.initialChatIds = const []});
+  const EditFolderPage({
+    super.key,
+    this.folderId,
+    this.initialChatIds = const [],
+  });
 
   bool get isCreating => folderId == null;
 
@@ -79,8 +83,7 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
   Set<String> _currentChatIds() {
     if (!widget.isCreating && widget.folderId != null) {
       final folders = ref.read(watchFoldersQueryProvider).asData?.value;
-      final folder =
-          folders?.where((f) => f.id == widget.folderId).firstOrNull;
+      final folder = folders?.where((f) => f.id == widget.folderId).firstOrNull;
       if (folder != null) return folder.chatIds.toSet();
     }
     return ref.read(editFolder_chatIdsProvider);
@@ -128,9 +131,7 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
       builder: (ctx) {
         return AlertDialog(
           title: const Text('Remove chat'),
-          content: Text(
-            'Remove "${chat.displayTitle}" from this folder?',
-          ),
+          content: Text('Remove "${chat.displayTitle}" from this folder?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -155,10 +156,9 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
 
     if (!widget.isCreating && widget.folderId != null) {
       try {
-        await ref.read(removeChatFromFolderCommandProvider.notifier).run(
-              folderId: widget.folderId!,
-              chatId: chat.chatId,
-            );
+        await ref
+            .read(removeChatFromFolderCommandProvider.notifier)
+            .run(folderId: widget.folderId!, chatId: chat.chatId);
       } catch (e) {
         if (mounted) {
           AppSnackbar.showError(context, e.toString());
@@ -166,9 +166,9 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
       }
     } else {
       final chatIds = ref.read(editFolder_chatIdsProvider);
-      ref.read(editFolder_chatIdsProvider.notifier).set(
-        {...chatIds}..remove(chat.chatId),
-      );
+      ref
+          .read(editFolder_chatIdsProvider.notifier)
+          .set({...chatIds}..remove(chat.chatId));
     }
   }
 
@@ -190,10 +190,9 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
     try {
       final chatIds = _currentChatIds();
       if (widget.isCreating) {
-        await ref.read(createFolderCommandProvider.notifier).run(
-              name: name,
-              chatIds: chatIds.toList(),
-            );
+        await ref
+            .read(createFolderCommandProvider.notifier)
+            .run(name: name, chatIds: chatIds.toList());
         if (mounted) {
           AppSnackbar.showSuccess(context, 'Folder created');
           context.pop();
@@ -208,18 +207,16 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
             .firstOrNull;
 
         if (existing == null || existing.name != name) {
-          await ref.read(renameFolderCommandProvider.notifier).run(
-                folderId: folderId,
-                name: name,
-              );
+          await ref
+              .read(renameFolderCommandProvider.notifier)
+              .run(folderId: folderId, name: name);
         }
 
         final currentIds = existing?.chatIds.toSet() ?? {};
         if (!_setEquals(currentIds, chatIds)) {
-          await ref.read(setFolderChatsCommandProvider.notifier).run(
-                folderId: folderId,
-                chatIds: chatIds.toList(),
-              );
+          await ref
+              .read(setFolderChatsCommandProvider.notifier)
+              .run(folderId: folderId, chatIds: chatIds.toList());
         }
 
         if (mounted) {
@@ -289,7 +286,10 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AsyncValue<List<ChatFolderModel>>>(watchFoldersQueryProvider, (prev, next) {
+    ref.listen<AsyncValue<List<ChatFolderModel>>>(watchFoldersQueryProvider, (
+      prev,
+      next,
+    ) {
       _tryInitialize();
     });
 
@@ -322,7 +322,7 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Text(
-                    'DONE',
+                    'SAVE',
                     style: TextStyle(
                       color: colorScheme.onPrimary,
                       fontWeight: FontWeight.w700,
@@ -400,10 +400,7 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
             )
           else
             for (final chat in folderChats)
-              FolderChatTile(
-                chat: chat,
-                onTap: () => _confirmRemoveChat(chat),
-              ),
+              FolderChatTile(chat: chat, onTap: () => _confirmRemoveChat(chat)),
         ],
       ),
     );

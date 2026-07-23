@@ -5,7 +5,7 @@ import 'package:telegram_clone/app/router/extra/edit_folder_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/folders/notifiers/command/add_chats_to_folder_command.dart';
-import 'package:telegram_clone/features/folders/notifiers/command/remove_chat_from_folder_command.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/remove_chats_from_folder_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
 
 /// Bottom sheet to pick one or more folders when adding selected chats.
@@ -128,14 +128,12 @@ class _AddToFolderSheetBody extends ConsumerWidget {
                           Navigator.pop(context);
                           try {
                             if (alreadyAll) {
-                              for (final chatId in chatIds) {
-                                await ref
-                                    .read(removeChatFromFolderCommandProvider.notifier)
-                                    .run(
-                                      folderId: folder.id,
-                                      chatId: chatId,
-                                    );
-                              }
+                              await ref
+                                  .read(removeChatsFromFolderCommandProvider.notifier)
+                                  .run(
+                                    folderId: folder.id,
+                                    chatIds: chatIds,
+                                  );
                               if (context.mounted) {
                                 AppSnackbar.showSuccess(
                                   context,

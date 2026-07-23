@@ -83,4 +83,19 @@ class WatchFoldersQuery extends _$WatchFoldersQuery {
           f,
     ]);
   }
+
+  void optimisticallyRemoveChats(String folderId, List<String> chatIds) {
+    final current = state.asData?.value;
+    if (current == null) return;
+    final toRemove = chatIds.toSet();
+    state = AsyncData([
+      for (final f in current)
+        if (f.id == folderId)
+          f.copyWith(
+            chatIds: f.chatIds.where((id) => !toRemove.contains(id)).toList(),
+          )
+        else
+          f,
+    ]);
+  }
 }

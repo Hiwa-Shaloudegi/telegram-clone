@@ -243,6 +243,23 @@ class ChatFoldersApi {
     }
   }
 
+  Future<void> removeChatsFromFolder({
+    required String folderId,
+    required List<String> chatIds,
+  }) async {
+    if (chatIds.isEmpty) return;
+    try {
+      await _assertOwnsFolder(folderId);
+      await supabase
+          .from('user_chat_folders')
+          .delete()
+          .eq('folder_id', folderId)
+          .inFilter('chat_id', chatIds);
+    } catch (e, st) {
+      exceptionHandler.handle(e, st);
+    }
+  }
+
   /// Sets the exact chat membership of a folder (adds missing, removes extras).
   Future<void> setFolderChats({
     required String folderId,
