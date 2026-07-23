@@ -127,7 +127,14 @@ GoRouter router(Ref ref) {
       GoRoute(
         name: RouteNames.createFolder,
         path: '/settings/folders/create',
-        builder: (context, state) => const EditFolderPage(),
+        builder: (context, state) {
+          final extra = state.extra is EditFolderExtra
+              ? state.extra as EditFolderExtra
+              : null;
+          return EditFolderPage(
+            initialChatIds: extra?.initialChatIds ?? const [],
+          );
+        },
       ),
       GoRoute(
         name: RouteNames.addChatsToFolder,

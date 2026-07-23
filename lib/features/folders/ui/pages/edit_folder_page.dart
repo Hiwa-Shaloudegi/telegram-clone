@@ -23,8 +23,9 @@ import 'package:telegram_clone/app/enums/chat_type.dart';
 /// Create or edit a single folder (name + included chats).
 class EditFolderPage extends ConsumerStatefulWidget {
   final String? folderId;
+  final List<String> initialChatIds;
 
-  const EditFolderPage({super.key, this.folderId});
+  const EditFolderPage({super.key, this.folderId, this.initialChatIds = const []});
 
   bool get isCreating => folderId == null;
 
@@ -43,6 +44,11 @@ class _EditFolderPageState extends ConsumerState<EditFolderPage> {
     if (widget.isCreating) {
       _initialized = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (widget.initialChatIds.isNotEmpty) {
+          ref
+              .read(editFolder_chatIdsProvider.notifier)
+              .set(widget.initialChatIds.toSet());
+        }
         _nameFocus.requestFocus();
       });
     } else {

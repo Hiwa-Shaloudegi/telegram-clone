@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:telegram_clone/app/router/extra/edit_folder_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/features/folders/notifiers/command/add_chats_to_folder_command.dart';
@@ -77,7 +78,10 @@ class _AddToFolderSheetBody extends ConsumerWidget {
               ),
               onTap: () {
                 Navigator.pop(context);
-                context.pushNamed(RouteNames.createFolder);
+                context.pushNamed(
+                  RouteNames.createFolder,
+                  extra: EditFolderExtra(initialChatIds: chatIds),
+                );
               },
             ),
             foldersAsync.when(
