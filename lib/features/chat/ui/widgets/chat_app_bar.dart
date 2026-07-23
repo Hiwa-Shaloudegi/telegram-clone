@@ -32,30 +32,38 @@ class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
         : AppBar(
             titleSpacing: 0,
             leadingWidth: 40,
-            title: GestureDetector(
-              onTap: () => _openProfile(context, chatInfo),
-              behavior: HitTestBehavior.opaque,
-              child: Row(
-                children: [
-                  ChatAvatar(chatInfo: chatInfo),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          chatInfo.displayTitle,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+            title: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _openProfile(context, chatInfo),
+                splashColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+                highlightColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
+                borderRadius: BorderRadius.circular(28),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                  child: Row(
+                    children: [
+                      ChatAvatar(chatInfo: chatInfo),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              chatInfo.displayTitle,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            ChatProfileSubtitle(chatInfo: chatInfo),
+                          ],
                         ),
-                        ChatProfileSubtitle(chatInfo: chatInfo),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
             actions: [
