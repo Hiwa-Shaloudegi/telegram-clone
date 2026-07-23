@@ -247,7 +247,7 @@ class SelectionAppBar extends ConsumerWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(56);
 }
 
-class _DeleteConfirmDialog extends ConsumerStatefulWidget {
+class _DeleteConfirmDialog extends ConsumerWidget {
   const _DeleteConfirmDialog({
     required this.chatId,
     required this.chatType,
@@ -261,26 +261,19 @@ class _DeleteConfirmDialog extends ConsumerStatefulWidget {
   final String? otherUserName;
 
   @override
-  ConsumerState<_DeleteConfirmDialog> createState() =>
-      _DeleteConfirmDialogState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final deleteForEveryone = ref.watch(chatUi_deleteForEveryoneProvider);
+    final isPrivateChat = chatType == ChatType.private;
 
-class _DeleteConfirmDialogState extends ConsumerState<_DeleteConfirmDialog> {
-  bool _deleteForEveryone = false;
-
-  bool get _isPrivateChat => widget.chatType == ChatType.private;
-
-  @override
-  Widget build(BuildContext context) {
-    final title = widget.selectedCounts == 1
+    final title = selectedCounts == 1
         ? 'Delete Message'
-        : 'Delete ${widget.selectedCounts} Messages';
+        : 'Delete $selectedCounts Messages';
 
-    final contentText = widget.selectedCounts == 1
+    final contentText = selectedCounts == 1
         ? 'Are you sure you want to delete this message?'
         : 'Are you sure you want to delete these messages?';
 
-    final otherName = widget.otherUserName ?? 'the other person';
+    final otherName = otherUserName ?? 'the other person';
 
     return AlertDialog(
       title: Text(title),
@@ -289,11 +282,11 @@ class _DeleteConfirmDialogState extends ConsumerState<_DeleteConfirmDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(contentText),
-          if (_isPrivateChat) ...[
+          if (isPrivateChat) ...[
             const SizedBox(height: 16),
             InkWell(
               onTap: () {
-                setState(() => _deleteForEveryone = !_deleteForEveryone);
+                ref.read(chatUi_deleteForEveryoneProvider.notifier).toggle();
               },
               borderRadius: BorderRadius.circular(4),
               child: Padding(
@@ -301,9 +294,9 @@ class _DeleteConfirmDialogState extends ConsumerState<_DeleteConfirmDialog> {
                 child: Row(
                   children: [
                     Checkbox(
-                      value: _deleteForEveryone,
+                      value: deleteForEveryone,
                       onChanged: (value) {
-                        setState(() => _deleteForEveryone = value ?? false);
+                        ref.read(chatUi_deleteForEveryoneProvider.notifier).set(value ?? false);
                       },
                     ),
                     Expanded(
@@ -332,6 +325,7 @@ class _DeleteConfirmDialogState extends ConsumerState<_DeleteConfirmDialog> {
         TextButton(
           onPressed: () {
             ref.read(chatUi_selectedMessagesProvider.notifier).clear();
+            ref.read(chatUi_deleteForEveryoneProvider.notifier).set(false);
             Navigator.of(context).pop();
           },
           child: Text('Cancel'),
@@ -339,11 +333,12 @@ class _DeleteConfirmDialogState extends ConsumerState<_DeleteConfirmDialog> {
         TextButton(
           onPressed: () {
             ref.read(deleteMessagesCommandProvider.notifier).run(
-              chatId: widget.chatId,
-              chatType: widget.chatType,
-              deleteForEveryone: _deleteForEveryone,
+              chatId: chatId,
+              chatType: chatType,
+              deleteForEveryone: deleteForEveryone,
             );
             ref.read(chatUi_selectedMessagesProvider.notifier).clear();
+            ref.read(chatUi_deleteForEveryoneProvider.notifier).set(false);
             Navigator.of(context).pop();
           },
           child: Text('Delete'),

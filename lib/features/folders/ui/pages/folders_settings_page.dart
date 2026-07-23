@@ -17,17 +17,7 @@ class FoldersSettingsPage extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     return AppScaffold(
-      appBar: AppBar(
-        title: const Text('Folders'),
-        actions: [
-          if ((foldersAsync.asData?.value.length ?? 0) > 1)
-            IconButton(
-              tooltip: 'Reorder',
-              icon: const Icon(Icons.reorder),
-              onPressed: () => context.pushNamed(RouteNames.reorderFolders),
-            ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Folders')),
       body: foldersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
@@ -80,8 +70,7 @@ class FoldersSettingsPage extends ConsumerWidget {
                   ),
                 ),
               ),
-              for (final folder in folders)
-                _FolderListTile(folder: folder),
+              for (final folder in folders) _FolderListTile(folder: folder),
             ],
           ],
         ),
@@ -104,9 +93,7 @@ class _FolderListTile extends StatelessWidget {
       leading: Icon(Icons.folder_outlined, color: colorScheme.onSurfaceVariant),
       title: Text(folder.name),
       subtitle: Text(
-        count == 0
-            ? 'No chats'
-            : '$count chat${count == 1 ? '' : 's'}',
+        count == 0 ? 'No chats' : '$count chat${count == 1 ? '' : 's'}',
         style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
       ),
       trailing: const Icon(Icons.chevron_right, size: 20),

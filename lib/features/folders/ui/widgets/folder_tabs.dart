@@ -34,34 +34,19 @@ class FolderTabs extends ConsumerWidget {
   }
 }
 
-class _FolderTabsBar extends ConsumerStatefulWidget {
+class _FolderTabsBar extends ConsumerWidget {
   final List<ChatFolderModel> folders;
   final bool isReorderMode;
 
   const _FolderTabsBar({required this.folders, required this.isReorderMode});
 
   @override
-  ConsumerState<_FolderTabsBar> createState() => _FolderTabsBarState();
-}
-
-class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
-  String? _longPressedFolderId;
-  bool _longPressedAll = false;
-
-  void _clearLongPress() {
-    if (_longPressedFolderId != null || _longPressedAll) {
-      setState(() {
-        _longPressedFolderId = null;
-        _longPressedAll = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final selectedId = ref.watch(selectedFolderIdProvider);
     final localFolders = ref.watch(reorderFolders_localProvider);
+    final longPressedFolderId = ref.watch(folderTabs_longPressedFolderIdProvider);
+    final longPressedAll = ref.watch(folderTabs_longPressedAllProvider);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
@@ -77,10 +62,11 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
     final longPressHighlight = Colors.white.withValues(alpha: 0.12);
 
     // Use local reordered list if available, otherwise use original
-    final displayFolders = localFolders ?? widget.folders;
+    final displayFolders = localFolders ?? folders;
 
-    if (widget.isReorderMode) {
+    if (isReorderMode) {
       return _buildReorderMode(
+        ref,
         displayFolders,
         selectedId,
         barColor,
@@ -102,7 +88,7 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
             _FolderTab(
               label: 'All',
               isSelected: selectedId == null,
-              backgroundColor: _longPressedAll ? longPressHighlight : null,
+              backgroundColor: longPressedAll ? longPressHighlight : null,
               selectedColor: selectedColor,
               unselectedColor: unselectedColor,
               indicatorColor: indicatorColor,
@@ -111,11 +97,11 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
               onLongPress: (renderBox) =>
                   _onTabLongPress(context, ref, renderBox, isAllFolder: true),
             ),
-            for (final folder in widget.folders)
+            for (final folder in folders)
               _FolderTab(
                 label: folder.name,
                 isSelected: selectedId == folder.id,
-                backgroundColor: _longPressedFolderId == folder.id
+                backgroundColor: longPressedFolderId == folder.id
                     ? longPressHighlight
                     : null,
                 selectedColor: selectedColor,
@@ -134,6 +120,7 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
   }
 
   Widget _buildReorderMode(
+    WidgetRef ref,
     List<ChatFolderModel> folders,
     String? selectedId,
     Color barColor,
@@ -155,7 +142,7 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: _saveReorder,
+                  onPressed: () => _saveReorder(ref),
                   child: Text(
                     'DONE',
                     style: TextStyle(
@@ -233,13 +220,11 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
     ChatFolderModel? folder,
     bool isAllFolder = false,
   }) async {
-    setState(() {
-      if (isAllFolder) {
-        _longPressedAll = true;
-      } else {
-        _longPressedFolderId = folder?.id;
-      }
-    });
+    if (isAllFolder) {
+      ref.read(folderTabs_longPressedAllProvider.notifier).set(true);
+    } else {
+      ref.read(folderTabs_longPressedFolderIdProvider.notifier).set(folder?.id);
+    }
 
     final action = await showFolderTabActionsPopup(
       context,
@@ -248,7 +233,7 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
     );
 
     // Clear highlight after menu closes.
-    _clearLongPress();
+    _clearLongPress(ref);
 
     if (!context.mounted || action == null) return;
 
@@ -264,7 +249,7 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
           );
         }
       case FolderTabAction.markAllRead:
-        _markAllAsRead(ref, folder);
+        _markAllAsRead(context, ref, folder);
       case FolderTabAction.deleteFolder:
         if (folder != null) {
           _confirmDeleteFolder(context, ref, folder);
@@ -272,7 +257,12 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
     }
   }
 
-  void _saveReorder() {
+  void _clearLongPress(WidgetRef ref) {
+    ref.read(folderTabs_longPressedFolderIdProvider.notifier).set(null);
+    ref.read(folderTabs_longPressedAllProvider.notifier).set(false);
+  }
+
+  void _saveReorder(WidgetRef ref) {
     final localFolders = ref.read(reorderFolders_localProvider);
     if (localFolders == null || localFolders.isEmpty) {
       ref.read(reorderFolders_isActiveProvider.notifier).deactivate();
@@ -290,7 +280,7 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
         .run(localFolders.map((f) => f.id).toList());
   }
 
-  void _markAllAsRead(WidgetRef ref, ChatFolderModel? folder) {
+  void _markAllAsRead(BuildContext context, WidgetRef ref, ChatFolderModel? folder) {
     final chats = ref.read(watchUserChatsQueryProvider).asData?.value ?? [];
     final chatIds = folder != null
         ? chats

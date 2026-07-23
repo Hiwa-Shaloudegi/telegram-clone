@@ -19,7 +19,6 @@ class ForwardChatPickerPage extends ConsumerStatefulWidget {
 
 class _ForwardChatPickerPageState extends ConsumerState<ForwardChatPickerPage> {
   final _searchController = TextEditingController();
-  String _searchQuery = '';
 
   @override
   void dispose() {
@@ -30,6 +29,7 @@ class _ForwardChatPickerPageState extends ConsumerState<ForwardChatPickerPage> {
   @override
   Widget build(BuildContext context) {
     final chatsAsync = ref.watch(watchUserChatsQueryProvider);
+    final searchQuery = ref.watch(chatUi_forwardSearchQueryProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -40,6 +40,7 @@ class _ForwardChatPickerPageState extends ConsumerState<ForwardChatPickerPage> {
             icon: const Icon(Icons.close),
             onPressed: () {
               ref.read(chatUi_forwardMessagesProvider.notifier).clear();
+              ref.read(chatUi_forwardSearchQueryProvider.notifier).set('');
               Navigator.of(context).pop();
             },
           ),
@@ -68,9 +69,7 @@ class _ForwardChatPickerPageState extends ConsumerState<ForwardChatPickerPage> {
                 ),
               ),
               onChanged: (value) {
-                setState(() {
-                  _searchQuery = value.toLowerCase();
-                });
+                ref.read(chatUi_forwardSearchQueryProvider.notifier).set(value.toLowerCase());
               },
             ),
           ),
@@ -80,9 +79,9 @@ class _ForwardChatPickerPageState extends ConsumerState<ForwardChatPickerPage> {
               data: (chats) {
                 final filteredChats = chats.where((chat) {
                   if (chat.chatType == ChatType.channel) return false;
-                  if (_searchQuery.isNotEmpty) {
+                  if (searchQuery.isNotEmpty) {
                     return chat.displayTitle.toLowerCase().contains(
-                      _searchQuery,
+                      searchQuery,
                     );
                   }
                   return true;

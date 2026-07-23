@@ -138,3 +138,21 @@ class ChatUi_forwardChatInfo extends _$ChatUi_forwardChatInfo {
 bool ChatUi_isForwarding(Ref ref) {
   return ref.watch(chatUi_forwardMessagesProvider).isNotEmpty;
 }
+
+@riverpod
+class ChatUi_deleteForEveryone extends _$ChatUi_deleteForEveryone {
+  @override
+  bool build() => false;
+
+  void set(bool value) => state = value;
+
+  void toggle() => state = !state;
+}
+
+@riverpod
+class ChatUi_forwardSearchQuery extends _$ChatUi_forwardSearchQuery {
+  @override
+  String build() => '';
+
+  void set(String value) => state = value;
+}

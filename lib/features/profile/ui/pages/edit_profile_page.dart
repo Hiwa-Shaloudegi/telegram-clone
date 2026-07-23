@@ -9,6 +9,7 @@ import 'package:telegram_clone/core/ui/widgets/section_divider.dart';
 import 'package:telegram_clone/data/models/user_profile_model.dart';
 import 'package:telegram_clone/features/profile/notifiers/command/update_profile_command.dart';
 import 'package:telegram_clone/features/profile/notifiers/query/user_profile_query.dart';
+import 'package:telegram_clone/features/profile/notifiers/ui/edit_profile_ui_state.dart';
 import 'package:telegram_clone/features/profile/ui/widgets/edit_profile_avatar.dart';
 import 'package:telegram_clone/features/profile/ui/widgets/edit_profile_nav_row.dart';
 import 'package:telegram_clone/features/profile/ui/widgets/edit_profile_text_field.dart';
@@ -35,31 +36,24 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final _lastNameController = TextEditingController();
   final _bioController = TextEditingController();
 
-  XFile? _localImage;
-  bool _photoRemoved = false;
-  bool _initialized = false;
-
   String _originalFirstName = '';
   String _originalLastName = '';
   String _originalBio = '';
-  String? _currentUsername;
 
   bool get _hasChanges {
     return _firstNameController.text.trim() != _originalFirstName ||
         _lastNameController.text.trim() != _originalLastName ||
         _bioController.text.trim() != _originalBio ||
-        _localImage != null ||
-        _photoRemoved;
+        ref.read(editProfile_localImageProvider) != null ||
+        ref.read(editProfile_photoRemovedProvider);
   }
 
   void _initializeFromProfile(UserProfileModel profile) {
-    if (_initialized) return;
-    _initialized = true;
-
     _originalFirstName = profile.firstName;
     _originalLastName = profile.lastName ?? '';
     _originalBio = profile.bio ?? '';
-    _currentUsername = profile.usernameWithoutAt;
+
+    ref.read(editProfile_currentUsernameProvider.notifier).set(profile.usernameWithoutAt);
 
     _firstNameController
       ..text = _originalFirstName
@@ -70,10 +64,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _bioController
       ..text = _originalBio
       ..addListener(_onFieldChanged);
+
+    ref.read(editProfile_initializedProvider.notifier).set(true);
   }
 
   void _onFieldChanged() {
-    if (mounted) setState(() {});
+    ref.read(editProfile_changeTickProvider.notifier).tick();
   }
 
   @override
@@ -96,24 +92,22 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       imageQuality: 85,
     );
     if (picked != null && mounted) {
-      setState(() {
-        _localImage = picked;
-        _photoRemoved = false;
-      });
+      ref.read(editProfile_localImageProvider.notifier).set(picked);
+      ref.read(editProfile_photoRemovedProvider.notifier).set(false);
     }
   }
 
   void _removePhoto() {
-    setState(() {
-      _localImage = null;
-      _photoRemoved = true;
-    });
+    ref.read(editProfile_localImageProvider.notifier).set(null);
+    ref.read(editProfile_photoRemovedProvider.notifier).set(true);
   }
 
   void _showPhotoSheet(UserProfileModel? profile) {
+    final localImage = ref.read(editProfile_localImageProvider);
+    final photoRemoved = ref.read(editProfile_photoRemovedProvider);
     final hasPhoto =
-        _localImage != null ||
-        (!_photoRemoved && profile?.hasProfileImage == true);
+        localImage != null ||
+        (!photoRemoved && profile?.hasProfileImage == true);
 
     ProfilePhotoBottomSheet.show(
       context: context,
@@ -133,14 +127,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     final bio = _bioController.text.trim();
+    final localImage = ref.read(editProfile_localImageProvider);
+    final photoRemoved = ref.read(editProfile_photoRemovedProvider);
 
     try {
       await ref.read(updateProfileCommandProvider.notifier).run(
             firstName: firstName != _originalFirstName ? firstName : null,
             lastName: lastName != _originalLastName ? lastName : null,
             bio: bio != _originalBio ? bio : null,
-            localImage: _localImage,
-            removePhoto: _photoRemoved && _localImage == null,
+            localImage: localImage,
+            removePhoto: photoRemoved && localImage == null,
           );
 
       if (mounted) {
@@ -211,6 +207,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     final profileAsync = ref.watch(userProfileQueryProvider);
     final updateState = ref.watch(updateProfileCommandProvider);
     final isSaving = updateState.isLoading;
+    final localImage = ref.watch(editProfile_localImageProvider);
+    final photoRemoved = ref.watch(editProfile_photoRemovedProvider);
+    final initialized = ref.watch(editProfile_initializedProvider);
+    final currentUsername = ref.watch(editProfile_currentUsernameProvider);
+    // Watch change tick to rebuild when text controllers change
+    ref.watch(editProfile_changeTickProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -218,9 +220,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     ref.listen(userProfileQueryProvider, (prev, next) {
       next.whenData((profile) {
         if (profile != null && mounted) {
-          setState(() {
-            _currentUsername = profile.usernameWithoutAt;
-          });
+          ref.read(editProfile_currentUsernameProvider.notifier).set(
+            profile.usernameWithoutAt,
+          );
         }
       });
     });
@@ -273,11 +275,11 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               return const Center(child: Text('Profile not found'));
             }
 
-            if (!_initialized) {
+            if (!initialized) {
               // Schedule after this frame to avoid mutating controllers mid-build
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted && !_initialized) {
-                  setState(() => _initializeFromProfile(profile));
+                if (mounted && !ref.read(editProfile_initializedProvider)) {
+                  _initializeFromProfile(profile);
                 }
               });
               return const Center(child: CircularProgressIndicator());
@@ -292,8 +294,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   // Avatar
                   EditProfileAvatar(
                     profile: profile,
-                    localImage: _localImage,
-                    photoRemoved: _photoRemoved,
+                    localImage: localImage,
+                    photoRemoved: photoRemoved,
                     onTap: isSaving ? null : () => _showPhotoSheet(profile),
                   ),
 
@@ -346,8 +348,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   // Username → dedicated page
                   EditProfileNavRow(
                     label: 'Username',
-                    value: (_currentUsername ?? '').isNotEmpty
-                        ? '@$_currentUsername'
+                    value: (currentUsername ?? '').isNotEmpty
+                        ? '@$currentUsername'
                         : null,
                     emptyLabel: 'None',
                     onTap: isSaving

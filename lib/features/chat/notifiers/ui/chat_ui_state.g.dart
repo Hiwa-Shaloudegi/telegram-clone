@@ -556,3 +556,109 @@ final class ChatUi_isForwardingProvider
 
 String _$chatUi_isForwardingHash() =>
     r'5a3fd8871b8bd06b1b31fc1577bfcf6e8acd905a';
+
+@ProviderFor(ChatUi_deleteForEveryone)
+final chatUi_deleteForEveryoneProvider = ChatUi_deleteForEveryoneProvider._();
+
+final class ChatUi_deleteForEveryoneProvider
+    extends $NotifierProvider<ChatUi_deleteForEveryone, bool> {
+  ChatUi_deleteForEveryoneProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chatUi_deleteForEveryoneProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chatUi_deleteForEveryoneHash();
+
+  @$internal
+  @override
+  ChatUi_deleteForEveryone create() => ChatUi_deleteForEveryone();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$chatUi_deleteForEveryoneHash() =>
+    r'd971d6b6c8bc830046c754462a430809f7cac909';
+
+abstract class _$ChatUi_deleteForEveryone extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(ChatUi_forwardSearchQuery)
+final chatUi_forwardSearchQueryProvider = ChatUi_forwardSearchQueryProvider._();
+
+final class ChatUi_forwardSearchQueryProvider
+    extends $NotifierProvider<ChatUi_forwardSearchQuery, String> {
+  ChatUi_forwardSearchQueryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'chatUi_forwardSearchQueryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$chatUi_forwardSearchQueryHash();
+
+  @$internal
+  @override
+  ChatUi_forwardSearchQuery create() => ChatUi_forwardSearchQuery();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
+String _$chatUi_forwardSearchQueryHash() =>
+    r'd0d05840fe4385d560fedd83b64723e13349d78d';
+
+abstract class _$ChatUi_forwardSearchQuery extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String, String>,
+              String,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

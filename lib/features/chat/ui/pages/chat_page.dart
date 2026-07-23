@@ -40,7 +40,6 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   // TODO: Refactor
   bool _isLoadingMore = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -86,8 +85,9 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   @override
   Widget build(BuildContext context) {
     MessageModel? replyingTo = ref.watch(chatUi_replyingToProvider);
-    MessageModel? editingMessage = ref.watch(chatUi_editingMessageProvider);
-    List<MessageModel> forwardMessages = ref.watch(chatUi_forwardMessagesProvider);
+    List<MessageModel> forwardMessages = ref.watch(
+      chatUi_forwardMessagesProvider,
+    );
     // when editing is started elsewhere (app bar), populate input
     ref.listen<MessageModel?>(chatUi_editingMessageProvider, (prev, next) {
       if (next != null) {

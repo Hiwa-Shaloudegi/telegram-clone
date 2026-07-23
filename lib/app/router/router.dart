@@ -19,7 +19,6 @@ import 'package:telegram_clone/features/contacts/ui/pages/contacts_page.dart';
 import 'package:telegram_clone/features/folders/ui/pages/add_chats_to_folder_page.dart';
 import 'package:telegram_clone/features/folders/ui/pages/edit_folder_page.dart';
 import 'package:telegram_clone/features/folders/ui/pages/folders_settings_page.dart';
-import 'package:telegram_clone/features/folders/ui/pages/reorder_folders_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/change_username_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/edit_profile_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/profile_page.dart';
@@ -145,11 +144,6 @@ GoRouter router(Ref ref) {
               : const AddChatsToFolderExtra();
           return AddChatsToFolderPage(extra: extra);
         },
-      ),
-      GoRoute(
-        name: RouteNames.reorderFolders,
-        path: '/settings/folders/reorder',
-        builder: (context, state) => const ReorderFoldersPage(),
       ),
       // Parameterized route last so it doesn't swallow static paths above.
       GoRoute(

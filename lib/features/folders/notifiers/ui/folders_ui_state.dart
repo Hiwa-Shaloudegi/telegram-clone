@@ -110,3 +110,23 @@ class ReorderFolders_saving extends _$ReorderFolders_saving {
 
   void set(bool value) => state = value;
 }
+
+// ---------------------------------------------------------------------------
+// FolderTabsBar state
+// ---------------------------------------------------------------------------
+
+@riverpod
+class FolderTabs_longPressedFolderId extends _$FolderTabs_longPressedFolderId {
+  @override
+  String? build() => null;
+
+  void set(String? value) => state = value;
+}
+
+@riverpod
+class FolderTabs_longPressedAll extends _$FolderTabs_longPressedAll {
+  @override
+  bool build() => false;
+
+  void set(bool value) => state = value;
+}

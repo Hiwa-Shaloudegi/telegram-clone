@@ -539,3 +539,110 @@ abstract class _$ReorderFolders_saving extends $Notifier<bool> {
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(FolderTabs_longPressedFolderId)
+final folderTabs_longPressedFolderIdProvider =
+    FolderTabs_longPressedFolderIdProvider._();
+
+final class FolderTabs_longPressedFolderIdProvider
+    extends $NotifierProvider<FolderTabs_longPressedFolderId, String?> {
+  FolderTabs_longPressedFolderIdProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'folderTabs_longPressedFolderIdProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$folderTabs_longPressedFolderIdHash();
+
+  @$internal
+  @override
+  FolderTabs_longPressedFolderId create() => FolderTabs_longPressedFolderId();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String?>(value),
+    );
+  }
+}
+
+String _$folderTabs_longPressedFolderIdHash() =>
+    r'5eba0de0a5e34a99812ed7a31932a337dabfa072';
+
+abstract class _$FolderTabs_longPressedFolderId extends $Notifier<String?> {
+  String? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String?, String?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String?, String?>,
+              String?,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(FolderTabs_longPressedAll)
+final folderTabs_longPressedAllProvider = FolderTabs_longPressedAllProvider._();
+
+final class FolderTabs_longPressedAllProvider
+    extends $NotifierProvider<FolderTabs_longPressedAll, bool> {
+  FolderTabs_longPressedAllProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'folderTabs_longPressedAllProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$folderTabs_longPressedAllHash();
+
+  @$internal
+  @override
+  FolderTabs_longPressedAll create() => FolderTabs_longPressedAll();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$folderTabs_longPressedAllHash() =>
+    r'f773e118ba3c4332d87e034f66fc1114f723c8d5';
+
+abstract class _$FolderTabs_longPressedAll extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
