@@ -69,7 +69,7 @@ class ArchivedChatsPage extends ConsumerWidget {
             child: Text(
               error.toString(),
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),

@@ -186,13 +186,12 @@ class _MainPageState extends ConsumerState<MainPage> {
                         const Icon(
                           Icons.error_outline,
                           size: 48,
-                          color: Colors.red,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           error.toString(),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.red),
+                          style: TextStyle(color: Theme.of(context).colorScheme.error),
                         ),
                       ],
                     ),

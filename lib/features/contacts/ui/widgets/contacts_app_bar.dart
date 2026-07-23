@@ -82,7 +82,7 @@ class ContactsAppBar extends ConsumerWidget implements PreferredSizeWidget {
                         },
                         child: Text(
                           'Delete',
-                          style: TextStyle(color: Colors.red),
+                          style: TextStyle(color: Theme.of(context).colorScheme.error),
                         ),
                       ),
                     ],

@@ -55,7 +55,7 @@ class ProfileInfoSection extends StatelessWidget {
             child: Text(
               "Info",
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.blueAccent,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
               ),
             ),

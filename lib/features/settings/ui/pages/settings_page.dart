@@ -198,7 +198,7 @@ class SettingsPage extends ConsumerWidget {
                 child: Text(
                   'Settings',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.blueAccent,
+                    color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

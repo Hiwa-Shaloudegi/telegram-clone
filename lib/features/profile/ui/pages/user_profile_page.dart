@@ -100,9 +100,9 @@ class UserProfilePage extends ConsumerWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.block, color: Colors.red),
-              title: const Text('Block user',
-                  style: TextStyle(color: Colors.red)),
+              leading: Icon(Icons.block, color: Theme.of(context).colorScheme.error),
+              title: Text('Block user',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
               onTap: () {
                 Navigator.pop(context);
               },
@@ -130,7 +130,7 @@ class _SettingsRows extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.notifications_outlined),
             title: const Text('Notifications'),
-            trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+            trailing: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurfaceVariant),
             onTap: () {},
           ),
           const Divider(height: 1, indent: 56),
@@ -140,7 +140,7 @@ class _SettingsRows extends ConsumerWidget {
               color: theme.colorScheme.primary,
             ),
             title: const Text('Media'),
-            trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+            trailing: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurfaceVariant),
             onTap: () {},
           ),
         ],
@@ -172,7 +172,7 @@ class _ErrorBody extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: 16),
             Text('Error: $message', textAlign: TextAlign.center),
             const SizedBox(height: 16),

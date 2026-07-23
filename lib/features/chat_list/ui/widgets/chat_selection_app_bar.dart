@@ -65,51 +65,59 @@ class ChatSelectionAppBar extends ConsumerWidget
           icon: const Icon(Icons.more_vert),
           onSelected: (action) =>
               _onMenuSelected(context, ref, action, allPinned),
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: allPinned
-                  ? _SelectionMenuAction.unpin
-                  : _SelectionMenuAction.pin,
-              child: Row(
-                children: [
-                  Icon(allPinned ? Icons.push_pin_outlined : Icons.push_pin),
-                  const SizedBox(width: 12),
-                  Text(allPinned ? 'Unpin' : 'Pin'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: _SelectionMenuAction.addToFolder,
-              child: Row(
-                children: [
-                  Icon(Icons.create_new_folder_outlined),
-                  SizedBox(width: 12),
-                  Text('Add to folder'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: _SelectionMenuAction.markUnread,
-              child: Row(
-                children: [
-                  Icon(Icons.mark_chat_unread_outlined),
-                  SizedBox(width: 12),
-                  Text('Mark as unread'),
-                ],
-              ),
-            ),
-            if (onlyDms)
-              const PopupMenuItem(
-                value: _SelectionMenuAction.blockUser,
+          itemBuilder: (context) {
+            final theme = Theme.of(context);
+            final onSurface = theme.colorScheme.onSurface;
+            final errorColor = theme.colorScheme.error;
+            return [
+              PopupMenuItem(
+                value: allPinned
+                    ? _SelectionMenuAction.unpin
+                    : _SelectionMenuAction.pin,
                 child: Row(
                   children: [
-                    Icon(Icons.block, color: Colors.red),
-                    SizedBox(width: 12),
-                    Text('Block user', style: TextStyle(color: Colors.red)),
+                    Icon(
+                        allPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                        color: onSurface),
+                    const SizedBox(width: 12),
+                    Text(allPinned ? 'Unpin' : 'Pin',
+                        style: TextStyle(color: onSurface)),
                   ],
                 ),
               ),
-          ],
+              PopupMenuItem(
+                value: _SelectionMenuAction.addToFolder,
+                child: Row(
+                  children: [
+                    Icon(Icons.create_new_folder_outlined, color: onSurface),
+                    const SizedBox(width: 12),
+                    Text('Add to folder', style: TextStyle(color: onSurface)),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _SelectionMenuAction.markUnread,
+                child: Row(
+                  children: [
+                    Icon(Icons.mark_chat_unread_outlined, color: onSurface),
+                    const SizedBox(width: 12),
+                    Text('Mark as unread', style: TextStyle(color: onSurface)),
+                  ],
+                ),
+              ),
+              if (onlyDms)
+                PopupMenuItem(
+                  value: _SelectionMenuAction.blockUser,
+                  child: Row(
+                    children: [
+                      Icon(Icons.block, color: errorColor),
+                      const SizedBox(width: 12),
+                      Text('Block user', style: TextStyle(color: errorColor)),
+                    ],
+                  ),
+                ),
+            ];
+          },
         ),
       ],
     );
@@ -185,7 +193,10 @@ class ChatSelectionAppBar extends ConsumerWidget
               ref.read(chatSelectionProvider.notifier).clear();
               AppSnackbar.show(context, message: 'Delete is coming soon');
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ],
       ),

@@ -9,13 +9,15 @@ class ChatProfileSubtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final subtitleColor = (Theme.of(context).appBarTheme.foregroundColor ?? Colors.white)
+        .withValues(alpha: 0.7);
     switch (chatInfo.chatType) {
       case ChatType.channel:
         return Text(
           'Channel',
           style: TextStyle(
             fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            color: subtitleColor,
           ),
         );
       case ChatType.group:
@@ -23,7 +25,7 @@ class ChatProfileSubtitle extends StatelessWidget {
           'Group',
           style: TextStyle(
             fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            color: subtitleColor,
           ),
         );
       case ChatType.saved:
@@ -31,7 +33,7 @@ class ChatProfileSubtitle extends StatelessWidget {
           'Your saved messages',
           style: TextStyle(
             fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            color: subtitleColor,
           ),
         );
       default:

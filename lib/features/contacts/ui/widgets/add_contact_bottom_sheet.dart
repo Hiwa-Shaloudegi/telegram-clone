@@ -94,7 +94,7 @@ class _AddContactBottomSheetState extends ConsumerState<AddContactBottomSheet> {
                 autofocus: true,
                 decoration: InputDecoration(
                   labelText: "First name (required)",
-                  labelStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                  labelStyle: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -109,7 +109,7 @@ class _AddContactBottomSheetState extends ConsumerState<AddContactBottomSheet> {
                 controller: _lastNameController,
                 decoration: InputDecoration(
                   labelText: "Last name (optional)",
-                  labelStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                  labelStyle: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   border: OutlineInputBorder(),
                 ),
               ),

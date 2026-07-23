@@ -51,9 +51,10 @@ class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
                           children: [
                             Text(
                               chatInfo.displayTitle,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                color: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),

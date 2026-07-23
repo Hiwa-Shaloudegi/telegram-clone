@@ -29,7 +29,7 @@ class InfoTile extends StatelessWidget {
           Text(
             subtitle,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: Colors.grey,
+              color: theme.colorScheme.onSurfaceVariant,
               fontSize: 13,
             ),
           ),

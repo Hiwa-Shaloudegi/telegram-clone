@@ -45,13 +45,13 @@ Future<FolderTabAction?> showFolderTabActionsPopup(
     ),
     if (!isAllFolder) ...[
       const PopupMenuDivider(),
-      const PopupMenuItem(
+      PopupMenuItem(
         value: FolderTabAction.deleteFolder,
         child: Row(
           children: [
-            Icon(Icons.delete_outline, size: 20, color: Colors.red),
-            SizedBox(width: 12),
-            Text('Delete Folder', style: TextStyle(color: Colors.red)),
+            Icon(Icons.delete_outline, size: 20, color: Theme.of(context).colorScheme.error),
+            const SizedBox(width: 12),
+            Text('Delete Folder', style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ],
         ),
       ),
