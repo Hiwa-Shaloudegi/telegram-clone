@@ -7,7 +7,6 @@ import 'package:telegram_clone/data/api/chat/chats_api.dart';
 import 'package:telegram_clone/data/models/chat_folder_model.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/folders/notifiers/command/delete_folder_command.dart';
-import 'package:telegram_clone/features/folders/notifiers/command/reorder_folders_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
 import 'package:telegram_clone/features/folders/notifiers/ui/folders_ui_state.dart';
 import 'package:telegram_clone/features/folders/ui/widgets/folder_tab_actions_sheet.dart';
@@ -45,21 +44,21 @@ class _FolderTabsBar extends ConsumerWidget {
     final theme = Theme.of(context);
     final selectedId = ref.watch(selectedFolderIdProvider);
     final localFolders = ref.watch(reorderFolders_localProvider);
-    final longPressedFolderId = ref.watch(folderTabs_longPressedFolderIdProvider);
+    final longPressedFolderId = ref.watch(
+      folderTabs_longPressedFolderIdProvider,
+    );
     final longPressedAll = ref.watch(folderTabs_longPressedAllProvider);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-
     // Match Telegram tab strip under the blue/dark app bar.
-    final barColor = isDark
-        ? const Color(0xFF17212B)
-        : theme.appBarTheme.backgroundColor ?? colorScheme.primary;
-    final selectedColor = Colors.white;
-    final unselectedColor = Colors.white.withValues(alpha: 0.7);
-    final indicatorColor = Colors.white;
+    final barColor =
+        theme.appBarTheme.backgroundColor ?? theme.colorScheme.primary;
+    final foregroundColor =
+        theme.appBarTheme.foregroundColor ?? Colors.white;
+    final selectedColor = foregroundColor;
+    final unselectedColor = foregroundColor.withValues(alpha: 0.7);
+    final indicatorColor = foregroundColor;
 
     // Slight background highlight for long-pressed tab.
-    final longPressHighlight = Colors.white.withValues(alpha: 0.12);
+    final longPressHighlight = foregroundColor.withValues(alpha: 0.12);
 
     // Use local reordered list if available, otherwise use original
     final displayFolders = localFolders ?? folders;
@@ -134,26 +133,6 @@ class _FolderTabsBar extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Reorder mode action bar
-          Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => _saveReorder(ref),
-                  child: Text(
-                    'DONE',
-                    style: TextStyle(
-                      color: selectedColor,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
           // Reorderable folder tabs
           SizedBox(
             height: 44,
@@ -162,7 +141,13 @@ class _FolderTabsBar extends ConsumerWidget {
               child: ReorderableListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 4),
-                buildDefaultDragHandles: false, // <-- removes the "=" icon
+                buildDefaultDragHandles: false,
+                proxyDecorator: (child, index, animation) => Material(
+                  color: barColor,
+                  elevation: 4,
+                  shadowColor: Colors.black26,
+                  child: child,
+                ),
                 itemCount: folders.length,
                 onReorder: (oldIndex, newIndex) {
                   final list = List<ChatFolderModel>.from(folders);
@@ -191,8 +176,7 @@ class _FolderTabsBar extends ConsumerWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () =>
-                            _confirmDeleteFolder(context, ref, folder),
+                        onTap: () => _confirmDeleteFolder(context, ref, folder),
                         child: Padding(
                           padding: const EdgeInsets.only(left: 2),
                           child: Icon(
@@ -262,25 +246,11 @@ class _FolderTabsBar extends ConsumerWidget {
     ref.read(folderTabs_longPressedAllProvider.notifier).set(false);
   }
 
-  void _saveReorder(WidgetRef ref) {
-    final localFolders = ref.read(reorderFolders_localProvider);
-    if (localFolders == null || localFolders.isEmpty) {
-      ref.read(reorderFolders_isActiveProvider.notifier).deactivate();
-      ref.read(reorderFolders_localProvider.notifier).set(null);
-      return;
-    }
-
-    // Deactivate immediately for instant feedback
-    ref.read(reorderFolders_isActiveProvider.notifier).deactivate();
-    ref.read(reorderFolders_localProvider.notifier).set(null);
-
-    // Fire-and-forget the API call
-    ref
-        .read(reorderFoldersCommandProvider.notifier)
-        .run(localFolders.map((f) => f.id).toList());
-  }
-
-  void _markAllAsRead(BuildContext context, WidgetRef ref, ChatFolderModel? folder) {
+  void _markAllAsRead(
+    BuildContext context,
+    WidgetRef ref,
+    ChatFolderModel? folder,
+  ) {
     final chats = ref.read(watchUserChatsQueryProvider).asData?.value ?? [];
     final chatIds = folder != null
         ? chats
@@ -343,7 +313,10 @@ class _FolderTabsBar extends ConsumerWidget {
                 }
               }
             },
-            child: Text('Delete', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ],
       ),

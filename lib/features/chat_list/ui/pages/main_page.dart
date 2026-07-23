@@ -8,8 +8,8 @@ import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/widgets/app_snackbar.dart';
 import 'package:telegram_clone/core/ui/widgets/eager_initialization.dart';
 import 'package:telegram_clone/features/auth/notifiers/command/logout_command.dart';
-import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/query/contact_name_map_provider.dart';
+import 'package:telegram_clone/features/chat_list/notifiers/query/watch_user_chats_query.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/chat_selection_state.dart';
 import 'package:telegram_clone/features/chat_list/notifiers/ui/main_ui_state.dart';
 import 'package:telegram_clone/features/chat_list/ui/widgets/app_drawer.dart';
@@ -20,6 +20,7 @@ import 'package:telegram_clone/features/chat_list/ui/widgets/chats_app_bar_title
 import 'package:telegram_clone/features/chat_list/ui/widgets/chats_empty_state.dart';
 import 'package:telegram_clone/features/contacts/notifiers/query/get_contacts_query.dart';
 import 'package:telegram_clone/features/contacts/notifiers/ui/contacts_ui_state.dart';
+import 'package:telegram_clone/features/folders/notifiers/command/reorder_folders_command.dart';
 import 'package:telegram_clone/features/folders/notifiers/query/watch_folders_query.dart';
 import 'package:telegram_clone/features/folders/notifiers/ui/folders_ui_state.dart';
 import 'package:telegram_clone/features/folders/ui/widgets/folder_tabs.dart';
@@ -95,10 +96,60 @@ class _MainPageState extends ConsumerState<MainPage> {
                   title: const ChatsAppBarTitle(),
                   scrolledUnderElevation: 0,
                   actions: [
-                    IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {},
-                      tooltip: 'Search',
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final isReorderMode = ref.watch(
+                          reorderFolders_isActiveProvider,
+                        );
+                        if (isReorderMode) {
+                          return TextButton(
+                            onPressed: () {
+                              final localFolders = ref.read(
+                                reorderFolders_localProvider,
+                              );
+                              if (localFolders == null ||
+                                  localFolders.isEmpty) {
+                                ref
+                                    .read(
+                                      reorderFolders_isActiveProvider.notifier,
+                                    )
+                                    .deactivate();
+                                ref
+                                    .read(reorderFolders_localProvider.notifier)
+                                    .set(null);
+                                return;
+                              }
+
+                              // Deactivate immediately for instant feedback
+                              ref
+                                  .read(
+                                    reorderFolders_isActiveProvider.notifier,
+                                  )
+                                  .deactivate();
+                              ref
+                                  .read(reorderFolders_localProvider.notifier)
+                                  .set(null);
+
+                              // Fire-and-forget the API call
+                              ref
+                                  .read(reorderFoldersCommandProvider.notifier)
+                                  .run(localFolders.map((f) => f.id).toList());
+                            },
+                            child: Text(
+                              'DONE',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          );
+                        }
+                        return IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () {},
+                          tooltip: 'Search',
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -137,14 +188,13 @@ class _MainPageState extends ConsumerState<MainPage> {
                     final archived = folderFiltered
                         .where((c) => c.isArchived)
                         .toList();
-                    final active = folderFiltered
-                        .where((c) => !c.isArchived)
-                        .toList()
-                      ..sort((a, b) {
-                        if (a.isPinned && !b.isPinned) return -1;
-                        if (!a.isPinned && b.isPinned) return 1;
-                        return 0;
-                      });
+                    final active =
+                        folderFiltered.where((c) => !c.isArchived).toList()
+                          ..sort((a, b) {
+                            if (a.isPinned && !b.isPinned) return -1;
+                            if (!a.isPinned && b.isPinned) return 1;
+                            return 0;
+                          });
 
                     // On a custom folder, don't surface the archive row —
                     // Telegram only shows archived under All.
@@ -160,9 +210,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                     if (active.isEmpty && showArchive) {
                       return ListView(
                         controller: _scrollController,
-                        children: [
-                          ArchivedChatsTile(archivedChats: archived),
-                        ],
+                        children: [ArchivedChatsTile(archivedChats: archived)],
                       );
                     }
 
@@ -173,8 +221,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                         if (showArchive && index == 0) {
                           return ArchivedChatsTile(archivedChats: archived);
                         }
-                        final item =
-                            active[index - (showArchive ? 1 : 0)];
+                        final item = active[index - (showArchive ? 1 : 0)];
                         return ChatTile(item: item);
                       },
                     );
@@ -183,15 +230,14 @@ class _MainPageState extends ConsumerState<MainPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.error_outline,
-                          size: 48,
-                        ),
+                        const Icon(Icons.error_outline, size: 48),
                         const SizedBox(height: 12),
                         Text(
                           error.toString(),
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Theme.of(context).colorScheme.error),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
                         ),
                       ],
                     ),
