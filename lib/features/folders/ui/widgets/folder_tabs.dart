@@ -198,6 +198,8 @@ class _FolderTabsBarState extends ConsumerState<_FolderTabsBar> {
                       indicatorColor: indicatorColor,
                       onTap: () {},
                       onLongPress: null,
+                      onRemove: () =>
+                          _confirmDeleteFolder(context, ref, folder),
                     ),
                   );
                 },
@@ -353,9 +355,9 @@ class _FolderTab extends StatelessWidget {
   final Color indicatorColor;
   final VoidCallback onTap;
   final void Function(RenderBox renderBox)? onLongPress;
+  final VoidCallback? onRemove;
 
   const _FolderTab({
-    super.key,
     required this.label,
     required this.isSelected,
     this.backgroundColor,
@@ -364,18 +366,20 @@ class _FolderTab extends StatelessWidget {
     required this.indicatorColor,
     required this.onTap,
     this.onLongPress,
+    this.onRemove,
   });
 
   @override
   Widget build(BuildContext context) {
-    final key = GlobalKey();
+    final globalKey = GlobalKey();
 
     return InkWell(
-      key: key,
+      key: globalKey,
       onTap: onTap,
       onLongPress: onLongPress != null
           ? () {
-              final box = key.currentContext?.findRenderObject() as RenderBox?;
+              final box =
+                  globalKey.currentContext?.findRenderObject() as RenderBox?;
               if (box != null) onLongPress!(box);
             }
           : null,
@@ -391,13 +395,27 @@ class _FolderTab extends StatelessWidget {
             ),
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? selectedColor : unselectedColor,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            fontSize: 15,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? selectedColor : unselectedColor,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                fontSize: 15,
+              ),
+            ),
+            if (onRemove != null) ...[
+              const SizedBox(width: 4),
+              IconButton(
+                onPressed: onRemove,
+                icon: Icon(Icons.cancel),
+                visualDensity: VisualDensity.compact,
+                iconSize: 18,
+              ),
+            ],
+          ],
         ),
       ),
     );
