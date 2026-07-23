@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telegram_clone/app/enums/chat_type.dart';
+import 'package:telegram_clone/app/router/extra/user_profile_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/data/models/chat_list_item_model.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
@@ -31,27 +32,31 @@ class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
         : AppBar(
             titleSpacing: 0,
             leadingWidth: 40,
-            title: Row(
-              children: [
-                ChatAvatar(chatInfo: chatInfo),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        chatInfo.displayTitle,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+            title: GestureDetector(
+              onTap: () => _openProfile(context, chatInfo),
+              behavior: HitTestBehavior.opaque,
+              child: Row(
+                children: [
+                  ChatAvatar(chatInfo: chatInfo),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          chatInfo.displayTitle,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      ChatProfileSubtitle(chatInfo: chatInfo),
-                    ],
+                        ChatProfileSubtitle(chatInfo: chatInfo),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             actions: [
               IconButton(
@@ -62,6 +67,25 @@ class ChatAppBar extends ConsumerWidget implements PreferredSizeWidget {
               IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
             ],
           );
+  }
+
+  void _openProfile(BuildContext context, ChatListItemModel chatInfo) {
+    // Telegram: in a DM, tapping the header opens the other user's profile.
+    // For groups/channels it would open the chat info page (not implemented yet).
+    if (chatInfo.chatType != ChatType.private) return;
+    final otherUserId = chatInfo.otherUserId;
+    if (otherUserId == null) return;
+
+    context.pushNamed(
+      RouteNames.userProfile,
+      pathParameters: {'userId': otherUserId},
+      extra: UserProfileExtra(
+        userId: otherUserId,
+        chatId: chatInfo.chatId,
+        displayName: chatInfo.displayTitle,
+        avatarUrl: chatInfo.avatarUrl,
+      ),
+    );
   }
 
   @override

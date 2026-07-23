@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/app/router/extra/contacts_page_extra.dart';
 import 'package:telegram_clone/app/router/extra/edit_folder_extra.dart';
+import 'package:telegram_clone/app/router/extra/user_profile_extra.dart';
 import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/core/ui/pages/not_found_page.dart';
 import 'package:telegram_clone/features/auth/notifiers/current_user_notifier.dart';
@@ -22,6 +23,7 @@ import 'package:telegram_clone/features/folders/ui/pages/reorder_folders_page.da
 import 'package:telegram_clone/features/profile/ui/pages/change_username_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/edit_profile_page.dart';
 import 'package:telegram_clone/features/profile/ui/pages/profile_page.dart';
+import 'package:telegram_clone/features/profile/ui/pages/user_profile_page.dart';
 import 'package:telegram_clone/features/settings/ui/pages/settings_page.dart';
 import 'package:telegram_clone/features/splash/ui/pages/splash_page.dart';
 
@@ -98,6 +100,14 @@ GoRouter router(Ref ref) {
         name: RouteNames.chat,
         path: '/chat/:chatId',
         builder: (context, state) => ChatPage(),
+      ),
+      GoRoute(
+        name: RouteNames.userProfile,
+        path: '/user/:userId',
+        builder: (context, state) {
+          final extra = state.extra as UserProfileExtra?;
+          return UserProfilePage(extra: extra);
+        },
       ),
       GoRoute(
         name: RouteNames.archivedChats,

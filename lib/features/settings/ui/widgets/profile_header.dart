@@ -3,12 +3,22 @@ import 'package:telegram_clone/data/models/user_profile_model.dart';
 
 class ProfileHeader extends StatelessWidget {
   final UserProfileModel profile;
+  final String? subtitle;
+  final Color? subtitleColor;
 
-  const ProfileHeader({super.key, required this.profile});
+  const ProfileHeader({
+    super.key,
+    required this.profile,
+    this.subtitle,
+    this.subtitleColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    final effectiveSubtitle = subtitle ?? 'Online';
+    final effectiveSubtitleColor = subtitleColor ?? theme.primaryColor;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -41,9 +51,9 @@ class ProfileHeader extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Online',
+            effectiveSubtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.primaryColor,
+              color: effectiveSubtitleColor,
             ),
           ),
         ],

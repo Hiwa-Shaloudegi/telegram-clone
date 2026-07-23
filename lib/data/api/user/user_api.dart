@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:telegram_clone/core/exception/app_exception.dart';
 import 'package:telegram_clone/core/exception/exception_handler.dart';
+import 'package:telegram_clone/data/models/user_presence_model.dart';
 import 'package:telegram_clone/data/models/user_profile_model.dart';
 import 'package:telegram_clone/services/supabase_client.dart';
 
@@ -423,5 +426,65 @@ class UserApi {
     } catch (e, st) {
       exceptionHandler.handle(e, st);
     }
+  }
+
+  Future<UserPresenceModel?> getUserPresence(String userId) async {
+    try {
+      final response = await supabase
+          .from('user_presence')
+          .select()
+          .eq('user_id', userId)
+          .maybeSingle();
+
+      if (response == null) return null;
+      return UserPresenceModel.fromJson(response);
+    } catch (e, st) {
+      exceptionHandler.handle(e, st);
+    }
+  }
+
+  Stream<UserPresenceModel?> watchUserPresence(String userId) {
+    final controller = StreamController<UserPresenceModel?>.broadcast();
+
+    Future<void> fetch() async {
+      try {
+        final response = await supabase
+            .from('user_presence')
+            .select()
+            .eq('user_id', userId)
+            .maybeSingle();
+
+        if (!controller.isClosed) {
+          controller.add(
+            response == null ? null : UserPresenceModel.fromJson(response),
+          );
+        }
+      } catch (e) {
+        if (!controller.isClosed) controller.addError(e);
+      }
+    }
+
+    fetch();
+
+    final channel = supabase
+        .channel('user_presence:$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'user_presence',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: userId,
+          ),
+          callback: (_) => fetch(),
+        )
+        .subscribe();
+
+    controller.onCancel = () {
+      supabase.removeChannel(channel);
+    };
+
+    return controller.stream;
   }
 }

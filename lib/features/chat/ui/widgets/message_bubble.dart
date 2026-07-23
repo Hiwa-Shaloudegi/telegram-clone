@@ -3,7 +3,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:telegram_clone/app/router/extra/user_profile_extra.dart';
+import 'package:telegram_clone/core/constants/route_names.dart';
 import 'package:telegram_clone/app/enums/message_status.dart';
 import 'package:telegram_clone/core/utils/get_color_from_name.dart';
 import 'package:telegram_clone/data/models/message_model.dart';
@@ -109,12 +112,15 @@ class MessageBubble extends ConsumerWidget {
                         if (showSenderInfo && !isOwn)
                           Padding(
                             padding: const EdgeInsets.only(left: 12, bottom: 2),
-                            child: Text(
-                              message.senderName,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: _senderColor(message.senderId),
+                            child: GestureDetector(
+                              onTap: () => _openUserProfile(context),
+                              child: Text(
+                                message.senderName,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: _senderColor(message.senderId),
+                                ),
                               ),
                             ),
                           ),
@@ -156,6 +162,20 @@ class MessageBubble extends ConsumerWidget {
   }
 
   Color _senderColor(String senderId) => getColorFromName(senderId);
+
+  void _openUserProfile(BuildContext context) {
+    if (message.senderId.isEmpty) return;
+    context.pushNamed(
+      RouteNames.userProfile,
+      pathParameters: {'userId': message.senderId},
+      extra: UserProfileExtra(
+        userId: message.senderId,
+        chatId: message.chatId,
+        displayName: message.senderName,
+        avatarUrl: message.senderImage,
+      ),
+    );
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
